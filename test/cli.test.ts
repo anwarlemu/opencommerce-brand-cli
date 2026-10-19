@@ -168,8 +168,8 @@ describe('project', () => {
 		expect(found.surface).toBe('site');
 		expect(listScreens(detectProject(s), styledFiles(s), found).map((x) => x.url)).toEqual(['/', '/about.html', '/pricing.html', '/404.html']);
 		// A project route that shares the CLI's name is still the project's; only the files the CLI writes are skipped.
-		const n = project({ 'src/app/agentcard-ds/page.tsx': '<div style={{ color: "#ff0000" }} />', 'src/app/_agentcard-ds/brand.css': ':root{}' });
-		expect(styledFiles(n)).toEqual(['src/app/agentcard-ds/page.tsx']);
+		const n = project({ 'src/app/opencommerce-ds/page.tsx': '<div style={{ color: "#ff0000" }} />', 'src/app/_opencommerce-ds/brand.css': ':root{}' });
+		expect(styledFiles(n)).toEqual(['src/app/opencommerce-ds/page.tsx']);
 		rmSync(n, { recursive: true });
 		for (const d of [p, s]) rmSync(d, { recursive: true });
 	});
@@ -351,10 +351,10 @@ describe('the one command', () => {
 		expect(first).toMatch(/installed and applied/);
 		expect(first).toMatch(/Task 1 of 2: 2 main screens and the shared shell/);
 		const css = readFileSync(join(p, 'styles.css'), 'utf8');
-		expect(css.startsWith('/* site */\n@import "./_agentcard-ds/brand.css";')).toBe(true);
+		expect(css.startsWith('/* site */\n@import "./_opencommerce-ds/brand.css";')).toBe(true);
 		expect(css).toContain("@font-face { font-family: 'Brand'; src: url(b.woff2); }");
 		expect(css).toContain('background: var(--ds-color-bg-default)');
-		expect(readFileSync(join(p, '_agentcard-ds/brand.css'), 'utf8')).toMatch(/^@import url\("https:\/\/fonts\.googleapis\.com\/css2\?family=Inter/);
+		expect(readFileSync(join(p, '_opencommerce-ds/brand.css'), 'utf8')).toMatch(/^@import url\("https:\/\/fonts\.googleapis\.com\/css2\?family=Inter/);
 		expect(readFileSync(join(p, 'index.html'), 'utf8')).not.toContain('<script');
 		expect(readFileSync(join(p, 'AGENTS.md'), 'utf8')).toContain('ds:contract:start');
 		expect(JSON.parse(readFileSync(join(p, '.claude/settings.json'), 'utf8')).hooks.PreToolUse[0].hooks[0].command).toMatch(/hook pre-tool-use/);
@@ -534,7 +534,7 @@ export function Picker(props: any) { return <Select.Root name="card" value={prop
       expect(existsSync(join(dir, 'lib/surface.tsx'))).toBe(true);
       expect(existsSync(join(dir, 'hooks/use-hold.ts'))).toBe(true);
       expect(readFileSync(join(dir, 'lib/utils.ts'), 'utf8')).toContain('"glass-hover"');
-      expect(readFileSync(join(dir, 'app/_agentcard-ds/brand.css'), 'utf8')).toContain('--ds-shadow-glass-hover');
+      expect(readFileSync(join(dir, 'app/_opencommerce-ds/brand.css'), 'utf8')).toContain('--ds-shadow-glass-hover');
     } finally { rmSync(dir, { recursive: true }); }
   });
 });

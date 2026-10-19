@@ -2,23 +2,27 @@
 
 Each is in force today; each names where it lives, so a change is one edit.
 
-1. Source. Values were measured from the rendered https://www.agentcard.sh on 2026-10-17 (computed styles), with the
-   agentcard-website source (main at 5b5c801) for names and structure. The live site is ahead of that branch (its
-   blue is #0000FF; the branch has #1520B8 and #2E3AE8). `brand/tokens.css`, `brand/elements.json`.
-2. Agentcard has a site only: every project, including an app or dashboard, gets the site's look. `brand/brand.json`
+1. Source. Values were measured from the rendered opencommerce site (opencommerce-agentcard-web main at fe64096,
+   built locally) on 2026-10-19, with its `src/app/globals.css` for names and intent. `brand/tokens.css`,
+   `brand/elements.json`.
+2. opencommerce has a site only: every project, including an app or dashboard, gets the site's look. `brand/brand.json`
    (`surfaces`).
-3. The display face is Neue Haas Grotesk Display, named in the stack and not shipped (it needs a webfont licence), so
-   it renders as Helvetica Neue on Apple devices and Helvetica or Arial elsewhere, as on agentcard.sh. Only Inter is
-   loaded. `brand/tokens.css` (`--ds-font-display`), `brand/brand.json` (`fonts`).
-4. The one markup touch on a restyled site is `data-ds-hero` on the home hero: the blue ground, white type and the four
-   stepped bands into the page below. Nothing else gets the blue ground automatically. `brand/site.css`,
-   `brand/brand.json` (`touches`).
-5. Section headings are centered with their description below, as on agentcard.sh's home. `brand/elements.json`.
-6. Muted text tokens are solid colors composited on white (ink at 80, 68, 60 and 45 percent), so they read the same on
-   any white and pass AA; on the blue ground, text uses white at 72 percent. `brand/tokens.css`.
-7. Small tags are the one place type is set in caps, so the value check allows uppercase. `brand/brand.json` (`type`).
-8. Fields are square (no corners), as on agentcard.sh's forms. `brand/elements.json` (input).
-9. Code is set in the display face, as on agentcard.sh's code windows. `brand/tokens.css` (`--ds-font-mono`).
-10. The logo is the new lockup supplied on 2026-10-17 (`brand/logo/lockup.svg`, `brand/logo/mark.svg`).
+3. The blue is the opencommerce site's #2E3AE8 (Agentcard's older bright blue), not agentcard.sh's current #0000FF.
+   `brand/tokens.css`.
+4. The display face is Neue Haas Grotesk Display, named in the stack and not shipped (it needs a webfont licence), so
+   it renders as Helvetica Neue on Apple devices and Helvetica or Arial elsewhere. Only Inter is loaded; code uses the
+   platform monospace. `brand/tokens.css`, `brand/brand.json` (`fonts`).
+5. No markup touches: the page is white throughout, so a restyle adds no attributes. The *@ glyph field is a library
+   visual an agent may place behind a window, not something the CLI adds. `brand/brand.json` (`touches`).
+6. Muted text tokens are solid colors composited on white (ink at 64 and 42 percent), as the site mixes them; 64 passes
+   AA, 42 is for hints only. `brand/tokens.css`.
+7. Keys are flat (no bevel) and a press scales to 97 percent in 160ms; the site's own press runs at 80 to 120ms, which
+   is under this harness's 150ms floor. `brand/tokens.css`, `brand/elements.json`.
+8. Nothing is set in caps, so the value check rejects uppercase. `brand/brand.json` (`type`).
+9. The logo is the typeset wordmark ("opencommerce" with "by Agentcard") and the [*] mark from the site's icon
+   (`brand/logo/`). There is no drawn lockup.
+10. The reference URL in `brand/brand.json` (`site`) is the Vercel deployment; opencommerce.agentcard.sh does not
+    serve the site yet.
 11. Review passes at 7 on every score. `brand/brand.json`.
-12. The repo is public, so installs need no token. Make it private if the brand's files should not be public.
+12. The repo is meant to be public so installs need no token, like the Agentcard harness. Make it private if the
+    brand's files should not be public.

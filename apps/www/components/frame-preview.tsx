@@ -19,7 +19,7 @@ function MeasuredFrame({ src, label, width, height, scale, onHeightChange }: { s
   React.useEffect(() => {
     // Sandboxed previews have an opaque origin, so authenticate the sending window.
     const receiveHeight = (event: MessageEvent) => {
-      if (event.source !== frame.current?.contentWindow || event.data?.type !== "agentcard:preview-height") return;
+      if (event.source !== frame.current?.contentWindow || event.data?.type !== "ds:preview-height") return;
       const height = event.data.height;
       if (typeof height === "number" && Number.isFinite(height)) {
         updateHeight(Math.max(120, Math.min(MAX_HEIGHT, Math.ceil(height))));
@@ -65,7 +65,7 @@ export function FramePreview({ src, name, label, component = false }: { src: str
     <figure className="min-w-0">
       <div className="mb-3 flex items-center justify-between gap-3">
         <SegmentedControl label="Window width" size="sm" value={device} onValueChange={setDevice} options={[{ value: "desktop", label: "Desktop" }, { value: "phone", label: "Phone" }]} />
-        <a href={src} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 rounded-sm px-2 py-1.5 font-display text-caption text-fg-muted outline-none transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-2 focus-visible:outline-focus-ring motion-reduce:transition-none">
+        <a href={src} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-caption text-fg-muted outline-none transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-2 focus-visible:outline-focus-ring motion-reduce:transition-none">
           Open alone <ArrowUpRight aria-hidden className="size-3.5" />
         </a>
       </div>

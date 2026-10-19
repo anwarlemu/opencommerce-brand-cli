@@ -6,7 +6,7 @@ import { DocsSearch } from "@www/components/docs-search";
 import { InlineCode, Prose } from "@www/components/prose";
 import { Thumb } from "@www/components/thumb";
 import { examples } from "@www/lib/examples.generated";
-import { CLI_COMMAND, GROUPS, items } from "@www/lib/registry";
+import { CLI_COMMAND, GROUPS, items, registryName } from "@www/lib/registry";
 
 export const metadata = { title: "Library" };
 
@@ -26,7 +26,7 @@ export default function Library() {
     <Page>
       <PageIntro
         title="Component library"
-        lead="React components and page templates for Agentcard. Each item includes a preview, usage notes, source and an install command."
+        lead={`React components and page templates for ${registryName}. Each item includes a preview, usage notes, source and an install command.`}
       >
         <div className="mx-auto grid w-full max-w-140 gap-4">
           <DocsSearch entries={items.map((i) => ({ name: i.name, title: i.title, group: GROUPS.find((g) => g.type === i.type)?.label ?? "Library", href: `/components/${i.name}` }))} />
@@ -46,12 +46,12 @@ export default function Library() {
                 const thumb = THUMB[i.type] ?? THUMB.ui;
                 return (
                   <li key={i.name} className="group/card relative">
-                    <Window name={i.name} className="h-full transition-[border-color] duration-150 ease-out group-hover/card:border-line-brand">
+                    <Window name={i.name} className="h-full transition-[border-color] duration-150 ease-out group-hover/card:border-line-brand motion-reduce:transition-none">
                       {main && <Thumb example={main} scale={thumb.scale} align={thumb.align} className="h-44" src={FRAMED.has(i.name) ? `/still/${i.name}/Site` : undefined} />}
-                      <div className="grid gap-1 border-t border-line-subtle p-5">
+                      <div className="grid gap-1.5 border-t border-line px-5 pt-4.5 pb-5">
                         <Link
                           href={`/components/${i.name}`}
-                          className="rounded-sm font-display text-body font-medium outline-none after:absolute after:inset-0 after:rounded-card focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-focus-ring"
+                          className="rounded-sm font-display text-h5 leading-snug font-medium tracking-tight outline-none after:absolute after:inset-0 after:rounded-panel focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-focus-ring"
                         >
                           {i.title}
                         </Link>

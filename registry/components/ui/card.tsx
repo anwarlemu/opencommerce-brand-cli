@@ -3,14 +3,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-// The brand's cards (agentcard.sh). `default` is the white card of the quotes and features (.v7-trail li): a 16 percent
-// ink hairline, 12px corners, a light line inside the top and the soft drop. `raised` is the large product card
-// (.v7-sol): 20px corners, a 12px inset frame around its media, and the hard 7px offset shadow at 10 percent ink.
-const cardVariants = cva("flex flex-col border border-hairline bg-surface text-fg", {
+// The brand's cards (globals.css .feat-tile, .feat-order; computed). `default` is the small white card: a 9 percent ink
+// edge, 6px corners and a hairline drop. `raised` is the card set on a picture (the order card): 8px corners and a
+// firmer, longer drop. For anything with a name of its own (code, a plan, a feature), use a Window instead.
+const cardVariants = cva("flex flex-col border border-line bg-surface text-fg", {
   variants: {
     variant: {
-      default: "gap-3 rounded-card p-6 shadow-card",
-      raised: "gap-3 rounded-shell p-3 shadow-raised",
+      default: "gap-2 rounded-card p-6 shadow-tile",
+      raised: "gap-2 rounded-control px-3.5 pt-3 pb-3.5 shadow-raised",
     },
   },
   defaultVariants: { variant: "default" },
@@ -24,14 +24,14 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return <div data-slot="card-header" className={cn("grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 has-data-[slot=card-action]:grid-cols-[1fr_auto]", className)} {...props} />;
 }
 
-// 24px display at 500, tracked tight.
+// 20px display at 500, tracked tight (.h-card).
 function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-title" className={cn("font-display text-h3 leading-display font-medium tracking-tight text-fg", className)} {...props} />;
+  return <div data-slot="card-title" className={cn("font-display text-h4 leading-snug font-medium tracking-tight text-fg", className)} {...props} />;
 }
 
-// 14px Inter at 68 percent ink.
+// 16px Inter at 64 percent ink.
 function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-description" className={cn("text-body-sm leading-relaxed text-fg-muted", className)} {...props} />;
+  return <div data-slot="card-description" className={cn("text-body leading-relaxed text-fg-muted", className)} {...props} />;
 }
 
 function CardAction({ className, ...props }: React.ComponentProps<"div">) {

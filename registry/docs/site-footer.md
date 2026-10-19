@@ -3,14 +3,13 @@ name: site-footer
 title: Site footer
 type: site
 surface: site
-description: "Footer with navigation groups, logos and optional merchant list."
-kinds: [footer, logo-strip, link]
-use_for: "Provide link groups, description and optional backing content. Check that every link resolves. Add an id when NavDock uses hideAt."
-never: [A white footer, Icons beside every link, More than six columns, Bold headings, A second wordmark]
-source: agentcard-website src/components/v7/site-footer.tsx; src/app/globals.css:5049 (.v7-foot); agentcard.sh / (computed)
+description: "White footer under a hairline: the name and a line, three link columns, the small print and the outlined wordmark."
+kinds: [footer, link]
+use_for: "Use once at the foot of every page. Provide link groups (three reads best), the description and the small print; check that every link resolves."
+never: [A blue or dark footer, Icons beside every link, More than four columns, Bold headings, A filled wordmark]
+source: "opencommerce-agentcard-web src/components/site-footer.tsx, src/components/footer-wordmark.tsx"
 ---
 
-`SiteFooter` props: `groups` ({ title, links: { label, href, external }[] }[]), `merchants` (string[]),
-`merchantsLabel`, `backing` (ReactNode: the sky line, with a small logo inside), `backingLabel`, `logo` (default the
-white lockup), `logoHref`, `logoLabel`, `description`, `wordmark` (string or null, default "AGENTCARD"), `bandFrom` (the
-ground above, default white; null for none), plus footer props. Give it an `id` to let the nav dock step aside.
+`SiteFooter` props: `groups` ({ title, links: { label, href, external }[] }[]), `name` (default "opencommerce"),
+`byline` (default "by Agentcard"), `logo`, `description`, `legal`, `wordmark` (string or null, default
+"opencommerce"), plus footer props.

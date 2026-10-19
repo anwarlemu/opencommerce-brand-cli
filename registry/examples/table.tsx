@@ -2,38 +2,38 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 const ROWS = [
-  { merchant: "Delta", card: "Travel agent", date: "Oct 14", amount: "$412.00", status: "Approved" },
-  { merchant: "Notion", card: "Ops agent", date: "Oct 13", amount: "$96.00", status: "Approved" },
-  { merchant: "Uber", card: "Travel agent", date: "Oct 12", amount: "$31.75", status: "Declined" },
+  { merchant: "DoorDash", success: "100%", last: "5 min ago", duration: "12 sec", status: "Operational" },
+  { merchant: "Amazon", success: "99.9%", last: "1 min ago", duration: "9 sec", status: "Operational" },
+  { merchant: "Best Buy", success: "99.6%", last: "7 min ago", duration: "16 sec", status: "Degraded" },
 ] as const;
 
 export function Site() {
   return (
-    <Table label="Recent purchases">
+    <Table label="Merchant monitoring">
       <TableHeader>
         <TableRow>
           <TableHead>Merchant</TableHead>
-          <TableHead>Card</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
+          <TableHead>Success rate</TableHead>
+          <TableHead>Last purchase</TableHead>
+          <TableHead>Duration</TableHead>
           <TableHead>Status</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {ROWS.map((row) => (
           <TableRow key={row.merchant}>
-            <TableCell>{row.merchant}</TableCell>
-            <TableCell label="Card" className="text-fg-muted">
-              {row.card}
+            <TableCell className="font-medium">{row.merchant}</TableCell>
+            <TableCell label="Success rate" className="font-mono text-snippet">
+              {row.success}
             </TableCell>
-            <TableCell label="Date" className="text-fg-muted">
-              {row.date}
+            <TableCell label="Last purchase" className="text-fg-muted">
+              {row.last}
             </TableCell>
-            <TableCell label="Amount" className="text-right">
-              {row.amount}
+            <TableCell label="Duration" className="font-mono text-snippet text-fg-muted">
+              {row.duration}
             </TableCell>
             <TableCell label="Status">
-              <Badge variant={row.status === "Approved" ? "success" : "destructive"}>{row.status}</Badge>
+              <Badge variant={row.status === "Operational" ? "success" : "warning"}>{row.status}</Badge>
             </TableCell>
           </TableRow>
         ))}
@@ -42,30 +42,30 @@ export function Site() {
   );
 }
 
-// As in the guides: a comparison, the row names in the first column.
+// A comparison, the row names in the first column.
 export function Compare() {
   const rows = [
-    ["Use when", "Your user pays with their own card (credit, debit or prepaid).", "Your agent needs a new card to finish a payment."],
-    ["Chargebacks", "Handled by the issuer.", "Handled by Agentcard."],
-    ["KYC", "No", "Yes"],
+    ["Merchants", "5 of your choice", "Every merchant"],
+    ["Payment providers", "2", "Every provider"],
+    ["Platform fee", "None", "1% of each completed order"],
   ];
   return (
-    <Table label="Vault and Issuing compared">
+    <Table label="Free and Standard compared">
       <TableHeader>
         <TableRow>
           <TableHead>
             <span className="sr-only">Topic</span>
           </TableHead>
-          <TableHead>Vault</TableHead>
-          <TableHead>Issuing</TableHead>
+          <TableHead>Free</TableHead>
+          <TableHead>Standard</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {rows.map(([topic, vault, issuing]) => (
+        {rows.map(([topic, free, standard]) => (
           <TableRow key={topic}>
-            <TableCell className="font-medium">{topic}</TableCell>
-            <TableCell label="Vault">{vault}</TableCell>
-            <TableCell label="Issuing">{issuing}</TableCell>
+            <TableCell className="text-fg-muted">{topic}</TableCell>
+            <TableCell label="Free">{free}</TableCell>
+            <TableCell label="Standard" className="text-fg-brand">{standard}</TableCell>
           </TableRow>
         ))}
       </TableBody>

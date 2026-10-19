@@ -6,8 +6,8 @@ surface: site
 description: "Typography and layout for long-form content."
 kinds: [page, column, eyebrow, hero-title, body-text, link, table, code-window]
 use_for: "Use for documentation, guides, legal content and release notes. Pass semantic HTML or rendered Markdown. Use wide for a wider content column."
-never: [Bold headings or table headers, Body text wider than 680px, Links without the underline, Centered long text]
-source: "agentcard-website src/app/globals.css:1808 (.v7-about-sheet), 2199 (.v7-guide-prose); agentcard.sh/terms and /card-terms (computed: .v7-about-head, .v7-prose)"
+never: [Bold headings or table headers, Body text wider than 576px, Links without the underline, Centered long text]
+source: "Extension in the opencommerce site's voice (its type, hairlines, code and mono labels; opencommerce-agentcard-web src/app/globals.css); the structure from agentcard.sh/terms"
 ---
 
 `Prose` props: `eyebrow`, `title`, `meta` (the head; any of them renders it), `wide` (820px instead of 680px),

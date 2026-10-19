@@ -31,10 +31,10 @@ function exampleLabel(name: string) {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
-// A section of the article, as the guides set theirs: a 24px display heading 56px below what came before.
+// A section of the article: a 24px display heading 56px below what came before.
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-6">
+    <section id={id} className="scroll-mt-24">
       <h2 className="mb-5 font-display text-h3 leading-display font-medium tracking-tight">{title}</h2>
       {children}
     </section>
@@ -64,10 +64,10 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-12 xl:grid-cols-[minmax(0,1fr)_clamp(15.25rem,19vw,17.5rem)]">
       <article className="mx-auto grid w-full max-w-180 min-w-0 grid-cols-[minmax(0,1fr)] gap-14">
-        <header className="border-b border-line-rule pb-7">
-          <p className="font-display text-caption tracking-label text-fg-label">{TYPE_LABEL[item.type]}</p>
-          <h1 className="mt-3 font-display text-h2 leading-display font-medium tracking-tight text-pretty">{item.title}</h1>
-          <p className="mt-3.5 text-body-lg leading-normal text-fg-muted">
+        <header className="border-b border-line pb-8">
+          <p className="font-mono text-caption text-fg-label">{TYPE_LABEL[item.type]}</p>
+          <h1 className="mt-3 font-display text-h2 leading-display font-medium tracking-tighter text-pretty">{item.title}</h1>
+          <p className="mt-4 text-body leading-lead text-fg-muted">
             <Prose text={item.description} />
           </p>
           <p className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-body-sm text-fg-brand">
@@ -79,7 +79,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
         </header>
 
         {demos.length > 0 && (
-          <div id="preview" className="grid scroll-mt-6 gap-8">
+          <div id="preview" className="grid scroll-mt-24 gap-8">
             {demos.map(([name, Demo]) =>
               framed ? <FramePreview key={name} src={`/preview/${item.name}/${name}`} name={item.name} label={exampleLabel(name)} component={item.type === "ui"} /> : <Preview key={name} example={Demo} name={item.name} block={name === "Block"} label={exampleLabel(name)} />,
             )}
@@ -105,7 +105,7 @@ export default async function ComponentPage({ params }: { params: Promise<{ name
 
         <Pager prev={prev && { name: prev.name, title: prev.title }} next={next && { name: next.name, title: next.title }} />
       </article>
-      <div className="sticky top-6 hidden flex-col gap-6 xl:flex">
+      <div className="sticky top-24 hidden flex-col gap-6 xl:flex">
         <Contents sections={sections} />
         <CtaCard command={`${CLI_COMMAND} add ${item.name}${surfaceFlag}`} />
       </div>
@@ -118,13 +118,13 @@ function Usage({ item }: { item: Item }) {
   return (
     <Section id="usage" title="Usage">
       <div className="grid gap-4">
-        <Window name="use-it-for.md" className="bg-note shadow-guide" bodyClassName="px-4.5 pt-3.5 pb-4">
+        <Window name="use-it-for.md" bodyClassName="bg-blue-5 px-4.5 pt-3.5 pb-4">
           <p className="text-body-sm leading-relaxed text-fg">
             <Prose text={item.use_for} />
           </p>
         </Window>
         {item.never.length > 0 && (
-          <Window name="never.md" className="shadow-guide" bodyClassName="px-4.5 pt-3.5 pb-4">
+          <Window name="never.md" bodyClassName="px-4.5 pt-3.5 pb-4">
             <ul className="grid gap-1.5 text-body-sm leading-relaxed text-fg">
               {item.never.map((n) => (
                 <li key={n} className="flex gap-2.5">
@@ -144,7 +144,7 @@ function Usage({ item }: { item: Item }) {
           {requires.map((d, i) => (
             <span key={d}>
               {findItem(d) ? (
-                <Link href={`/components/${d}`} className="rounded-sm text-fg underline decoration-line-brand underline-offset-[0.2em] outline-none transition-colors duration-150 ease-out hover:text-fg-brand focus-visible:outline-2 focus-visible:outline-focus-ring">
+                <Link href={`/components/${d}`} className="rounded-sm text-fg underline decoration-line-strong underline-offset-[0.2em] outline-none transition-colors duration-150 ease-out hover:text-fg-brand focus-visible:outline-2 focus-visible:outline-focus-ring">
                   {d}
                 </Link>
               ) : <InlineCode>{d}</InlineCode>}

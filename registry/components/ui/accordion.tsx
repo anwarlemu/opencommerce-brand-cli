@@ -5,28 +5,30 @@ import * as AccordionPrimitive from "@radix-ui/react-accordion";
 
 import { cn } from "@/lib/utils";
 
-// The brand's FAQ list (agentcard.sh /, .faq-list under .v7-page, measured as rendered): a 14 percent ink rule above
-// the first question and a 20 percent one under each; the question in the 14px display face at 500 (tracked -0.01em,
-// 1.2 leading, 20px by 14px of padding, 6px corners), blue and on a faint wash under the pointer (the wash eases in
-// 160ms, the color does not); a drawn + (a bar across and a bar down in a 30px box, not a glyph) that turns an eighth
-// into an x when open (220ms ease-out). Open, the question and its mark stay blue. The answer is 14px Inter at 1.8
-// leading, 68 percent ink at 80 percent opacity, 540px wide; it slides open in 200ms ease-out (and shut in 200ms) and
-// fades down 4px into place (240ms, 40ms late). Reduced motion opens it at once.
+// The brand's questions (faq.tsx, globals.css details[open] > .faq-answer; computed): rows on 9 percent ink rules, each
+// question in 16px Inter at 20px by 16px, a drawn + at the right (two 1px bars in a 14px box, 64 percent ink). Under the
+// pointer, and while open, a row takes the pale blue on a card drawn 3px inside its edges (6px corners), and the rules on
+// both its edges step aside so the card never sits between lines; the color eases in 200ms. Open, the + turns an eighth
+// into an x and goes blue (200ms ease-out), and the answer (15px Inter at 64 percent ink, 576px wide) slides open and
+// fades up 4px into place. Reduced motion opens it at once. Pull the list out by its padding (-mx-4) so the text lines
+// up with the column.
 function Accordion(props: React.ComponentProps<typeof AccordionPrimitive.Root>) {
   return <AccordionPrimitive.Root data-slot="accordion" {...props} />;
 }
 
 function AccordionItem({ className, ...props }: React.ComponentProps<typeof AccordionPrimitive.Item>) {
-  return <AccordionPrimitive.Item data-slot="accordion-item" className={cn("border-b border-b-ink/20 first:border-t first:border-t-line", className)} {...props} />;
+  return <AccordionPrimitive.Item data-slot="accordion-item" className={cn(
+        "relative isolate border-b border-line px-4 before:absolute before:inset-x-0 before:inset-y-0.75 before:-z-10 before:rounded-card before:transition-[background-color] before:duration-200 before:ease-out last:border-b-0 hover:border-b-transparent hover:before:bg-blue-5 data-[state=open]:border-b-transparent data-[state=open]:before:bg-blue-5 motion-reduce:before:transition-none [&:has(+:hover)]:border-b-transparent [&:has(+[data-state=open])]:border-b-transparent",
+        className,
+      )} {...props} />;
 }
 
-/** The FAQ's mark: a 12px plus drawn in two 1.5px bars, in a 30px box so a column of them lines up. */
+/** The question's mark: a 14px plus drawn in two 1px bars. */
 function AccordionMark({ className }: { className?: string }) {
   return (
-    <span aria-hidden data-slot="accordion-mark" className={cn("grid h-3.5 w-7.5 shrink-0 place-items-center self-center text-fg-faint transition-[rotate,color] duration-220 ease-out motion-reduce:transition-none", className)}>
-      <svg viewBox="0 0 12 12" className="size-3 fill-none stroke-current [stroke-width:1.5]">
-        <path d="M0 6h12M6 0v12" />
-      </svg>
+    <span aria-hidden data-slot="accordion-mark" className={cn("relative size-3.5 shrink-0 text-fg-muted transition-[rotate,color] duration-200 ease-out motion-reduce:transition-[color]", className)}>
+      <span className="absolute top-1/2 left-0 h-px w-3.5 -translate-y-1/2 bg-current" />
+      <span className="absolute top-0 left-1/2 h-3.5 w-px -translate-x-1/2 bg-current" />
     </span>
   );
 }
@@ -37,13 +39,13 @@ function AccordionTrigger({ className, children, icon, ...props }: React.Compone
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "group flex flex-1 cursor-pointer items-center justify-between gap-3.75 rounded-sm px-3.5 py-5 text-left font-display text-body-sm font-medium [letter-spacing:-0.01em] [line-height:1.2] text-fg transition-[background-color] duration-160 ease-out outline-none hover:bg-ink/5 hover:text-fg-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring disabled:pointer-events-none disabled:opacity-50 data-[state=open]:text-fg-brand motion-reduce:transition-none",
+          "group flex flex-1 cursor-pointer items-center justify-between gap-6 py-5 text-left font-sans text-body leading-body text-fg outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring disabled:pointer-events-none disabled:opacity-50",
           className,
         )}
         {...props}
       >
         {children}
-        {icon === undefined ? <AccordionMark className="group-hover:text-fg-brand group-data-[state=open]:rotate-45 group-data-[state=open]:text-fg-brand" /> : icon}
+        {icon === undefined ? <AccordionMark className="group-data-[state=open]:rotate-45 group-data-[state=open]:text-fg-brand" /> : icon}
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
   );
@@ -53,10 +55,10 @@ function AccordionContent({ className, children, ...props }: React.ComponentProp
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"
-      className="overflow-hidden text-body-sm [line-height:1.8] text-fg-muted motion-safe:data-[state=closed]:animate-accordion-up data-[state=closed]:[animation-duration:var(--ds-duration-base)] motion-safe:data-[state=open]:animate-accordion-down motion-reduce:animate-none"
+      className="overflow-hidden text-button leading-relaxed text-fg-muted motion-safe:data-[state=closed]:animate-accordion-up data-[state=closed]:[animation-duration:var(--ds-duration-base)] motion-safe:data-[state=open]:animate-accordion-down motion-reduce:animate-none"
       {...props}
     >
-      <div className={cn("max-w-135 px-3.5 pb-5.5 opacity-80 transition-[opacity,translate] delay-40 duration-240 ease-out starting:-translate-y-1 starting:opacity-0 motion-reduce:transition-none", className)}>{children}</div>
+      <div className={cn("max-w-xl pb-6 transition-[opacity,translate] duration-200 ease-out starting:-translate-y-1 starting:opacity-0 motion-reduce:transition-[opacity]", className)}>{children}</div>
     </AccordionPrimitive.Content>
   );
 }

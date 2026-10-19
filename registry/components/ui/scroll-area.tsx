@@ -55,7 +55,7 @@ function ScrollArea({ className, children, ...props }: React.ComponentProps<"div
         aria-hidden
         onClick={() => ref.current?.scrollBy({ top: ref.current.clientHeight * 0.8, behavior: "smooth" })}
         className={cn(
-          "absolute bottom-1 left-1/2 grid size-6 -translate-x-1/2 place-items-center rounded-sm border border-hairline bg-surface text-fg-brand shadow-key transition-[opacity,translate,background-color] duration-200 ease-out hover:bg-sky-wash motion-reduce:transition-[opacity]",
+          "absolute bottom-1 left-1/2 grid size-6 -translate-x-1/2 place-items-center rounded-sm border border-hairline bg-surface text-fg-brand shadow-tile transition-[opacity,translate,background-color] duration-200 ease-out hover:bg-subtle motion-reduce:transition-[opacity]",
           edges.below ? "opacity-100" : "pointer-events-none translate-y-1 opacity-0",
         )}
       >

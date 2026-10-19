@@ -1,14 +1,16 @@
 import { PageHeader } from "@/components/site/page-header";
 import { SiteHeader } from "@/components/site/site-header";
 
+const ACTION = { label: "Get started", href: "https://app.agentcard.sh" };
+
 export function Site() {
   return (
     <div className="relative bg-surface pb-24">
-      <SiteHeader href="https://www.agentcard.sh/" ground="white" action={{ label: "Get started", href: "https://app.agentcard.sh/" }} />
+      <SiteHeader fixed={false} action={ACTION} />
       <PageHeader
-        eyebrow="The company"
-        title="About"
-        lead="We are building Agentcard because we believe agents should have full autonomy to pay for things online. We want to give agents the freedom to operate in the world as it is today, not someday."
+        eyebrow="Changelog"
+        title="What’s new"
+        lead="New stores, faster routes and the changes to the SDK, as they ship."
       />
     </div>
   );
@@ -17,9 +19,9 @@ export function Site() {
 export function Short() {
   return (
     <div className="relative bg-surface pb-24">
-      <SiteHeader href="https://www.agentcard.sh/" ground="white" action={{ label: "Get started", href: "https://app.agentcard.sh/" }} />
+      <SiteHeader fixed={false} action={ACTION} />
       <PageHeader eyebrow="Get started" title="Let your agent buy">
-        <p className="mt-3 font-display text-caption text-fg-muted">A few answers, then a call</p>
+        <p className="mt-3 text-body-sm text-fg-muted">A few answers, then a call</p>
       </PageHeader>
     </div>
   );

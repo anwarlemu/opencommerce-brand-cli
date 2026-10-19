@@ -903,11 +903,11 @@
 				"background-color": "var(--ds-color-bg-default)",
 				"color": "var(--ds-color-text-default)",
 				"font-family": "var(--ds-font-mono)",
-				"font-size": "var(--ds-text-code)",
+				"font-size": "var(--ds-text-snippet)",
 				"line-height": "var(--ds-leading-code)",
 				"box-shadow": "var(--ds-shadow-card)"
 			},
-			"tailwind": "overflow-hidden border border-line-strong rounded-panel bg-surface text-fg font-mono text-code leading-code shadow-card",
+			"tailwind": "overflow-hidden border border-line-strong rounded-panel bg-surface text-fg font-mono text-snippet leading-code shadow-card",
 			"rules": [
 				"Code sits in a window: mono 13px, leading 1.75, keywords blue, strings deep blue, comments faint; a banded line is the pale blue.",
 				"Code that runs (a step, an install line) is the dark body: ink, text at 88 percent white, keywords pale blue, strings sky.",
@@ -1199,13 +1199,15 @@
 				"line-height": "var(--ds-leading-snug)",
 				"outline": "none"
 			},
-			"tailwind": "rounded-menu px-3 py-2 font-sans text-body-sm leading-snug text-fg outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-40 data-[highlighted]:bg-blue-5",
+			"tailwind": "rounded-menu px-3 py-2 font-sans text-body-sm leading-snug text-fg outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-40 data-[highlighted]:bg-wash-hover data-[highlighted]:text-fg",
 			"states": {
 				":hover": {
-					"background-color": "var(--ds-color-blue-5)"
+					"background-color": "var(--ds-color-wash-hover)",
+					"color": "var(--ds-color-text-default)"
 				},
 				"[data-highlighted]": {
-					"background-color": "var(--ds-color-blue-5)"
+					"background-color": "var(--ds-color-wash-hover)",
+					"color": "var(--ds-color-text-default)"
 				},
 				"[data-disabled]": {
 					"opacity": "0.4",
@@ -1213,7 +1215,7 @@
 				}
 			},
 			"rules": [
-				"Rows of 14px Inter in ink, 5px corners; the highlighted row takes the pale blue.",
+				"Rows of 14px Inter in ink, 5px corners; the highlighted row takes a 5 percent ink wash, as a nav link does.",
 				"Keep the existing interaction, placement, keyboard focus, disabled states and selection."
 			],
 			"source": "src/components/mobile-nav.tsx (sheet links)"

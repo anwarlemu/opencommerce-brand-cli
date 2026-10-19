@@ -7,7 +7,7 @@ description: "Label, help text, error message and accessibility attributes for a
 kinds: [input]
 use_for: "Wrap Input, Textarea, TagsInput or SelectTrigger. Derive error from the current value and clear it when valid. Use required for required fields and htmlFor when the control has an explicit id."
 never: [Labels inside the field as placeholders, Bold or caps labels, Errors shown only by color]
-source: "agentcard-website src/app/globals.css (.v7-gate-field); live https://www.agentcard.sh/get-started"
+source: "opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter); labels are an extension"
 ---
 
 `Field` connects its label and help/error message to `Input`, `Textarea`, `TagsInput`, and `SelectTrigger`. It also shares required and invalid state. Set `htmlFor` when you give the control an explicit `id`; otherwise the field generates an ID.

@@ -4,13 +4,15 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-// A ground: white (the default page), paper (the warm page behind white sections) or blue (the hero, a panel, the
-// footer). Blue sets white text and sky labels for everything inside, and dialogs, menus and tooltips opened inside a
-// Surface render inside it too, so they keep its ground.
+// A ground: white (the page, every card and window), mist (ink at 2.5 percent: the closing card, a window bar, an
+// inset; `paper` is the same tint under its older name) or blue (a rare deliberate band; the page itself
+// never sits on blue). Blue sets white text and sky labels for everything inside. Dialogs, menus and tooltips opened
+// inside a Surface render inside it too, so they keep its ground.
 const PortalContainer = React.createContext<HTMLElement | null>(null);
 
 const GROUNDS = {
   white: "bg-surface text-fg",
+  mist: "bg-subtle text-fg",
   paper: "bg-paper text-fg",
   blue: "bg-brand text-on-brand",
 } as const;

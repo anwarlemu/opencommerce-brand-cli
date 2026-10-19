@@ -1,43 +1,47 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function Site() {
   return (
-    <div className="grid gap-8 md:grid-cols-2">
+    <div className="grid gap-5 sm:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Vault</CardTitle>
-          <CardDescription>Store a card once. Your agent pays with a token that never leaves the vault.</CardDescription>
+          <CardTitle>Every merchant</CardTitle>
+          <CardDescription>One endpoint reaches any online store: catalog search, checkout and order tracking.</CardDescription>
         </CardHeader>
-        <CardFooter>
-          <Button variant="secondary" asChild><a href="https://www.agentcard.sh/vault" target="_blank" rel="noreferrer">Explore Vault</a></Button>
-        </CardFooter>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Issuing</CardTitle>
-          <CardDescription>Give each agent its own card, with a limit, a list of merchants and a log of every purchase.</CardDescription>
+          <CardTitle>Warmed routes</CardTitle>
+          <CardDescription>The stores your agents buy from most are kept warm, so a purchase finishes in seconds.</CardDescription>
         </CardHeader>
-        <CardFooter>
-          <Button variant="secondary" asChild><a href="https://www.agentcard.sh/issuing" target="_blank" rel="noreferrer">Explore Issuing</a></Button>
-        </CardFooter>
       </Card>
     </div>
   );
 }
 
+// The order card, set on a feature's picture.
 export function Raised() {
   return (
-    <Card variant="raised" className="mr-2 mb-2 grid gap-6 md:grid-cols-2 md:gap-12">
-      {/* The product's screen or object goes here; a tinted block holds its place. */}
-      <div aria-hidden className="aspect-[4/3] rounded-card bg-brand" />
-      <CardContent className="flex flex-col justify-center gap-4 p-3 md:p-6">
-        <CardTitle className="text-h2 font-normal tracking-tighter">Prepaid cards for every agent</CardTitle>
-        <CardDescription className="text-body-lg">Fund a card, choose what it can buy, and hand it to your agent.</CardDescription>
-        <div>
-          <Button asChild><a href="https://app.agentcard.sh/" target="_blank" rel="noreferrer">Start free</a></Button>
+    <div className="flex justify-center rounded-panel border border-line bg-surface px-6 py-10">
+      <Card variant="raised" className="w-full max-w-75">
+        <div className="flex items-center justify-between border-b border-line pb-2.5 font-mono text-bar text-fg-muted">
+          <span>Order · Amazon</span>
+          <Badge variant="brand">Confirmed</Badge>
         </div>
-      </CardContent>
-    </Card>
+        <ol className="mt-1 grid gap-2 text-body-sm">
+          {[
+            ["Cart", "2 items · $48.20"],
+            ["Payment", "Visa ···· 4832"],
+            ["Confirmed", "#A-10293"],
+          ].map(([step, detail]) => (
+            <li key={step} className="flex items-baseline justify-between gap-3">
+              <span>{step}</span>
+              <span className="font-mono text-bar text-fg-muted">{detail}</span>
+            </li>
+          ))}
+        </ol>
+      </Card>
+    </div>
   );
 }

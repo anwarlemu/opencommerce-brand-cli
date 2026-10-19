@@ -4,14 +4,11 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-// The running line (agentcard.sh, .v7-foot-line): names in the display face, each followed by a small star, between two
-// rules, sliding sideways forever. Two copies of the line sit end to end and the track moves by one copy's width, so the
-// loop has no seam. It is linear and slow (48s a lap), stops under the pointer so a name can be read, and stands still
-// with reduced motion. The moving line is hidden from screen readers; `label` says it once instead.
-const GROUNDS = {
-  blue: { line: "border-line-on-brand-strong", star: "text-fg-on-brand-label" },
-  white: { line: "border-line-strong", star: "text-fg-label" },
-} as const;
+// The running strip (the opencommerce hero's stores): bare marks or names in grey (ink at 45 percent), in one row,
+// drifting left at a slow, steady pace (linear, 100s a lap) and fading out at both ends. Two copies sit end to end and
+// the track moves by one copy's width, so the loop has no seam. A mouse resting on it holds it so a mark can be read.
+// With reduced motion it stands still and scrolls by hand. The second copy is hidden from screen readers; the first is
+// a list, and `label` names it.
 
 function useReducedMotion() {
   const [reduce, setReduce] = React.useState(false);
@@ -26,24 +23,18 @@ function useReducedMotion() {
 }
 
 type MarqueeProps = Omit<React.ComponentProps<"div">, "children"> & {
-  /** The names on the line, in order. */
+  /** The marks or names, in order. Give an image its alt here; the repeated copy is hidden from readers. */
   items: React.ReactNode[];
-  /** What a screen reader hears instead of the moving line. Defaults to the names joined, when they are text. */
+  /** The list's accessible name ("Stores"). */
   label?: string;
-  /** The mark between names. */
-  separator?: React.ReactNode;
-  /** Seconds for one lap (one copy of the line). */
+  /** Seconds for one lap (one copy of the row). */
   duration?: number;
-  /** The ground it sits on: white rules and sky stars on the blue, ink rules and blue stars on white. */
-  ground?: keyof typeof GROUNDS;
 };
 
-function Marquee({ items, label, separator = "✳", duration = 48, ground = "blue", className, ...props }: MarqueeProps) {
-  const trackRef = React.useRef<HTMLDivElement>(null);
+function Marquee({ items, label, duration = 100, className, ...props }: MarqueeProps) {
+  const trackRef = React.useRef<HTMLUListElement>(null);
   const animationRef = React.useRef<Animation | null>(null);
   const reduce = useReducedMotion();
-  const tone = GROUNDS[ground];
-  const spoken = label ?? (items.every((item) => typeof item === "string") ? `${items.join(", ")}.` : undefined);
 
   React.useEffect(() => {
     const el = trackRef.current;
@@ -61,21 +52,29 @@ function Marquee({ items, label, separator = "✳", duration = 48, ground = "blu
   };
   const play = () => animationRef.current?.play();
 
+  const row = (copy: boolean) =>
+    items.map((item, i) => (
+      <li key={`${i}${copy ? "-copy" : ""}`} aria-hidden={copy || undefined} className="flex flex-none items-center pr-11">
+        {item}
+      </li>
+    ));
+
   return (
-    <div data-slot="marquee" className={cn("flex overflow-hidden border-y font-display text-caption leading-body", tone.line, className)} onPointerEnter={pause} onPointerLeave={play} {...props}>
-      <div ref={trackRef} aria-hidden className="flex flex-none will-change-transform">
-        {[0, 1].map((copy) => (
-          <span key={copy} className="flex-none py-3 whitespace-nowrap">
-            {items.map((item, i) => (
-              <span key={i}>
-                {item}{" "}
-                <i className={cn("mx-4.5 inline-block not-italic", tone.star)}>{separator}</i>
-              </span>
-            ))}
-          </span>
-        ))}
-      </div>
-      {spoken && <span className="sr-only">{spoken}</span>}
+    <div
+      data-slot="marquee"
+      onPointerEnter={pause}
+      onPointerLeave={play}
+      className={cn(
+        "w-full text-[color-mix(in_srgb,var(--ds-color-ink)_45%,transparent)] [mask-image:linear-gradient(to_right,transparent,var(--ds-color-ink)_14%,var(--ds-color-ink)_86%,transparent)]",
+        reduce ? "overflow-x-auto" : "overflow-hidden",
+        className,
+      )}
+      {...props}
+    >
+      <ul ref={trackRef} aria-label={label} className="flex h-7 w-max list-none items-center p-0 text-body-sm whitespace-nowrap will-change-transform">
+        {row(false)}
+        {!reduce && row(true)}
+      </ul>
     </div>
   );
 }

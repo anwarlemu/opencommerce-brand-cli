@@ -81,19 +81,19 @@ export function Open() {
   );
 }
 
-// The dock's menu: glass over whatever is behind it.
+// The header's tray as a menu: frosted glass over whatever is behind it.
 export function Glass() {
   const [product, setProduct] = React.useState("");
   return (
-    <Surface ground="blue" className="flex h-80 flex-col items-start gap-4 rounded-panel p-8">
+    <Surface ground="mist" className="flex h-80 flex-col items-start gap-4 rounded-panel p-8">
       <DropdownMenu defaultOpen modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button variant="on-brand">Products</Button>
+          <Button variant="secondary">Products</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent variant="glass" align="start" className="w-64" onOpenAutoFocus={(event) => event.preventDefault()} onCloseAutoFocus={(event) => event.preventDefault()}>
-          <DropdownMenuItem onSelect={() => setProduct("Vault")}>Vault</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setProduct("Issuing")}>Issuing</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setProduct("Voice")}>Voice</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setProduct("Search")}>Search</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setProduct("Checkout")}>Checkout</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setProduct("Tracking")}>Tracking</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => setProduct("Updates")}>
             Updates
@@ -101,7 +101,7 @@ export function Glass() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {product && <p role="status" className="text-body-sm">{product === "Vault" ? "Vault stores cards for your agents." : product === "Issuing" ? "Issuing creates a card for each agent." : product === "Voice" ? "Voice lets customers approve purchases by speaking." : "You’re viewing the latest product updates."}</p>}
+      {product && <p role="status" className="text-body-sm">{product === "Search" ? "Search any store's catalog conversationally." : product === "Checkout" ? "Place an order at any online store with one call." : product === "Tracking" ? "Follow every order to the door." : "You’re viewing the latest product updates."}</p>}
     </Surface>
   );
 }
@@ -111,9 +111,9 @@ export function Choices() {
   const [exported, setExported] = React.useState("");
   const [notifications, setNotifications] = React.useState(true);
   return (
-    <Surface ground="blue" className="min-h-80 rounded-panel p-8">
+    <Surface ground="mist" className="min-h-80 rounded-panel p-8">
       <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild><Button variant="on-brand">Preferences</Button></DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild><Button variant="secondary">Preferences</Button></DropdownMenuTrigger>
         <DropdownMenuContent variant="glass" align="start">
           <DropdownMenuCheckboxItem checked={notifications} onCheckedChange={setNotifications}>Notifications</DropdownMenuCheckboxItem>
           <DropdownMenuSub>

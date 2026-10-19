@@ -5,7 +5,7 @@ type: ui
 surface: site
 description: "Container for related content, with default and raised variants."
 kinds: [card, card-raised, card-title]
-use_for: "Use default for features, plans or quotes. Use raised for product content with a preview. Use Window when the container needs a title bar."
-never: [Gray card backgrounds, Heavy blurred shadows, Cards inside cards, Corners other than 12px or 20px]
-source: "agentcard-website src/app/globals.css (.v7-trail li, .v7-sol); live https://www.agentcard.sh/"
+use_for: "Use default for a small group of related lines. Use raised for a card set on a picture (an order, a receipt). For code, plans and features use Window: the brand names its containers like files."
+never: [Gray card backgrounds, Heavy or offset shadows, Cards inside cards, Rounded corners above 8px]
+source: "opencommerce-agentcard-web src/app/globals.css (.feat-tile, .feat-order)"
 ---

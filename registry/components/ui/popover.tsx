@@ -6,12 +6,12 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import { usePortalContainer } from "@/lib/surface";
 import { cn } from "@/lib/utils";
 
-// The brand's floating panel: white, a 16 percent ink hairline, 8px corners and the tooltip shadow, 6px off its trigger,
-// growing out of the side nearest the trigger (scale 0.97 and a fade, 160ms ease-out). `glass` is the dock's panel: ink
-// at 42 percent under a light sheen and a blur, a white hairline, white text. Reduced motion keeps only the fade.
+// The brand's floating panel: white, a 9 percent ink edge, 8px corners and a soft drop, 6px off its trigger, growing out
+// of the side nearest the trigger (scale 0.97 and a fade, 160ms ease-out). `glass` is the header's tray as a panel: white
+// at 72 percent under a light sheen and a blur, a 10 percent ink edge. Reduced motion keeps only the fade.
 const VARIANTS = {
-  default: "border-hairline bg-surface text-fg shadow-tooltip",
-  glass: "border-line-on-brand bg-glass bg-(image:--ds-glass-sheen) text-on-brand shadow-floating [backdrop-filter:var(--ds-glass-blur)]",
+  default: "border-line bg-surface text-fg shadow-floating",
+  glass: "border-line-glass bg-glass bg-(image:--ds-glass-sheen) text-fg shadow-floating [backdrop-filter:var(--ds-glass-blur)]",
 } as const;
 
 function Popover(props: React.ComponentProps<typeof PopoverPrimitive.Root>) {

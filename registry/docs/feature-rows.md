@@ -3,21 +3,18 @@ name: feature-rows
 title: Feature rows
 type: site
 surface: site
-description: "Product feature layouts with text and media."
-kinds: [card-raised, card, chip, media-frame, card-title, body-text]
-use_for: "Use FeatureRows for the main feature list and FeatureGrid for supporting details. Supply a screen or illustration for each feature."
-never: [More than one blue key per row, Feature icons instead of screens, Stock photos in the panel, Rows without media]
-source: "agentcard-website src/components/v7/feature-rows.tsx; agentcard.sh/vault and /issuing (computed: .v7-feat, .v7-feat-stage, .v7-feat-pill, .v7-feats.is-4)"
+description: "Features as windows two to a row (picture, title, line), or one to a row beside their window; pictures play when first seen."
+kinds: [window, window-bar, card-title, body-text, chip]
+use_for: "Use FeatureGrid for the home page's four features in a medium SiteSection, FeatureRows for a product page that needs more room. Draw each picture from the page's own parts and key its motion off group-data-[state=…]/feature."
+never: [Icons in place of pictures, Stock photos, More than one blue voice in a picture, Pictures that loop, A move that does not end on the finished frame, More than six features in the grid]
+source: "opencommerce-agentcard-web src/components/features.tsx, src/components/feature-play.tsx, src/app/globals.css (THE FEATURE PICTURES)"
 ---
 
-`FeatureRows` and `FeatureGrid` take the same props: `rows` (`{ tags?, title, description?, media?, align?, footnote?
-}[]`), `product` (the blue key on every row: `Vault`) and `numbered` (the row's place, `01/08`; on by default). `align`
-is `foot` (default: the media rises from the panel's foot and is cut off, as a phone) or `center` (a window or code).
-Rows stack, copy first, below 1024px.
+`FeatureGrid` and `FeatureRows` take `features` ({ title, description, media, file, tags }[]) plus list props.
+`FeatureTag` is the small mono tag (FeatureRows shows `tags` with it).
 
-Helpers for the copy: `FeatureLogos` (`logos`, `more`: logos in small white keys, three to a row, and a dotted "and
-more" key), `FeaturePowered` (`label` (default "Powered by"), `href`, children: the partner's mark) and `FeatureTag`
-(`blue`, children: one small key).
-
-The brand's panels carry a moving grain (a WebGL shader) on the blue and fluted glass on the pale panels; here they are
-flat `bg-brand` and `bg-blue-mist`. Pass a backdrop inside `media` if you need the texture.
+A picture's motion: the card's `data-state` is absent (the finished frame: the server render and reduced motion),
+`idle` (the opening frame) or `play` (the move). Write the finished frame as the default, the opening frame under
+`group-data-[state=idle]/feature:` and the move under `group-data-[state=play]/feature:` with fill-mode backwards, so
+each piece holds its opening frame through its delay. Keep moves at 300ms or less each, ease-out; a sequence may
+stagger them (30 to 80ms apart).

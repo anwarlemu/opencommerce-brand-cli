@@ -8,22 +8,22 @@ import { useHold } from "@/hooks/use-hold";
 import { usePortalContainer } from "@/lib/surface";
 import { cn } from "@/lib/utils";
 
-// The brand's menu: the floating panel (white, a 16 percent ink hairline, 8px corners, the tooltip shadow) with 4px of
-// padding, rows in the 14px display face that take a faint wash when highlighted, with no transition, since menus are
-// worked from the keyboard. It grows from its trigger (scale 0.97 and a fade, 160ms ease-out). `glass` is the dock's
-// menu: ink at 42 percent under a light sheen and a blur, a white hairline, white rows that wash white when highlighted.
+// The brand's menu: a floating white panel (a 9 percent ink edge, 8px corners, a soft drop) with 4px of padding, rows
+// in 14px Inter with 5px corners that take a faint wash when highlighted, with no transition, since menus are worked
+// from the keyboard. It grows from its trigger (scale 0.97 and a fade, 160ms ease-out). `glass` is the header's tray as
+// a menu: white at 72 percent under a light sheen and a blur, a 10 percent ink edge, the same rows.
 // Destructive rows can require a hold (DropdownMenuHoldItem) so a stray click can't delete anything.
 const PANEL = {
-  default: "border-hairline bg-surface text-fg shadow-tooltip",
-  glass: "border-line-on-brand bg-glass bg-(image:--ds-glass-sheen) text-on-brand shadow-floating [backdrop-filter:var(--ds-glass-blur)]",
+  default: "border-line bg-surface text-fg shadow-floating",
+  glass: "border-line-glass bg-glass bg-(image:--ds-glass-sheen) text-fg shadow-floating [backdrop-filter:var(--ds-glass-blur)]",
 } as const;
 
 const MenuVariant = React.createContext<keyof typeof PANEL>("default");
 
 const ROW =
-  "relative flex w-full cursor-default items-center gap-2 rounded-menu px-2.5 py-2 font-display text-body-sm leading-snug text-fg-secondary outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-40 data-[highlighted]:bg-wash-hover data-[highlighted]:text-fg group-data-[variant=glass]/menu:text-on-brand group-data-[variant=glass]/menu:leading-none group-data-[variant=glass]/menu:text-caption group-data-[variant=glass]/menu:rounded-sm group-data-[variant=glass]/menu:px-2.75 group-data-[variant=glass]/menu:py-3 group-data-[variant=glass]/menu:data-[highlighted]:bg-wash-glass-hover group-data-[variant=glass]/menu:data-[highlighted]:shadow-glass-hover group-data-[variant=glass]/menu:data-[highlighted]:text-on-brand [&_svg]:size-3.5 [&_svg]:shrink-0";
-const DANGER = "text-danger data-[highlighted]:bg-danger/6 data-[highlighted]:text-danger group-data-[variant=glass]/menu:text-danger group-data-[variant=glass]/menu:data-[highlighted]:text-danger";
-const QUIET = "text-fg-muted group-data-[variant=glass]/menu:text-fg-on-brand-muted";
+  "relative flex w-full cursor-default items-center gap-2 rounded-menu px-2.5 py-2 font-sans text-body-sm leading-snug text-fg-muted outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-40 data-[highlighted]:bg-wash-hover data-[highlighted]:text-fg [&_svg]:size-3.5 [&_svg]:shrink-0";
+const DANGER = "text-danger data-[highlighted]:bg-danger/6 data-[highlighted]:text-danger";
+const QUIET = "text-fg-faint";
 
 function DropdownMenu(props: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
   return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
@@ -101,7 +101,7 @@ function DropdownMenuCheckboxItem({ className, children, checked, ...props }: Re
   return (
     <DropdownMenuPrimitive.CheckboxItem data-slot="dropdown-menu-checkbox-item" checked={checked} className={cn(ROW, "pr-8", className)} {...props}>
       {children}
-      <DropdownMenuPrimitive.ItemIndicator className="absolute right-2.5 text-fg-brand group-data-[variant=glass]/menu:text-on-brand">
+      <DropdownMenuPrimitive.ItemIndicator className="absolute right-2.5 text-fg-brand">
         <Check strokeWidth={1.75} />
       </DropdownMenuPrimitive.ItemIndicator>
     </DropdownMenuPrimitive.CheckboxItem>
@@ -116,7 +116,7 @@ function DropdownMenuRadioItem({ className, children, ...props }: React.Componen
   return (
     <DropdownMenuPrimitive.RadioItem data-slot="dropdown-menu-radio-item" className={cn(ROW, "pr-8 data-[state=checked]:text-fg", className)} {...props}>
       {children}
-      <DropdownMenuPrimitive.ItemIndicator className="absolute right-2.5 text-fg-brand group-data-[variant=glass]/menu:text-on-brand">
+      <DropdownMenuPrimitive.ItemIndicator className="absolute right-2.5 text-fg-brand">
         <Check strokeWidth={1.75} />
       </DropdownMenuPrimitive.ItemIndicator>
     </DropdownMenuPrimitive.RadioItem>
@@ -124,11 +124,11 @@ function DropdownMenuRadioItem({ className, children, ...props }: React.Componen
 }
 
 function DropdownMenuLabel({ className, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Label>) {
-  return <DropdownMenuPrimitive.Label data-slot="dropdown-menu-label" className={cn("px-2.5 pt-2 pb-1 font-display text-caption", QUIET, className)} {...props} />;
+  return <DropdownMenuPrimitive.Label data-slot="dropdown-menu-label" className={cn("px-2.5 pt-2 pb-1 font-sans text-caption", QUIET, className)} {...props} />;
 }
 
 function DropdownMenuSeparator({ className, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
-  return <DropdownMenuPrimitive.Separator data-slot="dropdown-menu-separator" className={cn("-mx-1 my-1 h-px bg-line group-data-[variant=glass]/menu:bg-line-on-brand", className)} {...props} />;
+  return <DropdownMenuPrimitive.Separator data-slot="dropdown-menu-separator" className={cn("-mx-1 my-1 h-px bg-line", className)} {...props} />;
 }
 
 function DropdownMenuShortcut({ className, ...props }: React.ComponentProps<"span">) {
@@ -141,7 +141,7 @@ function DropdownMenuSub(props: React.ComponentProps<typeof DropdownMenuPrimitiv
 
 function DropdownMenuSubTrigger({ className, children, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.SubTrigger>) {
   return (
-    <DropdownMenuPrimitive.SubTrigger data-slot="dropdown-menu-sub-trigger" className={cn(ROW, "data-[state=open]:bg-wash-hover group-data-[variant=glass]/menu:data-[state=open]:bg-wash-glass-hover group-data-[variant=glass]/menu:data-[state=open]:shadow-glass-hover", className)} {...props}>
+    <DropdownMenuPrimitive.SubTrigger data-slot="dropdown-menu-sub-trigger" className={cn(ROW, "data-[state=open]:bg-wash-hover", className)} {...props}>
       {children}
       <ChevronRight className="ml-auto" strokeWidth={1.5} />
     </DropdownMenuPrimitive.SubTrigger>

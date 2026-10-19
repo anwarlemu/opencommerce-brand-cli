@@ -3,37 +3,37 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-// A card with a title bar, as the brand draws its plans, cases, directories and FAQ (agentcard.sh, .v7-windowbar):
-// a 32px bar with an arrow, a file-like name and the [*] mark, over a white body with 12px corners and the soft drop.
-// The bar is sky with blue marks; `blue` is the featured window's bar, white marks on the blue. The tints are the
-// customer windows on the home page (.v7-customer): a shorter 26px bar in one pale hue, lit across its middle, over a 14
-// percent ink rule, ink marks at 45 percent; the window itself 10px corners, a 22 percent ink edge and the tile's soft
-// drop.
+// The brand's window (globals.css .win, .win-bar, .win-mark; computed): a plain white card on a 16 percent ink edge with
+// 12px corners and the soft drop, under a quiet 36px title bar. The bar is mist (ink at 2.5 percent) over a 9 percent
+// rule, set in the 11.5px platform mono at 64 percent ink: a dimmed arrow at the left, the file name centered, and the
+// drawn [*] in blue at the right (or an action, such as Copy). `dark` puts the body on ink for code that runs. The other
+// tones are kept for pages that need them: `sky` (a sky bar with blue marks), `blue` (white marks on the blue, for the
+// one window that matters) and five pale tints for a grid of apps.
 const windowBarVariants = cva(
-  "flex h-8 shrink-0 items-center justify-between gap-3 border-b px-2.5 font-display text-micro leading-body",
+  "grid min-h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b pr-3 pl-3.5 font-mono text-bar leading-body",
   {
     variants: {
       tone: {
-        sky: "border-line-window bg-window-bar text-window-bar-fg",
+        mist: "border-line bg-window-bar text-fg-muted",
+        sky: "border-line bg-sky text-fg-brand",
         blue: "border-line-brand-edge bg-brand text-on-brand",
-        sage: "h-6.5 border-line bg-linear-to-r from-tint-sage via-[color-mix(in_srgb,var(--ds-color-tint-sage)_55%,var(--ds-color-white))] to-tint-sage text-fg",
-        rose: "h-6.5 border-line bg-linear-to-r from-tint-rose via-[color-mix(in_srgb,var(--ds-color-tint-rose)_55%,var(--ds-color-white))] to-tint-rose text-fg",
-        teal: "h-6.5 border-line bg-linear-to-r from-tint-teal via-[color-mix(in_srgb,var(--ds-color-tint-teal)_55%,var(--ds-color-white))] to-tint-teal text-fg",
-        peach: "h-6.5 border-line bg-linear-to-r from-tint-peach via-[color-mix(in_srgb,var(--ds-color-tint-peach)_55%,var(--ds-color-white))] to-tint-peach text-fg",
-        butter: "h-6.5 border-line bg-linear-to-r from-tint-butter via-[color-mix(in_srgb,var(--ds-color-tint-butter)_55%,var(--ds-color-white))] to-tint-butter text-fg",
+        sage: "border-line bg-tint-sage text-fg",
+        rose: "border-line bg-tint-rose text-fg",
+        teal: "border-line bg-tint-teal text-fg",
+        peach: "border-line bg-tint-peach text-fg",
+        butter: "border-line bg-tint-butter text-fg",
       },
     },
-    defaultVariants: { tone: "sky" },
+    defaultVariants: { tone: "mist" },
   },
 );
 
 type Tone = NonNullable<VariantProps<typeof windowBarVariants>["tone"]>;
-const TINTS: Tone[] = ["sage", "rose", "teal", "peach", "butter"];
 
-/** The [*] mark at the right of a window bar: an asterisk drawn in three strokes between brackets. */
+/** The [*] mark at the right of a window bar: an asterisk drawn in three strokes between brackets, in the bar's blue. */
 function WindowMark({ className }: { className?: string }) {
   return (
-    <span aria-hidden className={cn("inline-flex items-center gap-px leading-none", className)}>
+    <span aria-hidden className={cn("inline-flex items-center gap-px text-caption leading-none text-window-bar-fg", className)}>
       [
       <svg viewBox="0 0 12 12" className="size-[0.8em] fill-none stroke-current [stroke-linecap:square] [stroke-width:1.6]">
         <path d="M6 .5v11M1.24 3.25l9.52 5.5M1.24 8.75l9.52-5.5" />
@@ -44,36 +44,32 @@ function WindowMark({ className }: { className?: string }) {
 }
 
 function WindowBar({ name, tone, actions, className, ...props }: Omit<React.ComponentProps<"div">, "children"> & { name: React.ReactNode; tone?: Tone; actions?: React.ReactNode }) {
+  const onColor = tone === "blue" || tone === "sky";
   return (
     <div data-slot="window-bar" className={cn(windowBarVariants({ tone }), className)} {...props}>
-      <span aria-hidden className="tracking-mark opacity-45">
+      <span aria-hidden className="justify-self-start opacity-60">
         ↳
       </span>
-      <span className="min-w-0 truncate">{name}</span>
-      {actions ?? <WindowMark className={tone && TINTS.includes(tone) ? "opacity-45" : undefined} />}
+      <span className="min-w-0 truncate text-center">{name}</span>
+      <span className="flex min-w-0 items-center justify-self-end">{actions ?? <WindowMark className={onColor ? "text-current" : undefined} />}</span>
     </div>
   );
 }
 
 /**
- * A window: the bar, then its body. `name` is the bar's label (pricing.plan, team.dir); `tone` its color. `raised`
- * adds the plan window's hard offset shadow (6px at 22 percent ink, as on /pricing and /about).
+ * A window: the bar, then its body. `name` is the bar's file name (agent.ts, standard.plan); `tone` its bar; `dark`
+ * puts the body on ink (code that runs); `actions` replaces the [*] (a Copy key). `raised` gives the firmer drop of a
+ * card set on a picture.
  */
-function Window({ name, tone, actions, raised = false, className, bodyClassName, children, ...props }: React.ComponentProps<"div"> & { name: React.ReactNode; tone?: Tone; actions?: React.ReactNode; raised?: boolean; bodyClassName?: string }) {
+function Window({ name, tone, actions, raised = false, dark = false, className, bodyClassName, children, ...props }: React.ComponentProps<"div"> & { name: React.ReactNode; tone?: Tone; actions?: React.ReactNode; raised?: boolean; dark?: boolean; bodyClassName?: string }) {
   return (
     <div
       data-slot="window"
-      className={cn(
-        "flex flex-col overflow-hidden rounded-card border border-hairline bg-surface text-fg",
-        raised ? "shadow-plan" : "shadow-card",
-        tone && TINTS.includes(tone) && "rounded-[calc(var(--ds-radius-sm)+var(--ds-space-1))] border-line-mid",
-        tone && TINTS.includes(tone) && !raised && "shadow-tile",
-        className,
-      )}
+      className={cn("flex flex-col overflow-hidden rounded-panel border border-line-window bg-surface text-fg", raised ? "shadow-raised" : "shadow-card", className)}
       {...props}
     >
       <WindowBar name={name} tone={tone} actions={actions} />
-      <div className={cn("min-h-0 flex-1", bodyClassName)}>{children}</div>
+      <div className={cn("min-h-0 flex-1", dark ? "bg-code text-fg-code" : "bg-surface", bodyClassName)}>{children}</div>
     </div>
   );
 }

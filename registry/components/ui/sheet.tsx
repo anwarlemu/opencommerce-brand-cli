@@ -8,8 +8,8 @@ import { WindowBar } from "@/components/ui/window";
 import { usePortalContainer } from "@/lib/surface";
 import { cn } from "@/lib/utils";
 
-// A side panel that is one of the brand's windows (the guides' panel, .v7-guide-nav, which closes to its bar over the page): white, a 16 percent ink hairline, 12px corners, the 32px sky title bar
-// (`name`) with a close mark where the [*] sits, floating 8px in from the screen's edge over the ink scrim, blurred 4px as behind the get-started dialog (.v7-gate::backdrop). It
+// A side panel that is one of the brand's windows: white, a 16 percent ink edge, 12px corners, the 36px mist title bar
+// (`name`) with a close mark where the [*] sits, floating 8px in from the screen's edge over the ink scrim, blurred 4px. It
 // slides in from its side as it fades (260ms ease-out, on transform); reduced motion keeps the fade. Pass
 // `modal={false}` to Sheet to keep the page behind it usable (no scrim then).
 function Sheet(props: React.ComponentProps<typeof SheetPrimitive.Root>) {
@@ -50,7 +50,7 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col overflow-hidden rounded-card border border-hairline bg-surface text-fg shadow-code outline-none transition-[opacity,translate] duration-260 ease-out starting:opacity-0 motion-reduce:starting:translate-x-0 motion-reduce:starting:translate-y-0",
+          "fixed z-50 flex flex-col overflow-hidden rounded-panel border border-line-window bg-surface text-fg shadow-floating outline-none transition-[opacity,translate] duration-260 ease-out starting:opacity-0 motion-reduce:starting:translate-x-0 motion-reduce:starting:translate-y-0",
           SIDES[side],
           className,
         )}
@@ -62,7 +62,7 @@ function SheetContent({
           actions={
             <SheetPrimitive.Close
               aria-label="Close"
-              className="-mr-1.5 grid size-7 shrink-0 place-items-center rounded-sm opacity-60 outline-none transition-[opacity,background-color] duration-150 ease-out hover:bg-wash-selected hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-solid focus-visible:outline-focus-ring [&_svg]:size-3.5"
+              className="-mr-1.5 grid size-7 shrink-0 place-items-center rounded-sm opacity-60 outline-none transition-[opacity,background-color] duration-150 ease-out hover:bg-wash-hover hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-solid focus-visible:outline-focus-ring [&_svg]:size-3.5"
             >
               <X strokeWidth={1.5} />
             </SheetPrimitive.Close>

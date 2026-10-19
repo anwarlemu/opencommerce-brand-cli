@@ -3,9 +3,9 @@ import * as React from "react";
 import { WindowBar } from "@/components/ui/window";
 import { cn } from "@/lib/utils";
 
-// An empty list or a search with no results, as a quiet window: a 16 percent ink hairline and 12px corners with no drop,
-// the 32px sky title bar (`name`, file-like: `cards.list`, `search.results`), and a centered body on the pale ground: an
-// optional mark, a title in the 20px display face at 500, one line in Inter at 68 percent ink, and an optional key.
+// An empty list or a search with no results, as a quiet window: the 16 percent ink edge and 12px corners with no drop,
+// the mist title bar (`name`, file-like: `orders.list`, `search.results`), and a centered body on white: an optional
+// mark, a title in the 20px display face at 500, one line in Inter at 64 percent ink, and an optional key.
 function EmptyState({
   title,
   description,
@@ -28,11 +28,11 @@ function EmptyState({
   tone?: React.ComponentProps<typeof WindowBar>["tone"];
 }) {
   return (
-    <div data-slot="empty-state" className={cn("flex flex-col overflow-hidden rounded-card border border-hairline bg-surface text-fg", className)} {...props}>
+    <div data-slot="empty-state" className={cn("flex flex-col overflow-hidden rounded-panel border border-line-window bg-surface text-fg", className)} {...props}>
       {name !== null && <WindowBar name={name} tone={tone} />}
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 bg-subtle px-6 py-12 text-center md:py-16">
+      <div className="flex flex-1 flex-col items-center justify-center gap-3 bg-surface px-6 py-12 text-center md:py-16">
         {icon && (
-          <div aria-hidden className="mb-1 grid size-10 place-items-center rounded-control border border-hairline bg-surface text-fg-brand shadow-key [&_svg]:size-4.5">
+          <div aria-hidden className="mb-1 grid size-10 place-items-center rounded-card border border-line bg-surface text-fg-brand shadow-tile [&_svg]:size-4.5">
             {icon}
           </div>
         )}

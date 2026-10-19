@@ -3,9 +3,12 @@ name: pricing
 title: Pricing
 type: site
 surface: site
-description: "Pricing plans grouped by product, with optional tabs."
-kinds: [window, window-bar, stat, tabs, button-primary]
-use_for: "Pass title and products with their plans, prices, features and actions. Use one featured plan per product. A single product hides the tabs."
-never: [More than one featured plan per product, Repeating the free plan's features in the paid plan (use includes), Strikethrough prices without a reason, A pill or secondary key for the plan's action]
-source: "agentcard-website src/components/v7/pricing-plans.tsx; agentcard.sh /pricing (.plan-tabs, .v7-offer-card, .v7-offer-list, computed)"
+description: "Plans side by side in windows, with the figure, compared rows and a full-width key; one plan featured."
+kinds: [window, window-bar, stat, chip, button-primary, button-secondary]
+use_for: "Pass title, description, the compared rows and two plans with one value per row. Feature at most one plan."
+never: [More than one featured plan, More than three plans, Strikethrough prices without a reason, Check lists in place of compared rows, A blue window]
+source: "opencommerce-agentcard-web src/components/pricing.tsx, src/lib/content.ts (PRICING)"
 ---
+
+`Pricing` props: `title`, `description`, `rows` (the labels compared), `plans` ({ name, badge, price, unit, blurb,
+values, action ({ label, href } or a node), featured, file }[]), plus div props.

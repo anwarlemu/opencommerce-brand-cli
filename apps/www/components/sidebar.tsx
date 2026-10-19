@@ -10,10 +10,10 @@ import { cn } from "@/lib/utils";
 
 type Group = { label: string; items: { name: string; title: string }[] };
 
-// A row of the list, as the guides' nav draws one: 14px Inter at 68 percent ink in an 8px-cornered row, a 4 percent
-// wash on hover; the current page is the pale sky row with blue text at 500.
+// A row of the list: 14px Inter in muted ink in a 6px-cornered row, a 5 percent wash on hover; the current page is the
+// pale blue row with blue text, as the brand highlights the step you are on.
 const LINK =
-  "block rounded-control px-2.5 py-1.5 text-body-sm leading-snug text-fg-muted outline-none transition-[background-color,color] duration-150 ease-out hover:bg-wash-hover hover:text-fg focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring aria-[current=page]:bg-sky-wash aria-[current=page]:font-medium aria-[current=page]:text-fg-brand motion-reduce:transition-none";
+  "block rounded-card px-2.5 py-1.5 text-body-sm leading-snug text-fg-muted outline-none transition-[background-color,color] duration-150 ease-out hover:bg-wash-hover hover:text-fg focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring aria-[current=page]:bg-blue-5 aria-[current=page]:text-fg-brand motion-reduce:transition-none";
 
 function useCurrent() {
   const pathname = usePathname();
@@ -45,8 +45,7 @@ function Groups({ groups, current, query, onNavigate }: { groups: Group[]; curre
 }
 
 /**
- * The library's panel, as the guides' nav (.v7-guide-nav): a white window with the sky bar (library.dir), the filter,
- * then the groups ruled apart. From 1024px it sticks beside the page and scrolls inside; below, it closes to its bar
+ * The library's panel: a window with the quiet mist bar (library.dir), the filter, then the groups ruled apart. From 1024px it sticks beside the page and scrolls inside; below, it closes to its bar
  * over the page, which opens it.
  */
 export function LibraryNav({ groups }: { groups: Group[] }) {
@@ -56,16 +55,16 @@ export function LibraryNav({ groups }: { groups: Group[] }) {
   // The shared layout owns this list: route changes must preserve its scroll and filter.
 
   return (
-    <nav aria-label="Library" data-open={open || undefined} className="group/nav overflow-hidden rounded-card border border-hairline bg-surface shadow-guide lg:sticky lg:top-6">
+    <nav aria-label="Library" data-open={open || undefined} className="group/nav overflow-hidden rounded-panel border border-line-window bg-surface shadow-card lg:sticky lg:top-24">
       <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="block w-full text-left outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus-ring lg:pointer-events-none">
         <WindowBar name="library.dir" className="max-lg:group-not-data-open/nav:border-b-transparent" actions={
             <>
-              <span className="font-display text-caption text-fg lg:hidden">{open ? "Close" : "Browse the library"}</span>
+              <span className="font-sans text-caption text-fg lg:hidden">{open ? "Close" : "Browse the library"}</span>
               <WindowMark className="max-lg:hidden" />
             </>
           } />
       </button>
-      <div className={cn("grid gap-4.5 px-2.5 pt-3.5 pb-4 lg:max-h-[calc(100svh-var(--spacing)*20)] lg:overflow-y-auto lg:overscroll-contain lg:[scrollbar-width:none]", !open && "max-lg:hidden")}>
+      <div className={cn("grid gap-4.5 px-2.5 pt-3.5 pb-4 lg:max-h-[calc(100svh-var(--spacing)*38)] lg:overflow-y-auto lg:overscroll-contain lg:[scrollbar-width:none]", !open && "max-lg:hidden")}>
         <Input variant="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Filter the library" aria-label="Filter the library" />
         <Groups groups={groups} current={current} query={query} onNavigate={() => setOpen(false)} />
       </div>

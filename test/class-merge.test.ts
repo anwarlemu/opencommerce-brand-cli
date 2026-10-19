@@ -46,5 +46,5 @@ export const untouched = 42;`;
 it("the CLI fallback can extract the form label appearance", () => {
   const source = readFileSync(new URL("../registry/components/ui/label.tsx", import.meta.url), "utf8");
   const classes = libraryClasses(source, "Label", () => undefined);
-  expect(classes).toContain("font-display text-caption leading-normal text-fg-muted");
+  expect(classes).toContain("font-sans text-caption leading-normal text-fg-muted");
 });

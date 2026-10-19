@@ -9,11 +9,9 @@ const Mark = ({ d }: { d: string }) => (
 export function Site() {
   return (
     <section className="mx-auto w-full max-w-(--ds-frame-column) py-20">
-      <div className="mx-auto max-w-(--ds-layout-heading) text-center">
-        <h2 className="font-display text-h2 leading-heading font-medium tracking-tighter">Powering payments for agentic startups</h2>
-        <p className="mt-3.5 text-body-lg leading-6.5 tracking-tight opacity-70">
-          Consumer apps, B2B companies and crypto teams run their agents’ purchases on Agentcard.
-        </p>
+      <div className="mx-auto max-w-(--ds-layout-heading) pb-12 text-center">
+        <h2 className="font-display text-h2 leading-display font-medium tracking-tighter">Agents that already buy</h2>
+        <p className="mx-auto mt-4 max-w-(--ds-layout-text) text-body leading-lead text-fg-muted">Consumer apps, B2B companies and crypto teams run their agents’ purchases through opencommerce.</p>
       </div>
       <Testimonials
         cases={[

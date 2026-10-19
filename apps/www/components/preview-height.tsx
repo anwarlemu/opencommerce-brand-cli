@@ -18,7 +18,7 @@ export function PreviewHeight() {
     };
     root.addEventListener("click", openLink, true);
     const observer = new ResizeObserver(() => {
-      window.parent.postMessage({ type: "agentcard:preview-height", height: root.getBoundingClientRect().height }, window.location.origin);
+      window.parent.postMessage({ type: "ds:preview-height", height: root.getBoundingClientRect().height }, window.location.origin);
     });
     observer.observe(root);
     return () => { observer.disconnect(); root.removeEventListener("click", openLink, true); };

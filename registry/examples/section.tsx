@@ -1,9 +1,9 @@
-import { Eyebrow, SectionHeading, SiteSection } from "@/components/site/section";
+import { SectionHeading, SiteSection } from "@/components/site/section";
 import { Window } from "@/components/ui/window";
 
 function Placeholder({ name }: { name: string }) {
   return (
-    <Window name={name} className="h-48" bodyClassName="flex items-center justify-center bg-sky-wash font-display text-caption text-fg-label">
+    <Window name={name} className="h-48" bodyClassName="flex items-center justify-center font-mono text-caption text-fg-muted">
       Content
     </Window>
   );
@@ -12,20 +12,16 @@ function Placeholder({ name }: { name: string }) {
 export function Site() {
   return (
     <>
-      <SiteSection>
-        <SectionHeading title="Powering payments for agentic startups" description="Consumer apps, B2B companies and crypto platforms use Agentcard to let their agents pay." />
-        <div className="mt-16 grid gap-6 md:grid-cols-3">
-          <Placeholder name="first.case" />
-          <Placeholder name="second.case" />
-          <Placeholder name="third.case" />
+      <SiteSection width="medium">
+        <SectionHeading title="Everything your agent needs to buy" description="One endpoint for every store: search the catalogue, check out and track the order, with the uptime to rely on." />
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Placeholder name="merchants.feature" />
+          <Placeholder name="checkout.feature" />
         </div>
       </SiteSection>
-      <SiteSection ground="paper">
-        <SectionHeading eyebrow="Products" title="Explore our products" description="Vault, Issuing, Voice and the Purchase Agent." />
-      </SiteSection>
-      <SiteSection ground="blue">
-        <Eyebrow>On the blue</Eyebrow>
-        <SectionHeading align="start" className="mt-2.5" title="A lit band" description="White text, sky labels." />
+      <SiteSection className="pb-18 md:pb-30">
+        <SectionHeading eyebrow="Monitoring" title="Merchant monitoring" description="Every route is exercised around the clock." />
+        <Placeholder name="monitoring.live" />
       </SiteSection>
     </>
   );

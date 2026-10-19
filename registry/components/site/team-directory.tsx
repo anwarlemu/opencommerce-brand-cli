@@ -3,11 +3,10 @@ import * as React from "react";
 import { Window } from "@/components/ui/window";
 import { cn } from "@/lib/utils";
 
-// The About page's team and investors (agentcard.sh/about, .v7-about-sec): a window holding a ruled grid of people.
-// Each cell is a gray photo, the name in the display face and the role in small muted display type; a cell that links
-// out carries a blue arrow in its top right corner that nudges up and right as the cell lights sky under the pointer.
-// The team sits two to a row in the blue-bar window, the investors three to a row in the sky one, with the backers
-// (Y Combinator, Pioneer) as the last, two-column row. One column on phones.
+// A team or investors directory, in the home page's windows: a window holding a grid of people ruled by hairlines.
+// Each cell is a gray photo, the name in the display face and the role in the small muted mono; a cell that links out
+// carries a blue arrow in its top right corner (it never moves) and takes the mist under the pointer. Two to a row with
+// larger photos, three with smaller; the backers can close it as a two-column row of logos. One column on phones.
 
 type Person = {
   name: React.ReactNode;
@@ -43,7 +42,7 @@ function Go() {
   return (
     <span
       aria-hidden
-      className="absolute top-3 right-3.5 font-sans text-body-sm leading-none text-fg-brand transition-[translate] duration-150 ease-out group-hover/cell:translate-x-0.5 group-hover/cell:-translate-y-0.5 motion-reduce:transition-none motion-reduce:group-hover/cell:translate-0"
+      className="absolute top-3 right-3.5 font-sans text-body-sm leading-none text-fg-faint transition-colors duration-(--ds-duration-fast) ease-out group-hover/cell:text-fg-brand motion-reduce:transition-none"
     >
       ↗
     </span>
@@ -62,7 +61,7 @@ function Cell({ href, ariaLabel, large, className, children }: { href?: string; 
           aria-label={ariaLabel}
           className={cn(
             box,
-            "group/cell pr-9 outline-none transition-[background-color] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--ds-color-sky)_40%,var(--ds-color-white))] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring motion-reduce:transition-none",
+            "group/cell pr-9 outline-none transition-[background-color] duration-150 ease-out hover:bg-subtle focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring motion-reduce:transition-none",
           )}
         >
           {children}
@@ -84,8 +83,6 @@ function Photo({ photo, alt, large }: { photo: Person["photo"]; alt: string; lar
 type TeamDirectoryProps = Omit<React.ComponentProps<"div">, "children"> & {
   /** The window bar's label (team.dir, investors.dir). */
   name: React.ReactNode;
-  /** blue for the team (the window that matters), sky for the rest. */
-  tone?: "blue" | "sky";
   /** People per row from the small breakpoint up; one on phones. Two cells larger photos (64px), three smaller (40px). */
   columns?: 1 | 2 | 3;
   people: Person[];
@@ -93,10 +90,10 @@ type TeamDirectoryProps = Omit<React.ComponentProps<"div">, "children"> & {
   footer?: FooterCell[];
 };
 
-function TeamDirectory({ name, tone = "sky", columns = 2, people, footer, className, ...props }: TeamDirectoryProps) {
+function TeamDirectory({ name, columns = 2, people, footer, className, ...props }: TeamDirectoryProps) {
   const large = columns <= 2;
   return (
-    <Window name={name} tone={tone} raised className={className} bodyClassName="overflow-hidden rounded-b-[calc(var(--ds-radius-card)-1px)]" {...props}>
+    <Window name={name} className={className} bodyClassName="overflow-hidden" {...props}>
       <ul className={cn("m-0 grid list-none grid-cols-1 gap-px bg-line p-0", COLUMNS[columns])}>
         {people.map((p, i) => {
           const alt = p.photoAlt ?? (typeof p.name === "string" ? `Photo of ${p.name}` : "");
@@ -105,7 +102,7 @@ function TeamDirectory({ name, tone = "sky", columns = 2, people, footer, classN
               {p.photo ? <Photo photo={p.photo} alt={alt} large={large} /> : null}
               <span className="grid min-w-0 gap-1">
                 <b className="font-display text-body leading-snug font-medium">{p.name}</b>
-                {p.role ? <span className="font-display text-micro leading-4 tracking-label text-fg-muted">{p.role}</span> : null}
+                {p.role ? <span className="font-mono text-caption leading-4 text-fg-muted">{p.role}</span> : null}
               </span>
             </Cell>
           );

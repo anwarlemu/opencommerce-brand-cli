@@ -1,33 +1,17 @@
 import { SiteHeader } from "@/components/site/site-header";
 
+const LINKS = [
+  { label: "Home", href: "#top" },
+  { label: "Features", href: "#features" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Docs", href: "https://docs.agentcard.sh" },
+];
+
 export function Site() {
   return (
-    <div className="relative h-50 bg-brand">
-      <SiteHeader href="https://www.agentcard.sh/" ground="blue" action={{ label: "Get started", href: "https://app.agentcard.sh/" }} />
-    </div>
-  );
-}
-
-export function White() {
-  return (
-    <div className="relative h-50 bg-surface">
-      <SiteHeader href="https://www.agentcard.sh/" ground="white" action={{ label: "Get started", href: "https://app.agentcard.sh/" }} />
-    </div>
-  );
-}
-
-export function WithLinks() {
-  return (
-    <div className="relative h-50 bg-surface">
-      <SiteHeader href="https://www.agentcard.sh/"
-        ground="white"
-        links={[
-          { label: "Vault", href: "https://www.agentcard.sh/vault" },
-          { label: "Issuing", href: "https://www.agentcard.sh/issuing" },
-          { label: "Pricing", href: "https://www.agentcard.sh/pricing", current: true },
-        ]}
-        action={{ label: "Get started", href: "https://app.agentcard.sh/" }}
-      />
+    <div className="min-h-40 bg-surface pt-4">
+      <SiteHeader fixed={false} links={LINKS} action={{ label: "Get started", href: "https://app.agentcard.sh" }} />
     </div>
   );
 }

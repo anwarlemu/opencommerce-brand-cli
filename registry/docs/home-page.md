@@ -3,9 +3,9 @@ name: home-page
 title: Home page
 type: block
 surface: site
-description: "Home page template with product sections, integrations, FAQ and navigation."
+description: "Home page template: header, hero, features, steps, live status, pricing, closing card, questions and footer."
 kinds: []
-use_for: "Use as a starting point for an Agentcard landing page. Replace sample content and media, and check every link."
-never: [Blue grounds stacked between the hero and the footer, A window bar on every card]
-source: agentcard-website src/app/page.tsx; agentcard.sh / (computed)
+use_for: "Use as a starting point for an opencommerce landing page. Replace the sample content and pictures, and check every link."
+never: [A blue or dark section, Two closing cards, A window bar on the hero's pill, Sections out of this order without a reason]
+source: opencommerce-agentcard-web src/components/home-page.tsx
 ---

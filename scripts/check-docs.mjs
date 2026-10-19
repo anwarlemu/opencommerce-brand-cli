@@ -67,8 +67,10 @@ try {
   await page.getByRole('radio', { name: 'Phone', exact: true }).first().click();
   await page.waitForFunction(previous => { const frame = document.querySelector('iframe'); return frame?.style.width === '390px' && Number.parseFloat(frame.style.height) !== previous; }, desktopHeight);
   const frame = await iframe.contentFrame();
-  await frame.getByText('Does the merchant need to integrate anything?', { exact: true }).click();
-  await frame.getByText('No. The agent pays at checkout with a card, as a person would.', { exact: true }).waitFor();
+  // The first question opens its answer, whatever the example's copy.
+  const question = frame.locator('summary, [aria-expanded]').first();
+  await question.click();
+  await frame.locator('details[open], [aria-expanded="true"]').first().waitFor();
   assert.equal(await frame.locator('html').evaluate(async () => { await document.fonts.ready; return [...document.fonts].every(font => font.status === 'loaded' || font.status === 'unloaded'); }), true);
   console.log('PASS: isolated previews render and resize at desktop and phone widths.');
 

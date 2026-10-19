@@ -19,12 +19,11 @@ function SearchIcon({ className }: { className?: string }) {
 }
 
 /**
- * The docs' search, as the guides draw theirs: a 36px bar that opens a palette of every item and page (also on ⌘K).
- * `glass` is the bar on the blue top (dark glass, a faint white rim, the light inner top); `field` the white one on a
- * white page (a pale edge, a faint inner shadow). The palette opens without an animation: it is opened from the
- * keyboard many times a day.
+ * The docs' search: a bar that opens a palette of every item and page (also on ⌘K). `field` is the white bar on a page
+ * (a hairline edge, a faint inner shadow); `tray` the compact link in the header's glass tray. The palette opens
+ * without an animation: it is opened from the keyboard many times a day.
  */
-export function DocsSearch({ entries, tone = "field", className }: { entries: SearchEntry[]; tone?: "glass" | "field"; className?: string }) {
+export function DocsSearch({ entries, tone = "field", className }: { entries: SearchEntry[]; tone?: "tray" | "field"; className?: string }) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
 
@@ -48,16 +47,16 @@ export function DocsSearch({ entries, tone = "field", className }: { entries: Se
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         className={cn(
-          "flex h-9 w-full items-center gap-2.5 rounded-control border pr-3 pl-3.5 text-left text-body-sm outline-none transition-[border-color] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 motion-reduce:transition-none",
-          tone === "glass"
-            ? "border-line-on-brand bg-glass bg-(image:--ds-glass-sheen) text-fg-on-brand-muted shadow-floating hover:border-line-on-brand-strong focus-visible:outline-white"
-            : "border-line-field bg-surface text-fg-muted shadow-inset hover:border-line-field-hover focus-visible:outline-focus-ring",
+          "flex items-center text-left text-body-sm outline-none transition-[background-color,border-color,color] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-focus-ring motion-reduce:transition-none",
+          tone === "tray"
+            ? "gap-2 rounded-menu px-3 py-2.25 leading-none text-fg-muted hover:bg-wash-hover hover:text-fg focus-visible:-outline-offset-2"
+            : "h-9 w-full gap-2.5 rounded-control border border-line-field bg-surface pr-3 pl-3.5 text-fg-muted shadow-inset hover:border-line-field-hover focus-visible:outline-offset-2",
           className,
         )}
       >
         <SearchIcon />
-        <span className="flex-1">Search the library...</span>
-        <kbd className={cn("font-display text-caption max-sm:hidden", tone === "glass" ? "text-fg-on-brand-muted" : "text-fg-faint")}>⌘K</kbd>
+        <span className={tone === "field" ? "flex-1" : undefined}>{tone === "tray" ? "Search" : "Search the library..."}</span>
+        <kbd className="font-mono text-caption text-fg-faint max-sm:hidden">⌘K</kbd>
       </button>
       <CommandDialog open={open} onOpenChange={setOpen} title="Search the library" description="Find a component, section, page or visual">
         <CommandInput placeholder="Search the library" />

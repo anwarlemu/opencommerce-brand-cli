@@ -1,39 +1,35 @@
 import { Cta } from "@/components/site/cta";
 import { Button } from "@/components/ui/button";
-import { Window } from "@/components/ui/window";
+import { InstallTabs } from "@/components/ui/install-tabs";
 
 export function Site() {
   return (
-    <div className="bg-surface py-16">
+    <div className="mx-auto w-(--ds-frame-column) py-16">
       <Cta
-        title="Let your agent buy"
-        description="Issue a card in minutes and set the limits it spends under."
+        title="Give your agent a checkout"
+        description="One endpoint, every online store. Start free: your first purchase can go through today."
         actions={
-          <Button asChild variant="on-brand">
-            <a href="https://app.agentcard.sh/">Get started</a>
-          </Button>
+          <>
+            <Button asChild>
+              <a href="https://app.agentcard.sh">Get started</a>
+            </Button>
+            <Button asChild variant="secondary">
+              <a href="https://cal.com/agentcard">Book a call</a>
+            </Button>
+          </>
+        }
+        media={
+          <InstallTabs
+            className="w-full max-w-md"
+            commands={[
+              { label: "npm", command: "npm install @agentcard/sdk" },
+              { label: "pnpm", command: "pnpm add @agentcard/sdk" },
+              { label: "yarn", command: "yarn add @agentcard/sdk" },
+              { label: "bun", command: "bun add @agentcard/sdk" },
+            ]}
+          />
         }
       />
     </div>
-  );
-}
-
-export function WithMedia() {
-  return (
-    <Cta
-      bandFrom="paper"
-      bandTo="paper"
-      title="Let your agent buy"
-      actions={
-        <Button asChild variant="on-brand">
-          <a href="https://app.agentcard.sh/">Get started</a>
-        </Button>
-      }
-      media={
-        <Window name="agent.request" className="mx-auto h-56 max-w-160 text-left shadow-code" bodyClassName="flex items-center justify-center bg-sky-wash font-display text-caption text-fg-label">
-          Imagery
-        </Window>
-      }
-    />
   );
 }

@@ -1,41 +1,18 @@
 import { ArrowUpRight } from "lucide-react";
 
 import { ProductGrid } from "@/components/site/product-grid";
+import { CodeWindow } from "@/components/ui/code-window";
 import { Window } from "@/components/ui/window";
 
-// Neutral stand-ins for the brand's pictures (3D cards, keycaps, screens), drawn from tokens so the layout reads.
-function Cards() {
+// Stand-ins for a product's pictures, drawn from the page's own parts: windows, hairlines and the one blue.
+function Screen({ name, rows }: { name: string; rows: [string, string][] }) {
   return (
-    <div className="relative h-56 w-80">
-      <div className="absolute inset-x-6 top-16 h-32 -rotate-2 rounded-card border border-hairline bg-surface shadow-tile" />
-      <div className="absolute inset-x-4 top-8 h-32 rotate-1 rounded-card bg-blue-mid shadow-tile" />
-      <div className="absolute inset-x-2 top-0 flex h-32 -rotate-3 flex-col justify-between rounded-card bg-inverse p-4 text-on-brand shadow-tile">
-        <span className="font-display text-body-sm">agentcard</span>
-        <span className="self-end font-display text-caption">···· 4832</span>
-      </div>
-    </div>
-  );
-}
-
-function Keys() {
-  const tints = ["bg-tint-peach", "bg-sky", "bg-tint-teal", "bg-tint-rose", "bg-tint-sage"];
-  return (
-    <div className="grid grid-cols-5 gap-3 md:gap-4">
-      {Array.from({ length: 15 }, (_, i) => (
-        <div key={i} className={`size-10 rounded-card md:size-14 border border-hairline shadow-key ${tints[(i * 2) % tints.length]}`} />
-      ))}
-    </div>
-  );
-}
-
-function Screen({ name, rows }: { name: string; rows: string[] }) {
-  return (
-    <Window name={name} className="w-full max-w-md -rotate-1">
-      <ul className="grid gap-2 p-4 text-caption">
-        {rows.map((row) => (
-          <li key={row} className="flex items-center justify-between rounded-sm border border-hairline px-3 py-2">
+    <Window name={name} className="w-full max-w-md">
+      <ul className="m-0 grid list-none gap-2 p-4 text-body-sm">
+        {rows.map(([row, status]) => (
+          <li key={row} className="flex items-center justify-between rounded-control border border-line px-3 py-2">
             {row}
-            <span className="rounded-chip bg-sky px-1.5 text-micro text-fg-brand">Active</span>
+            <span className="rounded-chip bg-tint px-1.5 py-0.5 font-mono text-caption leading-none text-fg-brand">{status}</span>
           </li>
         ))}
       </ul>
@@ -43,25 +20,23 @@ function Screen({ name, rows }: { name: string; rows: string[] }) {
   );
 }
 
+const CODE = `const order = await agentcard.commerce.buy({
+  query: "Oat milk, 6 pack",
+  store: "any",
+});`;
+
 export function Site() {
   return (
-    <section className="mx-auto w-full max-w-(--ds-frame-column) py-20">
-      <div className="mx-auto mb-18 max-w-(--ds-layout-heading) text-center max-lg:mb-10">
-        <h2 className="font-display text-h2 leading-heading font-medium tracking-tighter">Explore our products</h2>
-        <p className="mt-3.5 text-body-lg leading-6.5 tracking-tight opacity-70">Vault, Issuing, Voice and the Purchase Agent: what an agent needs to pay for things.</p>
+    <section className="mx-auto w-(--ds-frame-column) py-20">
+      <div className="mx-auto max-w-(--ds-layout-heading) pb-12 text-center">
+        <h2 className="font-display text-h2 leading-display font-medium tracking-tighter">One router, every way to buy</h2>
+        <p className="mx-auto mt-4 max-w-(--ds-layout-text) text-body leading-lead text-fg-muted">Search, checkout and tracking, for any store your agent needs.</p>
       </div>
       <ProductGrid
         products={[
-          { layout: "lead", title: "Vault", description: "Store customers’ cards and make purchases with agents safely.", action: { label: "Explore Vault", href: "https://www.agentcard.sh/vault" }, media: <Cards /> },
-          {
-            layout: "half",
-            title: "Purchase Agent",
-            description: "Integrate our agent into yours and enable purchases from Amazon, DoorDash and many other online stores.",
-            action: { label: "Read the docs", href: "https://docs.agentcard.sh", icon: <ArrowUpRight /> },
-            media: <Keys />,
-          },
-          { layout: "half", title: "Issuing", description: "Create one-time and multi-use cards for your agent.", action: { label: "Explore Issuing", href: "https://www.agentcard.sh/issuing" }, media: <Screen name="issuing.product" rows={["Agentcard ···· 4832", "Agentcard ···· 7719", "Agentcard ···· 2051"]} /> },
-          { layout: "lead", title: "Voice", description: "Let customers approve their agent’s purchases by speaking, with no screen to look at.", action: { label: "Explore Voice", href: "https://cal.com/team/agentcard/agentcard-call" }, media: <Screen name="voice.product" rows={["Your usual from Rose Indian, $34.20", "Approved"]} /> },
+          { layout: "lead", title: "Checkout", description: "One call takes your agent from a request to a confirmed order.", action: { label: "Read the docs", href: "https://docs.agentcard.sh", icon: <ArrowUpRight /> }, media: <CodeWindow title="buy.ts" code={CODE} dark className="w-full max-w-md" /> },
+          { layout: "half", title: "Search", description: "Catalogues from thousands of stores, searchable in plain words.", action: { label: "See stores", href: "#monitoring" }, media: <Screen name="search.product" rows={[["USB-C charger, 65W", "$32"], ["Running shoes, size 10", "$96"], ["Oat milk, 6 pack", "$18"]]} /> },
+          { layout: "half", title: "Tracking", description: "Every order followed to the door, with updates your agent can relay.", action: { label: "See pricing", href: "#pricing" }, media: <Screen name="orders.product" rows={[["#A-10293", "Shipped"], ["#A-10294", "Confirmed"]]} /> },
         ]}
       />
     </section>

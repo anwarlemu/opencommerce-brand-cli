@@ -1,231 +1,230 @@
-import { ArrowUpRight } from "lucide-react";
-
+import { Cta } from "@/components/site/cta";
 import { Faq } from "@/components/site/faq";
+import { FeatureGrid } from "@/components/site/feature-rows";
 import { Hero } from "@/components/site/hero";
-import { IntegrationCode, IntegrationScreen, Integrations } from "@/components/site/integrations";
 import { LogoStrip } from "@/components/site/logo-strip";
-import { NavDock } from "@/components/site/nav-dock";
-import { ProductGrid } from "@/components/site/product-grid";
+import { Pricing } from "@/components/site/pricing";
 import { SectionHeading, SiteSection } from "@/components/site/section";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { Testimonials } from "@/components/site/testimonials";
+import { StatusTable, type DayStatus } from "@/components/site/status-table";
+import { Steps } from "@/components/site/steps";
 import { Button } from "@/components/ui/button";
-import { Window } from "@/components/ui/window";
+import { CodeWindow } from "@/components/ui/code-window";
+import { InstallTabs } from "@/components/ui/install-tabs";
 
-// The footer as agentcard.sh carries it on every page: five columns, the line, the running merchant names.
-const FOOTER = {
-  description: (
-    <>
-      We want agents to buy anything online
-      <br />
-      that you can buy as a human.
-    </>
-  ),
-  groups: [
-    { title: "Product", links: [{ label: "Vault", href: "https://www.agentcard.sh/vault" }, { label: "Issuing", href: "https://www.agentcard.sh/issuing" }, { label: "Voice", href: "https://cal.com/team/agentcard/agentcard-call" }, { label: "Purchase Agent", href: "https://www.agentcard.sh/purchase-agent" }, { label: "Pricing", href: "https://www.agentcard.sh/pricing" }, { label: "FAQ", href: "#faq" }] },
-    { title: "Developers", links: [{ label: "Documentation", href: "https://docs.agentcard.sh" }, { label: "API reference", href: "https://docs.agentcard.sh/companies/api/reference" }] },
-    { title: "Company", links: [{ label: "About", href: "https://www.agentcard.sh/about" }, { label: "Changelog", href: "https://www.agentcard.sh/updates" }, { label: "Trust Center", href: "https://app.vanta.com/agentcard.sh/trust/8t52k9fqhneqwt4y2jpvmn" }] },
-    { title: "Legal", links: [{ label: "Privacy Policy", href: "https://legal.raincards.xyz/legal/privacy-policy" }, { label: "Terms of Service", href: "https://www.agentcard.sh/terms" }, { label: "Card Terms", href: "https://www.agentcard.sh/card-terms" }, { label: "Card Terms (International)", href: "https://www.agentcard.sh/card-terms-international" }] },
-    { title: "Social", links: [{ label: "X / Twitter", href: "https://x.com/agentcardhq" }, { label: "Instagram", href: "https://www.instagram.com/agentcardhq/" }] },
-  ],
-  merchants: ["Amazon", "Walmart", "Target", "Best Buy", "Home Depot", "Lowe’s", "Macy’s", "Wayfair", "Staples", "DoorDash", "Good Eggs", "Flights"],
-};
+// The home page as the opencommerce site draws it, top to bottom on one white page: the glass header, the hero (pill,
+// title, two keys, the strip of stores, the code over its field of glyphs), what you get (four feature windows), how it
+// works (the steps and their code), the live status table, pricing, the closing card with the install box, the
+// questions, and the footer with its outlined wordmark. Sample content in its shape; replace it with your own and check
+// every link.
 
-// The dock as agentcard.sh carries it: Home, the Products menu, About, Pricing, and Get started.
-const PRODUCTS = {
-  label: "Products",
-  items: [
-    { title: "Vault", description: "Store customers’ cards and buy with an agent.", href: "https://www.agentcard.sh/vault" },
-    { title: "Issuing", description: "One-time and multi-use cards for your agent.", href: "https://www.agentcard.sh/issuing" },
-    { title: "Voice", description: "Approve an agent’s purchase by speaking.", href: "https://cal.com/team/agentcard/agentcard-call" },
-    { title: "Purchase Agent", description: "Buy from Amazon, DoorDash and more.", href: "https://www.agentcard.sh/purchase-agent" },
-  ],
-};
+const SIGNUP = "https://app.agentcard.sh";
+const DOCS = "https://docs.agentcard.sh";
 
-// The home page as agentcard.sh draws it: the blue hero, the customer cases, the products, the integrations, the
-// customers and the FAQ, the blue footer, and the glass dock. Sample content in its shape; replace it with your own,
-// and the stand-in pictures with your imagery.
+const LINKS = [
+  { label: "Home", href: "#top" },
+  { label: "Features", href: "#features" },
+  { label: "Monitoring", href: "#monitoring" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "FAQ", href: "#faq" },
+  { label: "Docs", href: DOCS },
+];
 
-const NAV = {
-  links: [
-    { label: "Home", href: "https://www.agentcard.sh/", current: true },
-    { label: "About", href: "https://www.agentcard.sh/about" },
-    { label: "Pricing", href: "https://www.agentcard.sh/pricing" },
-  ],
-  menu: {
-    label: "Products",
-    items: [
-      { title: "Vault", description: "Store customers’ cards and buy with an agent.", href: "https://www.agentcard.sh/vault" },
-      { title: "Issuing", description: "One-time and multi-use cards for your agent.", href: "https://www.agentcard.sh/issuing" },
-      { title: "Purchase Agent", description: "Buy from Amazon, DoorDash and more.", href: "https://www.agentcard.sh/purchase-agent" },
-    ],
-  },
-  action: { label: "Get started", href: "https://app.agentcard.sh/" },
-};
+const HERO_CODE = `import { Agentcard } from "@agentcard/sdk";
 
-const Glyph = ({ d }: { d: string }) => (
-  <svg viewBox="0 0 20 20" className="fill-current">
-    <path d={d} />
-  </svg>
-);
+const agentcard = new Agentcard({
+  clientSecret: process.env.AGENTCARD_SECRET,
+});
 
-function Tile({ className }: { className: string }) {
-  return <span aria-hidden className={`absolute rounded-card opacity-80 shadow-card ${className}`} />;
-}
+// One call: find the item, check out, track the order.
+const order = await agentcard.commerce.buy({
+  query: "USB-C charger, 65W",
+  maxPrice: 40,
+});`;
 
-function Scene() {
+const STORES = ["Northwind", "Acme Supply", "Globex", "Initech", "Umbrella", "Hooli", "Vandelay", "Soylent", "Wonka", "Pied Piper"].map((name) => ({ name }));
+
+// Thirty days drawn in left to right when the card is first seen; the one rough day stays pale.
+function Uptime() {
   return (
-    <div aria-hidden className="absolute inset-0">
-      <Tile className="top-[14%] left-[6%] size-20 rotate-12 bg-sky" />
-      <Tile className="top-[58%] left-[16%] h-16 w-24 -rotate-6 bg-white" />
-      <Tile className="top-[20%] right-[8%] h-20 w-28 rotate-6 bg-white" />
-      <Tile className="top-[64%] right-[18%] size-16 -rotate-12 bg-sky" />
-    </div>
-  );
-}
-
-function CardStack() {
-  return (
-    <div className="relative h-56 w-80 max-w-full">
-      <div className="absolute inset-x-6 top-16 h-32 -rotate-2 rounded-card border border-hairline bg-surface shadow-tile" />
-      <div className="absolute inset-x-2 top-0 flex h-32 -rotate-3 flex-col justify-between rounded-card bg-inverse p-4 text-on-brand shadow-tile">
-        <span className="font-display text-body-sm">agentcard</span>
-        <span className="self-end font-display text-caption">···· 4832</span>
+    <div aria-hidden className="w-full max-w-75 font-mono text-snippet">
+      <div className="flex items-baseline justify-between text-fg-muted">
+        <span className="flex items-center gap-2">
+          <span className="size-1.5 rounded-full bg-brand" />
+          Uptime
+        </span>
+        <span className="text-fg">99.9%</span>
+      </div>
+      <div className="mt-2.5 flex h-14 items-end gap-0.75">
+        {Array.from({ length: 30 }, (_, i) => (
+          <span
+            key={i}
+            style={{ animationDelay: `${i * 26}ms` }}
+            className={`h-full flex-1 origin-bottom rounded-chip group-data-[state=idle]/feature:scale-y-0 group-data-[state=play]/feature:animate-chart-bar ${i === 19 ? "bg-brand/25" : "bg-brand"}`}
+          />
+        ))}
       </div>
     </div>
   );
 }
 
-function Screen({ name, rows }: { name: string; rows: string[] }) {
+function Route({ label, time, width, warm }: { label: string; time: string; width: string; warm?: boolean }) {
   return (
-    <Window name={name} className="w-full max-w-md -rotate-1">
-      <ul className="grid gap-2 p-4 text-caption">
-        {rows.map((row) => (
-          <li key={row} className="flex items-center justify-between rounded-sm border border-hairline px-3 py-2">
-            {row}
-          </li>
-        ))}
-      </ul>
-    </Window>
+    <div>
+      <div className={warm ? "flex justify-between text-fg-brand" : "flex justify-between text-fg-muted"}>
+        <span>{label}</span>
+        <span>{time}</span>
+      </div>
+      <div className="mt-2 h-2.5 overflow-hidden rounded-chip bg-line">
+        <div style={{ width }} className={warm ? "h-full bg-brand" : "h-full bg-line-strong"} />
+      </div>
+    </div>
   );
 }
 
-const CODE = `await client.vaults.items.upsert('order', {
-  type: 'card',
-  spec: { provider: 'agentcard',
-    merchant: 'amazon.com', amount: 2306 },
-});`;
+function Race() {
+  return (
+    <div aria-hidden className="flex w-full max-w-75 flex-col gap-5 font-mono text-snippet">
+      <Route label="Cold route" time="2m 40s" width="100%" />
+      <Route label="Warmed route" time="9s" width="6%" warm />
+    </div>
+  );
+}
+
+const FEATURES = [
+  { title: "Every store, one endpoint", description: "Search the catalogue, check out and track the order at any store through the same call.", media: <Race />, file: "merchants.feature" },
+  { title: "Uptime you can see", description: "Every route is exercised around the clock, so you know a store works before your agent tries it.", media: <Uptime />, file: "uptime.feature" },
+  { title: "Warmed routes", description: "The stores your agents use most stay warm, so a purchase takes seconds, not minutes.", media: <Race />, file: "speed.feature" },
+  { title: "Checkout that finishes", description: "Payment, shipping and confirmation, with the order number back in your agent’s hands.", media: <Uptime />, file: "checkout.feature" },
+];
+
+const STEPS = [
+  { title: "Add the commerce tool to your agent", code: `npm install @agentcard/sdk\n\nimport { Agentcard } from "@agentcard/sdk";\n\nconst agentcard = new Agentcard({\n  clientSecret: process.env.AGENTCARD_SECRET,\n});\n\nconst tools = [agentcard.tools.commerce()];` },
+  { title: "Search catalogues and place orders conversationally", code: `const results = await agentcard.commerce.search({\n  query: "running shoes, size 10",\n  maxPrice: 120,\n});` },
+  { title: "Pay with your customer’s stored card", code: `const order = await agentcard.commerce.checkout({\n  item: results[0].id,\n  card: customer.cardId,\n});` },
+  { title: "Follow orders and report back to users", code: `const status = await agentcard.commerce.track(order.id);\n// "shipped", with the carrier and tracking number` },
+];
+
+// Deterministic per name, so the server and the browser draw the same bars.
+function history(name: string): DayStatus[] {
+  let seed = [...name].reduce((a, c) => a * 31 + c.charCodeAt(0), 7) >>> 0;
+  return Array.from({ length: 45 }, () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    const r = seed / 2 ** 32;
+    return r < 0.03 ? "down" : r < 0.08 ? "degraded" : "up";
+  });
+}
+
+const STATUS = [
+  ["Northwind", "100%", "5 min ago", "12 sec"],
+  ["Acme Supply", "99.9%", "1 min ago", "9 sec"],
+  ["Globex", "99.8%", "2 min ago", "14 sec"],
+  ["Initech", "100%", "4 min ago", "11 sec"],
+  ["Umbrella", "99.6%", "7 min ago", "16 sec"],
+].map(([name, ...values]) => ({ name, values, days: history(name) }));
+
+const FAQS = [
+  { question: "What is opencommerce?", answer: "An open router for commerce: one endpoint your agent calls to search a store, check out and track the order." },
+  { question: "Which stores can my agent buy from?", answer: "More than 4,000 online stores, from marketplaces to restaurants, with new routes added every week." },
+  { question: "How are payments handled?", answer: "Your customers’ cards stay in Agentcard’s vault; the agent pays with them, within the limits they set." },
+  { question: "Which agent frameworks does it work with?", answer: "Any that can call a tool: the SDK ships tools for the common frameworks and a plain HTTP API." },
+  { question: "What happens when a merchant’s checkout changes?", answer: "The route is re-learned within minutes; monitoring shows the store as degraded until it is." },
+  { question: "How does the 1% platform fee work?", answer: "It is charged on each completed order. Failed and cancelled orders cost nothing." },
+];
+
+const FOOTER = [
+  { title: "Product", links: [{ label: "Features", href: "#features" }, { label: "Monitoring", href: "#monitoring" }, { label: "Pricing", href: "#pricing" }, { label: "FAQ", href: "#faq" }] },
+  { title: "Developers", links: [{ label: "Docs", href: DOCS }, { label: "SDK", href: "https://www.npmjs.com/package/@agentcard/sdk" }] },
+  { title: "Company", links: [{ label: "Agentcard", href: "https://agentcard.sh" }, { label: "Contact", href: "mailto:hello@agentcard.sh" }] },
+];
 
 export function HomePage() {
   return (
-    <main>
-      <Hero
-        header={<SiteHeader href="https://www.agentcard.sh/" ground="blue" action={NAV.action} />}
-        background={<Scene />}
-        title="Let agents buy anything online"
-        subtitle="Cards your agents can use anywhere, under limits you set."
-        actions={
-          <Button asChild variant="on-brand">
-            <a href={NAV.action.href}>Get started</a>
-          </Button>
-        }
-      />
-
-      <SiteSection>
-        <SectionHeading title="Powering payments for agentic startups" description="Consumer apps, B2B companies and crypto teams run their agents’ purchases on Agentcard." />
-        <Testimonials
-          cases={[
-            { name: "Orchid", logo: <Glyph d="M10 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16Z" />, context: "Consumer apps like Orchid buy for customers using Agentcard:", quote: "Orchid uses Agentcard to store customers’ cards safely and buy things on their behalf.”", tag: "Consumer" },
-            { name: "Almanac", logo: <Glyph d="M3 3h14v14H3Z" />, context: "B2B companies like Almanac give cards to company agents:", quote: "Almanac stores corporate cards using Agentcard and automates company purchases with their Slack agent.”", tag: "B2B" },
-            { name: "Laso Finance", file: "laso.case", logo: <Glyph d="M3 5l7-3 7 3v10l-7 3-7-3Z" />, context: "Crypto companies like Laso use it as their payment infrastructure:", quote: "Users with funds in crypto can create cards their agent can use.”", tag: "Crypto" },
-          ]}
+    <div id="top" className="bg-surface text-fg">
+      <SiteHeader links={LINKS} action={{ label: "Get started", href: SIGNUP }} />
+      <main className="overflow-x-clip">
+        <Hero
+          eyebrow="Buy from 4000+ stores"
+          eyebrowHref="#monitoring"
+          title="Open router for commerce"
+          subtitle="Let your agent buy from any online store through one endpoint."
+          actions={
+            <>
+              <Button asChild>
+                <a href={SIGNUP}>Get started</a>
+              </Button>
+              <Button asChild variant="secondary">
+                <a href={DOCS}>Read the docs</a>
+              </Button>
+            </>
+          }
+          strip={<LogoStrip brands={STORES} />}
+          media={<CodeWindow title="agent.ts" code={HERO_CODE} copy highlight={[7, 8, 9, 10]} preClassName="text-caption leading-normal" />}
         />
-      </SiteSection>
-
-      <SiteSection>
-        <SectionHeading title="Explore our products" description="Vault, Issuing and the Purchase Agent: what an agent needs to pay for things." className="mb-10 lg:mb-18" />
-        <ProductGrid
-          products={[
-            { layout: "lead", title: "Vault", description: "Store customers’ cards and make purchases with agents safely.", action: { label: "Explore Vault", href: "https://www.agentcard.sh/vault" }, media: <CardStack /> },
-            { layout: "half", title: "Purchase Agent", description: "Integrate our agent into yours and buy from many online stores.", action: { label: "Read the docs", href: "https://docs.agentcard.sh", icon: <ArrowUpRight /> }, media: <Screen name="purchase.agent" rows={["Amazon", "DoorDash", "Walmart"]} /> },
-            { layout: "half", title: "Issuing", description: "Create one-time and multi-use cards for your agent.", action: { label: "Explore Issuing", href: "https://www.agentcard.sh/issuing" }, media: <Screen name="issuing.product" rows={["Agentcard ···· 4832", "Agentcard ···· 7719"]} /> },
-            { layout: "lead", title: "Voice", description: "Let customers approve their agent’s purchases by speaking, with no screen to look at.", action: { label: "Explore Voice", href: "https://cal.com/team/agentcard/agentcard-call" }, media: <Screen name="voice.product" rows={["Your usual from Rose Indian, $34.20", "Approved"]} /> },
-          ]}
-        />
-      </SiteSection>
-
-      <SiteSection>
-        <SectionHeading title="Integrates natively with the tools you use" description="The browsers and messaging platforms your agent already runs on." className="mb-9" />
-        <Integrations
-          rows={[
-            {
-              title: "Browser integrations",
-              description: "Integrate with your agent’s browser and automate purchases online.",
-              options: ["Kernel", "Browserbase", "Your own browser"].map((tool) => ({
-                label: tool,
-                panel: (
-                  <>
-                    <IntegrationCode name={`${tool.toLowerCase().replaceAll(" ", "-")}.ts`}>{CODE}</IntegrationCode>
-                    <IntegrationScreen name={tool.toUpperCase()} address="vault · user-12345">
-                      <p className="text-micro">The card is swapped in at checkout</p>
-                    </IntegrationScreen>
-                  </>
-                ),
-              })),
-            },
-            {
-              title: "Messaging integrations",
-              description: "iMessage agents built on Linq and Blooio can use Agentcard to complete payments.",
-              options: ["Linq", "Blooio"].map((tool) => ({
-                label: tool,
-                panel: (
-                  <>
-                    <IntegrationCode name={`${tool.toLowerCase()} payments`}>{`POST api.${tool.toLowerCase()}.com/v3/payments\n\n{ "amount": 2306, "merchant": "amazon.com" }`}</IntegrationCode>
-                    <IntegrationScreen>
-                      <p className="w-fit rounded-card bg-surface px-3 py-1.5 text-fg">Found it. Ready to check out?</p>
-                      <p className="ml-auto w-fit rounded-card bg-brand px-3 py-1.5">Approved</p>
-                    </IntegrationScreen>
-                  </>
-                ),
-              })),
-            },
-          ]}
-        />
-      </SiteSection>
-
-      <SiteSection>
-        <SectionHeading title="Working with Agentcard" description="Personal assistant companies use Agentcard as their payment infrastructure." />
-        <LogoStrip customers={["Orchid", "Pally", "Almanac", "Endstack", "Pickle", "Persona", "Ego", "Orgo"].map((name) => ({ name }))} />
-      </SiteSection>
-
-      <SiteSection id="faq">
-        <Faq
-          bar="faq.help / Agentcard"
-          title="Frequently asked questions"
-          lead="Everything you need to know about Agentcard."
-          topics={[
-            {
-              label: "General",
-              items: [
-                { question: "What does Agentcard do?", answer: "It lets AI agents buy anything online: it stores your customers’ cards or issues new ones, and pays where a human would." },
-                { question: "Vault or Issuing: which should we start with?", answer: "Vault if your customers already have cards they want their agent to use; Issuing if the agent should spend from a card you fund." },
-                { question: "Is Agentcard B2B or for consumers?", answer: "Both. Consumer apps store their users’ cards; companies give cards to their own agents." },
-                { question: "Does the merchant need to integrate anything?", answer: "No. The agent pays at checkout with a card, as a person would." },
-                { question: "How is this different from Stripe Link?", answer: "Link fills in a saved card for a person. Agentcard lets an agent pay on its own, within the limits the owner sets." },
-                { question: "How does the Purchase Agent work?", answer: "It drives a real browser through checkout and hands the result back to your agent." },
-                { question: "Do you support x402, AP2 or other agent payment protocols?", answer: "Yes, where the merchant supports them; a card works everywhere else." },
-              ],
-            },
-            { label: "Vault", items: [{ question: "Where are the cards stored?", answer: "Cards are encrypted on the user’s device before they are stored." }] },
-            { label: "Issuing", items: [{ question: "How are the cards funded?", answer: "From a balance you top up." }] },
-          ]}
-        />
-      </SiteSection>
-
-      <SiteFooter backing="Backed by Y Combinator" description={FOOTER.description} groups={FOOTER.groups} merchants={FOOTER.merchants} />
-
-      <NavDock links={NAV.links} menu={PRODUCTS} action={NAV.action} />
-    </main>
+        <SiteSection id="features" aria-label="Features" width="medium">
+          <SectionHeading title="Everything your agent needs to buy" description="One endpoint for every store, routes kept warm, and checkout that finishes." />
+          <FeatureGrid features={FEATURES} />
+        </SiteSection>
+        <SiteSection id="in-action" aria-label="In action">
+          <SectionHeading title="See it in action" description="From a single tool call to a delivered order. Pick a step to see the code behind it." />
+          <Steps steps={STEPS} />
+        </SiteSection>
+        <SiteSection id="monitoring" aria-label="Monitoring">
+          <SectionHeading title="Merchant monitoring" description="Every route is exercised around the clock. This is the live picture of the stores your agents buy from most." />
+          <StatusTable
+            nameLabel="Merchant"
+            columns={[{ label: "Success rate", mono: true }, { label: "Last purchase", muted: true }, { label: "Duration", mono: true, muted: true }]}
+            daysLabel="Uptime · 45 days"
+            filterLabel="Filter merchants"
+            filterPlaceholder="Filter merchants…"
+            note="+ 4000 more merchants"
+            rows={STATUS}
+          />
+        </SiteSection>
+        <SiteSection id="pricing" aria-label="Pricing">
+          <Pricing
+            title="Pricing"
+            description="Start free while you build. Move to Standard when your agent is buying for real."
+            rows={["Platform fees", "Merchants", "PSPs"]}
+            plans={[
+              { name: "Free", price: "$0", unit: "while you build", blurb: "Everything you need to wire up your agent and make its first purchases.", values: ["N/A", "5 merchants", "2 PSPs"], action: { label: "Try free", href: SIGNUP } },
+              { name: "Standard", badge: "Every merchant", price: "1%", unit: "of each completed order", blurb: "For agents buying for real, across every store and payment provider.", values: ["1%", "Every merchant", "Every PSP"], featured: true, action: { label: "Get started", href: SIGNUP } },
+            ]}
+          />
+        </SiteSection>
+        <SiteSection aria-label="Get started">
+          <Cta
+            title="Give your agent a checkout"
+            description="One endpoint, every online store. Start free: your first purchase can go through today."
+            actions={
+              <>
+                <Button asChild>
+                  <a href={SIGNUP}>Get started</a>
+                </Button>
+                <Button asChild variant="secondary">
+                  <a href="https://cal.com/agentcard">Book a call</a>
+                </Button>
+              </>
+            }
+            media={
+              <InstallTabs
+                className="w-full max-w-md"
+                commands={[
+                  { label: "npm", command: "npm install @agentcard/sdk" },
+                  { label: "pnpm", command: "pnpm add @agentcard/sdk" },
+                  { label: "yarn", command: "yarn add @agentcard/sdk" },
+                  { label: "bun", command: "bun add @agentcard/sdk" },
+                ]}
+              />
+            }
+          />
+        </SiteSection>
+        <SiteSection id="faq" aria-label="FAQ" className="pb-18 md:pb-30">
+          <Faq title="Questions" lead="What teams ask before their agent makes its first purchase. Still unsure? Book a call and we’ll walk you through it." items={FAQS} />
+        </SiteSection>
+      </main>
+      <SiteFooter description="The open router for commerce. Buy from any online store from a single endpoint." legal={<span>© 2026 Agentcard, Inc.</span>} groups={FOOTER} />
+    </div>
   );
 }

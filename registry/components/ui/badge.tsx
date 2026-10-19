@@ -4,29 +4,29 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
-// A short label (agentcard.sh). `tag` is the brand's small caps tag on the updates page (/updates, .v7-upd-tag): the 10px
-// display face in caps tracked 0.14em at 1.75 leading, 3px 8px 2px of padding, square corners and a 1px border in the
-// text's own color: blue for something added (`tag`), ink for something improved (`tag-ink`), the heart red for a fix
-// (`tag-heart`). Those are the only caps the brand sets. The status badges have no counterpart on the site; they are
-// drawn from the white key in small: a white box on the hairline, 6px corners, the 12px display face in sentence case,
-// told apart by a dot and the color of their text. `chip` is the guides' sky chip (.v7-guide-prose code): blue on a
-// pale sky wash with a pale blue edge, for counts and filters.
-const STATUS = "h-6 gap-1.5 rounded-sm border border-hairline bg-surface px-2 font-display text-caption leading-none before:size-1.5 before:shrink-0 before:rounded-pill before:bg-current";
+// A short label. `chip` is the brand's tag (the pricing card's "Every merchant", globals.css .rounded-chip; computed):
+// the 11.5px platform mono in the blue on the pale blue, 2px corners, 4px by 8px. The status badges are the order card's
+// pills (.feat-pill): a 10px pill at 500, gray while something waits (`default`), blue on sky once it is done
+// (`brand`), and success, warning and destructive told apart by a dot and the color of their text. The tags (`tag`,
+// `tag-ink`, `tag-heart`) are the chip's outlined kin for a changelog: the mono on a 1px rule in the text's own color,
+// sentence case like everything else (the brand sets no caps).
+const STATUS = "h-5.5 gap-1.5 rounded-pill px-2 font-sans text-micro font-medium leading-none";
+const DOT = "border border-line bg-surface before:size-1.5 before:shrink-0 before:rounded-pill before:bg-current";
 
-const TAG = "rounded-none border border-current px-2 pt-0.75 pb-0.5 font-display text-micro [line-height:1.75] tracking-caps uppercase";
+const TAG = "rounded-chip border border-current px-2 py-0.75 font-mono text-bar leading-snug";
 
 const badgeVariants = cva("inline-flex w-fit shrink-0 items-center justify-center gap-1 whitespace-nowrap [&>svg]:pointer-events-none [&>svg]:size-3", {
   variants: {
     variant: {
-      default: `${STATUS} text-fg-muted`,
-      brand: `${STATUS} border-line-window bg-blue-5 text-fg-brand`,
-      success: `${STATUS} text-success`,
-      warning: `${STATUS} text-warning`,
-      destructive: `${STATUS} text-danger`,
+      default: `${STATUS} bg-wash-pill text-fg-muted`,
+      brand: `${STATUS} bg-sky text-fg-brand`,
+      success: `${STATUS} ${DOT} text-success`,
+      warning: `${STATUS} ${DOT} text-warning`,
+      destructive: `${STATUS} ${DOT} text-danger`,
       tag: `${TAG} text-fg-brand`,
       "tag-ink": `${TAG} text-fg`,
       "tag-heart": `${TAG} text-heart`,
-      chip: "h-6 rounded-sm border border-line-window bg-sky-wash px-2 font-display text-caption leading-none text-fg-brand",
+      chip: "rounded-chip bg-blue-5 px-2 py-1 font-mono text-bar leading-snug text-fg-brand",
     },
   },
   defaultVariants: { variant: "default" },

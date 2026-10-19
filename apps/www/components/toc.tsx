@@ -6,8 +6,8 @@ import { Window } from "@/components/ui/window";
 import { cn } from "@/lib/utils";
 
 /**
- * The page's contents, as the guides draw theirs (.v7-guide-toc): a white window (contents.md) with "On this page" and
- * the sections hung on a thread; the section in view lights the thread blue beside it (color, 160ms ease-out).
+ * The page's contents: a window (contents.md) with "On this page" and the sections hung on a thread; the section in
+ * view lights the thread blue beside it (color, 150ms ease-out).
  */
 export function Contents({ sections }: { sections: { id: string; label: string }[] }) {
   const [active, setActive] = React.useState(sections[0]?.id);
@@ -24,7 +24,7 @@ export function Contents({ sections }: { sections: { id: string; label: string }
     return () => observer.disconnect();
   }, [sections]);
   return (
-    <Window name="contents.md" className="shadow-guide">
+    <Window name="contents.md">
       <nav aria-label="On this page">
         <p className="mt-3.5 mb-2 flex items-center gap-2 px-4 font-display text-body-sm font-medium text-fg">
           <svg aria-hidden viewBox="0 0 16 16" className="size-3.5 fill-none stroke-current [stroke-linecap:round] [stroke-width:1.5]">

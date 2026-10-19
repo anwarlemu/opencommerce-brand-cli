@@ -3,12 +3,11 @@ name: cta
 title: CTA
 type: site
 surface: site
-description: "Blue section with a heading, action and optional media."
-kinds: [button-on-brand]
-use_for: "Use near the end of a page when another action is needed. Provide a working link or handler for the action."
-never: [More than one per page, Two keys of equal weight, A blue key on the blue, A gradient or glow behind the headline, Long copy]
-source: "Extension from agentcard-website src/app/globals.css:1288 (.cta, an earlier closing stage); built from the hero's ground and the band divider (agentcard.sh has no closing CTA)"
+description: "The closing card: mist, a hairline and 16px corners, the headline, two keys and the install box, glyphs gathering at its edges."
+kinds: [card, button-primary, button-secondary]
+use_for: "Use once near the end of the home page, in a wide SiteSection. Pass the primary and secondary Buttons as actions and InstallTabs as media."
+never: [More than one per page, A blue card, Two primary keys, A gradient or glow behind the headline, Long copy]
+source: "opencommerce-agentcard-web src/components/cta.tsx, src/components/install-tabs.tsx, src/app/globals.css (.cta-binary)"
 ---
 
-`Cta` props: `title`, `description`, `actions` (the on-brand Button), `media`, `bandFrom` and `bandTo` (default white;
-null for none), `scan` (default true), plus section props.
+`Cta` props: `title`, `description`, `actions`, `media`, `glyphs` (default true), plus div props.

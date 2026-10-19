@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Check, Copy } from "lucide-react";
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
@@ -54,33 +53,80 @@ export function useCopy() {
   return { hasCopied, error, copy };
 }
 
-// A small key that copies (the brand's command key, .v7-command): a 32px white key with the bevel and a clipboard; once
-// copied it turns into the blue key for two seconds, the clipboard shrinking away as a tick takes its place (200ms
-// ease-out), then turns back. A press sinks it. Reduced motion swaps the marks without moving them.
-function CopyButton({ value, label = "Copy", className }: { value: string; label?: string; className?: string }) {
-  const { hasCopied, error, copy } = useCopy();
+// The brand's copy key (copy-button.tsx, globals.css .copy-layer, .key-white, .key-dark; computed): a 28px key with 6px
+// corners and the 12px platform mono, "Copy" beside a drawn clipboard. White with blue text on white; on ink (`dark`)
+// an outline at 15 percent white that brightens with its label under the pointer. Copied, the two states swap in one
+// cell, so the key never changes width: the leaving one lifts away, shrinking a touch and blurring as it fades (160ms),
+// the arriving one rises from below (250ms ease-out) and its tick draws once the label has landed. A press shrinks the
+// key to 0.97. Reduced motion only crossfades. `compact` drops the words for a tight bar (the tooltip names it).
+const LAYER =
+  "col-start-1 row-start-1 flex items-center justify-center gap-1.5 transition-[opacity,translate,scale,filter] duration-250 ease-out motion-reduce:transition-[opacity] motion-reduce:duration-150";
+const OUT = "pointer-events-none -translate-y-1.75 scale-94 opacity-0 blur-xs duration-160 motion-reduce:translate-y-0 motion-reduce:scale-100 motion-reduce:blur-none";
+
+function CopyIcon() {
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          data-slot="copy-button"
-          data-copied={hasCopied || undefined}
-          onClick={() => copy(value)}
-          aria-label={hasCopied ? "Copied" : error ?? label}
-          className={cn(
-            "relative grid size-8 shrink-0 place-items-center rounded-control border outline-none transition-[background-color,border-color,box-shadow,color,translate] duration-200 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring active:translate-y-px active:shadow-pressed motion-reduce:transition-none motion-reduce:active:translate-y-0 [&_svg]:col-start-1 [&_svg]:row-start-1 [&_svg]:size-3.5 [&_svg]:transition-[opacity,scale] [&_svg]:duration-200 [&_svg]:ease-out motion-reduce:[&_svg]:transition-[opacity]",
-            hasCopied ? "border-line-brand-edge bg-primary text-on-primary shadow-key-brand" : "border-hairline bg-surface text-fg-brand shadow-key hover:bg-sky-wash",
-            className,
-          )}
-        >
-          <Copy strokeWidth={1.5} className={cn(hasCopied && "scale-60 opacity-0 motion-reduce:scale-100")} />
-          <Check strokeWidth={2} className={cn(!hasCopied && "scale-60 opacity-0 motion-reduce:scale-100")} />
-        </button>
-      </TooltipTrigger>
+    <svg aria-hidden viewBox="0 0 12 12" className="size-3 fill-none stroke-current">
+      <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+      <path d="M8.5 1.5h-5.5a1.5 1.5 0 0 0-1.5 1.5v5.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function TickIcon({ drawn }: { drawn: boolean }) {
+  return (
+    <svg aria-hidden viewBox="0 0 12 12" className="size-3 fill-none stroke-current">
+      <path
+        d="M2 6.4l2.6 2.6L10 3.4"
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        pathLength={1}
+        strokeDasharray={1}
+        strokeDashoffset={drawn ? 0 : 1}
+        className="transition-[stroke-dashoffset] delay-100 duration-200 ease-out motion-reduce:transition-none"
+      />
+    </svg>
+  );
+}
+
+function CopyButton({ value, label = "Copy", dark = false, compact = false, className }: { value: string; label?: string; dark?: boolean; compact?: boolean; className?: string }) {
+  const { hasCopied, error, copy } = useCopy();
+  const button = (
+    <button
+      type="button"
+      data-slot="copy-button"
+      data-copied={hasCopied || undefined}
+      onClick={() => copy(value)}
+      aria-label={hasCopied ? "Copied" : error ?? label}
+      className={cn(
+        "relative grid h-7 shrink-0 place-items-center overflow-hidden rounded-sm border font-mono text-caption leading-none outline-none transition-[background-color,border-color,color,scale] duration-160 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring active:scale-97 motion-reduce:transition-[background-color,border-color,color] motion-reduce:active:scale-100",
+        compact ? "w-7" : "px-2.5",
+        dark ? "border-line-on-code text-white/70 hover:border-line-on-code-hover hover:text-white" : "border-hairline bg-surface text-fg-brand hover:bg-subtle",
+        className,
+      )}
+    >
+      <span aria-hidden className={cn(LAYER, hasCopied && OUT)}>
+        <CopyIcon />
+        {!compact && "Copy"}
+      </span>
+      <span aria-hidden className={cn(LAYER, !hasCopied && OUT, !hasCopied && "translate-y-1.75", dark && "text-sky")}>
+        <TickIcon drawn={hasCopied} />
+        {!compact && "Copied"}
+      </span>
+    </button>
+  );
+  return (
+    <>
+      {compact ? (
+        <Tooltip>
+          <TooltipTrigger asChild>{button}</TooltipTrigger>
+          <TooltipContent side="top">{hasCopied ? "Copied" : error ?? label}</TooltipContent>
+        </Tooltip>
+      ) : (
+        button
+      )}
       <span role="status" className="sr-only">{hasCopied ? "Copied" : error}</span>
-      <TooltipContent side="top">{hasCopied ? "Copied" : error ?? label}</TooltipContent>
-    </Tooltip>
+    </>
   );
 }
 

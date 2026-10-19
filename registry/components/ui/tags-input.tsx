@@ -25,17 +25,17 @@ function TagsInput({ tags, onTagsChange, placeholder, isTagInvalid, bare = false
   }
   return (
     <div data-slot="tags-input" data-disabled={disabled || undefined} className={cn(
-      "flex min-h-11 w-full flex-wrap items-center gap-1.5 px-2 py-1.5 data-disabled:opacity-50",
-      !bare && "rounded-none border border-line-strong bg-surface focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-solid focus-within:outline-focus-ring", className)}>
+      "flex min-h-10 w-full flex-wrap items-center gap-1.5 px-1.5 py-1.5 data-disabled:opacity-50",
+      !bare && "rounded-control border border-hairline bg-surface transition-[border-color] duration-160 ease-out focus-within:border-line-brand motion-reduce:transition-none", className)}>
       {name && tags.map((tag) => <input key={tag} type="hidden" name={name} value={tag} disabled={disabled} />)}
       {tags.map((tag) => <span key={tag} className={cn(
-        "flex h-7 items-center gap-0.5 rounded-sm border pr-0.5 pl-2 font-display text-body-sm leading-none",
-        isTagInvalid?.(tag) ? "border-danger bg-surface text-danger" : "border-line-window bg-sky-wash text-fg-brand")}>
+        "flex h-6.5 items-center gap-0.5 rounded-chip pr-0.5 pl-2 font-mono text-bar leading-none",
+        isTagInvalid?.(tag) ? "border border-danger bg-surface text-danger" : "bg-blue-5 text-fg-brand")}>
         {tag}
         <button type="button" disabled={locked} aria-label={`Remove ${tag}`}
           onPointerDown={(event) => event.preventDefault()}
           onClick={() => onTagsChange(tags.filter((existing) => existing !== tag))}
-          className="grid size-5.5 place-items-center rounded-[calc(var(--ds-radius-sm)/2)] opacity-70 outline-none transition-[opacity,background-color] duration-150 ease-out hover:bg-wash-selected hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-solid focus-visible:outline-focus-ring disabled:pointer-events-none motion-reduce:transition-none">
+          className="grid size-5.5 place-items-center rounded-chip opacity-70 outline-none transition-[opacity,background-color] duration-150 ease-out hover:bg-blue-10 hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-solid focus-visible:outline-focus-ring disabled:pointer-events-none motion-reduce:transition-none">
           <X className="size-3" strokeWidth={1.75} />
         </button>
       </span>)}
@@ -64,7 +64,7 @@ function TagsInput({ tags, onTagsChange, placeholder, isTagInvalid, bare = false
         }}
         onBlur={(event) => { onBlur?.(event); if (!event.defaultPrevented && draft) commit(draft); }}
         placeholder={tags.length ? "" : placeholder}
-        className="h-8 min-w-24 flex-1 bg-transparent px-1.5 text-h5 leading-snug text-fg outline-none placeholder:text-fg-faint" />
+        className="h-8 min-w-24 flex-1 bg-transparent px-1.5 font-sans text-body-sm leading-body text-fg outline-none placeholder:text-fg-faint" />
     </div>
   );
 }

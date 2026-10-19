@@ -6,11 +6,10 @@ import { Check, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
-// A tag filter. The picked tags are the guides' inline code chips (.v7-guide-prose code: blue text on the pale sky, a
-// faint blue edge, small corners), each clearing itself; then a small white key, Tags, opens the brand's floating panel
-// with the guides' search panel inside it in small (.v7-guide-search-field: a blue search mark, a borderless field in the
-// display face over a dotted rule; .v7-guide-search-results: rows that take the sky wash under the pointer), each row
-// ticked in blue when picked.
+// A tag filter. The picked tags are the brand's chips (the mono in blue on the pale blue, 2px corners), each clearing
+// itself; then a small white key, Tags, opens the brand's floating panel with a small search inside it (a search mark
+// and a borderless field over a 9 percent rule; rows that take the pale blue under the pointer), each row ticked in
+// blue when picked.
 function TagFilter({
   tags,
   tagOptions,
@@ -37,7 +36,7 @@ function TagFilter({
           type="button"
           onClick={() => onRemoveTag(tag)}
           aria-label={`Clear tag filter ${tag}`}
-          className="flex h-8 items-center gap-1 rounded-sm border border-line-window bg-sky-wash pr-2 pl-2.5 font-display text-body-sm leading-none text-fg-brand outline-none transition-[background-color] duration-150 ease-out hover:bg-blue-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring motion-reduce:transition-none [&_svg]:opacity-70"
+          className="flex h-7 items-center gap-1 rounded-chip bg-blue-5 pr-2 pl-2.5 font-mono text-bar leading-none text-fg-brand outline-none transition-[background-color] duration-160 ease-out hover:bg-blue-10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring motion-reduce:transition-none [&_svg]:opacity-70"
         >
           {tag}
           <X className="size-3" strokeWidth={1.75} />
@@ -46,7 +45,7 @@ function TagFilter({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           aria-label="Filter by tags"
-          className="flex h-8 items-center gap-2 rounded-control border border-hairline bg-surface px-3 font-display text-caption whitespace-nowrap text-fg shadow-key outline-none transition-[background-color,box-shadow,translate] duration-150 ease-out hover:bg-sky-wash focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring active:translate-y-px active:shadow-pressed data-[state=open]:bg-sky-wash motion-reduce:transition-none motion-reduce:active:translate-y-0"
+          className="flex h-8 items-center gap-2 rounded-control border border-hairline bg-surface px-3 font-sans text-body-sm whitespace-nowrap text-fg outline-none transition-[background-color,scale] duration-160 ease-out hover:bg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring active:scale-97 data-[state=open]:bg-subtle motion-reduce:transition-[background-color] motion-reduce:active:scale-100"
         >
           Tags
           <svg aria-hidden viewBox="0 0 10 6" className="h-1.5 w-2.5 fill-current text-fg-muted">
@@ -54,7 +53,7 @@ function TagFilter({
           </svg>
         </PopoverTrigger>
         <PopoverContent align="end" sideOffset={6} className="w-64 p-0">
-          <label className="flex items-center gap-2.5 border-b-2 border-dotted border-line-mid px-3.5 text-fg-brand">
+          <label className="flex items-center gap-2.5 border-b border-line px-3.5 text-fg-muted">
             <svg aria-hidden viewBox="0 0 16 16" className="size-3.75 shrink-0 fill-none stroke-current [stroke-linecap:round] [stroke-width:1.5]">
               <circle cx="7" cy="7" r="4.75" />
               <path d="M10.5 10.5 14 14" />
@@ -66,11 +65,11 @@ function TagFilter({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search tags"
               aria-label="Search tags"
-              className="h-11 min-w-0 flex-1 bg-transparent font-display text-body text-fg caret-primary outline-none placeholder:text-fg-faint [&::-webkit-search-cancel-button]:hidden"
+              className="h-11 min-w-0 flex-1 bg-transparent font-sans text-body-sm text-fg caret-primary outline-none placeholder:text-fg-faint [&::-webkit-search-cancel-button]:hidden"
             />
           </label>
           <ul className="max-h-64 overflow-y-auto p-1">
-            {options.length === 0 && <li className="px-2.5 py-2 font-display text-body-sm text-fg-muted">{tagOptions.length === 0 ? "No tags yet" : "No matching tags"}</li>}
+            {options.length === 0 && <li className="px-2.5 py-2 font-sans text-body-sm text-fg-muted">{tagOptions.length === 0 ? "No tags yet" : "No matching tags"}</li>}
             {options.map((tag) => {
               const isSelected = selected.has(tag);
               return (
@@ -80,8 +79,8 @@ function TagFilter({
                     aria-pressed={isSelected}
                     onClick={() => (isSelected ? onRemoveTag(tag) : onAddTag(tag))}
                     className={cn(
-                      "flex h-9 w-full items-center gap-2.5 rounded-sm px-2.5 text-left font-display text-body-sm outline-none hover:bg-search-selected focus-visible:bg-search-selected",
-                      isSelected ? "text-fg" : "text-fg-secondary",
+                      "flex h-9 w-full items-center gap-2.5 rounded-menu px-2.5 text-left font-sans text-body-sm outline-none hover:bg-blue-5 focus-visible:bg-blue-5",
+                      isSelected ? "text-fg" : "text-fg-muted",
                     )}
                   >
                     <span className="min-w-0 flex-1 truncate">{tag}</span>

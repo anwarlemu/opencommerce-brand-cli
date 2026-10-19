@@ -46,7 +46,8 @@ try {
     await field.fill(brief);
     assert.equal(await field.inputValue(),brief);
     assert.equal(await field.getAttribute('aria-invalid'),null);
-    assert.equal(await field.evaluate(e=>getComputedStyle(e).outlineWidth),'2px');
+    // Focus turns the field's edge blue (the brand's merchant filter), with no outline or glow.
+    assert.equal(await field.evaluate(e=>getComputedStyle(e).borderTopColor),'rgb(46, 58, 232)');
     assert.equal(await field.evaluate(e=>new FormData(e.form).get('brief')),brief);
     await page.getByRole('button',{name:'Save brief'}).click();
     assert.match(await page.getByRole('status').innerText(),/Saved: Buy two train tickets/);

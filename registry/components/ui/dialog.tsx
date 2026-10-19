@@ -8,7 +8,7 @@ import { WindowBar } from "@/components/ui/window";
 import { usePortalContainer } from "@/lib/surface";
 import { cn } from "@/lib/utils";
 
-// A dialog is one of the brand's windows: white, a 16 percent ink hairline, 12px corners, the 32px sky title bar with
+// A dialog is one of the brand's windows: white, a 16 percent ink edge, 12px corners, the 36px mist title bar with
 // its arrow and a file-like name (`name`), and a close mark where the [*] sits. It floats centered over a 40 percent
 // ink scrim, popping in from scale 0.97 with a fade (200ms ease-out; a modal stays centered, so it scales from its own
 // middle). Reduced motion keeps the fade. Radix adds the focus trap, scroll lock and Escape.
@@ -39,7 +39,7 @@ function WindowClose({ className }: { className?: string }) {
     <DialogPrimitive.Close
       aria-label="Close"
       className={cn(
-        "-mr-1.5 grid size-7 shrink-0 place-items-center rounded-sm opacity-60 outline-none transition-[opacity,background-color] duration-150 ease-out hover:bg-wash-selected hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-solid focus-visible:outline-focus-ring [&_svg]:size-3.5",
+        "-mr-1.5 grid size-7 shrink-0 place-items-center rounded-sm opacity-60 outline-none transition-[opacity,background-color] duration-150 ease-out hover:bg-wash-hover hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-solid focus-visible:outline-focus-ring [&_svg]:size-3.5",
         className,
       )}
     >
@@ -62,7 +62,7 @@ function DialogContent({
   size?: keyof typeof WIDTHS;
   /** The title bar's label, file-like: `card.new`, `agent.pause`. */
   name?: React.ReactNode;
-  /** The bar's color: sky (the default) or blue for the one that matters. */
+  /** The bar's tone: mist (the default); see Window. */
   tone?: React.ComponentProps<typeof WindowBar>["tone"];
   showCloseButton?: boolean;
 }) {
@@ -72,7 +72,7 @@ function DialogContent({
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] -translate-1/2 animate-pop-in motion-reduce:animate-none flex-col overflow-hidden rounded-card border border-hairline bg-surface text-fg shadow-code outline-none [animation-duration:var(--ds-duration-base)]",
+          "fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] -translate-1/2 animate-pop-in motion-reduce:animate-none flex-col overflow-hidden rounded-panel border border-line-window bg-surface text-fg shadow-floating outline-none [animation-duration:var(--ds-duration-base)]",
           WIDTHS[size],
           className,
         )}

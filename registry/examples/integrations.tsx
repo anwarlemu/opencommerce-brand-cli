@@ -4,12 +4,12 @@ import { IntegrationCode, IntegrationScreen, Integrations } from "@/components/s
 
 function Field({ title, detail, status }: { title: string; detail: string; status: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-chip border border-line-on-brand-strong bg-[color-mix(in_srgb,var(--ds-color-white)_55%,transparent)] px-2.5 py-2 text-fg">
+    <div className="flex items-center gap-2 rounded-control border border-line px-2.5 py-2 text-fg">
       <span className="grid">
         <b className="font-medium">{title}</b>
         <small className="text-micro text-fg-muted">{detail}</small>
       </span>
-      <em className="ml-auto rounded-chip bg-sky px-1.5 py-0.5 text-micro not-italic text-fg-brand">{status}</em>
+      <em className="ml-auto rounded-chip bg-tint px-1.5 py-0.5 font-mono text-micro not-italic text-fg-brand">{status}</em>
     </div>
   );
 }

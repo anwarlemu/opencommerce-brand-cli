@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Command, CommandDialog, CommandEmpty, CommandFooter, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
 const GUIDES: Record<string, string> = {
-  "Enable payments for your agent": "Create a card, set a purchase limit, and give the card token to your agent.",
-  "Differences between Vault and Issuing": "Vault stores an existing card. Issuing creates a separate card for each agent.",
-  "How we store cards": "Your agent uses a token to request a payment without receiving the stored card details.",
+  "Add the commerce tool to your agent": "Install the SDK and pass agentcard.tools.commerce() to your agent's tools.",
+  "Search a store's catalog": "Your agent asks for products in plain words and gets back items it can buy.",
+  "How we store cards": "Cards are tokenized through your payment provider; your agent never sees the card details.",
   "Get your Agentcard credentials": "Create credentials in your Agentcard account and keep the secret on your server.",
   "Deploy to Vercel": "Add your credentials as server environment variables before deploying your agent.",
 };
@@ -23,13 +23,13 @@ function Results({ onSelect }: { onSelect: (value: string) => void }) {
       <CommandList>
         <CommandEmpty>No results.</CommandEmpty>
         <CommandGroup heading="Start here">
-          <CommandItem description="Getting started" onSelect={() => onSelect("Enable payments for your agent")}>Enable payments for your agent</CommandItem>
-          <CommandItem description="Getting started" onSelect={() => onSelect("Differences between Vault and Issuing")}>Differences between Vault and Issuing</CommandItem>
-          <CommandItem description="Agentic purchases explained" onSelect={() => onSelect("How we store cards")}>How we store cards</CommandItem>
+          <CommandItem description="Getting started" onSelect={() => onSelect("Add the commerce tool to your agent")}>Add the commerce tool to your agent</CommandItem>
+          <CommandItem description="Getting started" onSelect={() => onSelect("Search a store's catalog")}>Search a store's catalog</CommandItem>
+          <CommandItem description="Payments" onSelect={() => onSelect("How we store cards")}>How we store cards</CommandItem>
         </CommandGroup>
         <CommandGroup heading="Set up">
-          <CommandItem description="Create an iMessage agent and connect the Vault" onSelect={() => onSelect("Get your Agentcard credentials")}>Get your Agentcard credentials</CommandItem>
-          <CommandItem description="Create an iMessage agent and connect the Vault" onSelect={() => onSelect("Deploy to Vercel")}>Deploy to Vercel</CommandItem>
+          <CommandItem description="Setup" onSelect={() => onSelect("Get your Agentcard credentials")}>Get your Agentcard credentials</CommandItem>
+          <CommandItem description="Setup" onSelect={() => onSelect("Deploy to Vercel")}>Deploy to Vercel</CommandItem>
         </CommandGroup>
       </CommandList>
       <CommandFooter>

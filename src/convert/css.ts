@@ -149,7 +149,10 @@ function convertDecls(css: string, palette: Palette, stats: Stats, selector: str
 					return p.startsWith('animation') && (ms > 1000 || /\binfinite\b/.test(value)) ? m : `var(${nearest(scales().duration, ms)})`;
 				})
 				.replace(/\bcubic-bezier\([^)]*\)|\bease-in-out\b|\bease-in\b|\bease-out\b|(?<![\w-])ease(?![\w-])/g, (e) => (e === 'ease-in-out' ? 'var(--ds-easing-in-out)' : 'var(--ds-easing-out)'))
-				.replace(/(?<![\w-])all(?![\w-])/g, 'color, background-color, border-color, box-shadow, opacity, transform');
+				// In the shorthand each property keeps the timing that followed `all`; in transition-property it is a plain list.
+				.replace(p === 'transition' ? /(?<![\w-])all(?![\w-])([^,]*)/g : /(?<![\w-])all(?![\w-])/g, (_m: string, timing = '') =>
+					['color', 'background-color', 'border-color', 'box-shadow', 'opacity', 'transform'].map((x) => `${x}${timing}`).join(', '),
+				);
 			if (next !== before) stats.motion++;
 		}
 		return next === value ? all : `${lead}${prop}${sep}${next}${trail}`;

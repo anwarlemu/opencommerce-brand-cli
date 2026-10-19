@@ -8,7 +8,7 @@ function Initials({ name }: { name: string }) {
     .slice(0, 2)
     .join("");
   return (
-    <span role="img" aria-label={`Photo of ${name}`} className="flex items-center justify-center bg-sky font-display text-body-sm text-fg-brand">
+    <span role="img" aria-label={`Photo of ${name}`} className="flex items-center justify-center bg-tint font-display text-body-sm text-fg-brand">
       {letters}
     </span>
   );
@@ -49,7 +49,7 @@ export function Site() {
         <h2 id="team" className="mb-3.5 font-display text-caption font-normal text-fg-brand">
           Team
         </h2>
-        <TeamDirectory name="team.dir" tone="blue" columns={2} people={TEAM.map((p) => ({ ...p, photo: <Initials name={p.name} /> }))} />
+        <TeamDirectory name="team.dir" columns={2} people={TEAM.map((p) => ({ ...p, photo: <Initials name={p.name} /> }))} />
         <p className="mt-4 text-body-sm text-fg-muted">
           We are not hiring, but you can always send us an{" "}
           <a href="mailto:support@agentcard.sh" className="text-fg-brand underline underline-offset-3">

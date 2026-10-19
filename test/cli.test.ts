@@ -103,7 +103,7 @@ describe('convert', () => {
 		expect(convertCss('h2 { font-family: Georgia, serif } p { font-family: Lato }', sitePalette(''), stats())).toBe('h2 { font-family: var(--ds-font-display) } p { font-family: var(--ds-font-sans) }');
 		expect(out).toContain('letter-spacing: var(--ds-tracking-tight)');
 		expect(out).toContain('animation: scroll 48s linear infinite');
-		expect(out).toMatch(/transition: color, background-color, border-color, box-shadow, opacity, transform var\(--ds-duration-slow\) var\(--ds-easing-out\)/);
+		expect(out).toContain('transition: color var(--ds-duration-slow) var(--ds-easing-out), background-color var(--ds-duration-slow) var(--ds-easing-out), border-color var(--ds-duration-slow) var(--ds-easing-out), box-shadow var(--ds-duration-slow) var(--ds-easing-out), opacity var(--ds-duration-slow) var(--ds-easing-out), transform var(--ds-duration-slow) var(--ds-easing-out)');
 	});
 	it('reads channel triplets and a comment above :root does not flip the theme', () => {
 		const css = '/* same under prefers-color-scheme: dark */\n:root { --black: 0 0 0; --bg: #ffffff; }\nbody { background: var(--bg); }\n.x { background: rgb(var(--black) / 0.5); }';
@@ -114,7 +114,7 @@ describe('convert', () => {
 	it('converts Tailwind classes, style objects, chart literals and native colors', () => {
 		const pal = sitePalette('body { background: #fff; color: #111; }');
 		expect(convertClasses('bg-white text-gray-500 hover:bg-blue-600 border-zinc-200', pal, stats(), true)).toBe('bg-surface text-fg-muted hover:bg-brand border-line-subtle');
-		expect(convertScript("const s = { color: '#ff0000', marginTop: 16 }; const series = ['#22c55e', '#f59e0b', '#8b5cf6'];", pal, stats(), {})).toMatch(/marginTop: 'var\(--ds-space-4\)'.*#0000FF.*#4B50F4/s);
+		expect(convertScript("const s = { color: '#ff0000', marginTop: 16 }; const series = ['#22c55e', '#f59e0b', '#8b5cf6'];", pal, stats(), {})).toMatch(/marginTop: 'var\(--ds-space-4\)'.*#2E3AE8.*#1520B8/s);
 		expect(convertNative('val bg = Color(0xFF0B0B0C)\nText(color = Color(0xFFF5F5F5))', sitePalette('body{background:#0b0b0c;color:#f5f5f5}'), stats(), 'site')).toContain('Color(0xFFFFFFFF)');
 	});
 	it('reads a text color by its property, not by the words in the line', () => {
@@ -177,7 +177,7 @@ describe('project', () => {
 
 describe('check', () => {
 	it('flags raw values with the token to use, and fixes exact matches', () => {
-		const css = '.a { color: #0000ff; padding: 16px; font-weight: 700; transition: all 300ms ease-in; font-family: Inter; }';
+		const css = '.a { color: #2e3ae8; padding: 16px; font-weight: 700; transition: all 300ms ease-in; font-family: Inter; }';
 		const r = checkText('a.css', css);
 		expect(r.findings.map((f) => f.rule)).toEqual(expect.arrayContaining(['raw-color', 'off-scale', 'font', 'motion']));
 		expect(r.findings.find((f) => f.rule === 'raw-color')?.hint).toContain('var(--ds-color-brand)');
@@ -242,8 +242,8 @@ describe('touches', () => {
 	it('marks the hero with the brand\'s attribute and leaves headings and words as they are', () => {
 		const html = '<section class="hero"><h1>All your tasks, sales and clients \u2014 in one workspace</h1></section><h2>Built for agencies of every size</h2><h2>Our <b>team</b> today</h2>';
 		const out = addTouches(html, false);
-		expect(out).toContain('<section class="hero" data-ds-hero>');
-		expect(out).not.toContain('ds-accent');
+		// opencommerce has no touches: the home page is left exactly as it is.
+		expect(out).toBe(html);
 		expect(out.replace(/<[^>]+>/g, '')).toBe(html.replace(/<[^>]+>/g, ''));
 		expect(addTouches(out, false)).toBe(out);
 		expect(accentSplit('All your tasks, sales and clients \u2014 in one workspace')?.[1]).toBe('in one workspace');
@@ -251,15 +251,10 @@ describe('touches', () => {
 });
 
 describe('blue ground', () => {
-	it('declares a project\'s own color aliases again on the blue ground, so they take its colors', () => {
+	it('declares nothing when the brand has no hero ground', () => {
 		const css = groundAliases(':root { --fg: var(--ds-color-text-default); --gap: 4px; --ds-x: var(--ds-color-brand) }\n.card { --tint: var(--ds-color-bg-tint) }');
-		expect(css).toContain(':where([data-ds-hero], [data-ds-ground="blue"], .ds-on-blue) {\n\t--fg: var(--ds-color-text-default);\n}');
-		expect(css).not.toContain('--gap');
-		expect(groundAliases('body { color: red }')).toBe('');
-		expect(groundAliases('@theme { --color-ink: var(--ds-color-text-default); }\n@theme inline { --color-x: var(--ds-color-brand); }')).toContain('--color-ink: var(--ds-color-text-default);');
-		expect(groundAliases('@theme inline { --color-x: var(--ds-color-brand); }')).toBe('');
-		expect(groundAliases(':root { --text: var(--palette-white); --gap: 4px; }\n:root { --palette-white: var(--ds-color-text-default); }')).toContain('--text: var(--palette-white);');
-		expect(groundAliases(':root { --a: 1px; /* not var(--ds-color-brand) here */ --b: var(--ds-color-brand); }')).not.toContain('not var');
+		// opencommerce has no blue ground, so nothing is declared again.
+		expect(css).toBe('');
 	});
 });
 
@@ -362,7 +357,7 @@ describe('the one command', () => {
 		expect(readState(p)?.screens.map((s) => s.url)).toEqual(['/', '/about.html']);
 		const again = run(p);
 		expect(again).toMatch(/0 of 2 screens done/);
-		expect(readFileSync(join(p, 'index.html'), 'utf8')).toContain('<section class="hero" data-ds-hero>');
+		expect(readFileSync(join(p, 'index.html'), 'utf8')).toContain('<section class="hero">');
 		expect(again).not.toMatch(/Add data-ds-hero/);
 		expect(again).not.toMatch(/Wrap the closing words/);
 		run(p, 'skip', '/', '--reason', 'needs a database');
@@ -467,8 +462,8 @@ export function Help({ children, ...props }: any) { return <PopoverPanel classNa
   it('styles portalled parts without replacing refs, state, handlers, placement or variant conditions', () => {
     const out = restyleOverlays(menu, 'site');
     expect(out.parts).toEqual(['dropdown-menu.Content', 'dropdown-menu.Item', 'popover.Content']);
-    expect(out.text).toContain('border-hairline bg-surface');
-    expect(out.text).toContain('shadow-tooltip');
+    expect(out.text).toContain('border-line bg-surface');
+    expect(out.text).toContain('shadow-floating');
     expect(out.text).toContain('data-[highlighted]:bg-wash-hover');
     expect(out.text).toContain('max-h-(--radix-dropdown-menu-content-available-height)');
     expect(out.text).toContain('danger === "danger" && "text-red-500"');
@@ -486,8 +481,8 @@ export function Help({ children, ...props }: any) { return <PopoverPanel classNa
 export function Picker(props: any) { return <Select.Root name="card" value={props.value} onValueChange={props.onValueChange} required><Select.Trigger ref={props.ref} className="flex h-10 rounded-xl bg-black text-white px-4"><Select.Value /></Select.Trigger><Select.Portal><Select.Content position="popper" className="w-full min-w-20 rounded-xl bg-black text-white font-display text-body-sm"><Select.Viewport><Select.Item value="travel" disabled={props.disabled} onKeyDown={props.onKeyDown} className="py-2 font-display text-body-sm focus:bg-purple-500"><Select.ItemText>Travel</Select.ItemText></Select.Item></Select.Viewport></Select.Content></Select.Portal></Select.Root>; }`;
     const out = restyleOverlays(source, 'site');
     expect(out.parts).toEqual(['select.Trigger', 'select.Content', 'select.Item']);
-    expect(out.text).toContain('rounded-none');
-    expect(out.text).toContain('font-sans text-h5');
+    expect(out.text).toContain('rounded-control');
+    expect(out.text).toContain('font-sans text-body-sm');
     expect(out.text).toContain('w-[max(11rem,var(--radix-select-trigger-width))]');
     expect(out.text).toContain('max-w-(--radix-select-content-available-width)');
     expect(out.text).toContain('data-[highlighted]:bg-search-selected');
@@ -504,17 +499,17 @@ export function Picker(props: any) { return <Select.Root name="card" value={prop
       expect(readFileSync(join(dir, 'components/dropdown-menu.tsx'), 'utf8')).toBe(menu);
       run(dir);
       const applied = readFileSync(join(dir, 'components/dropdown-menu.tsx'), 'utf8');
-      expect(applied).toContain('shadow-tooltip');
+      expect(applied).toContain('shadow-floating');
       expect(applied).toContain('data-[highlighted]:bg-wash-hover');
       expect(applied).toContain('onSelect={props.onSelect}');
-      expect(readFileSync(join(dir, 'app/page.tsx'), 'utf8')).toContain('shadow-tooltip');
+      expect(readFileSync(join(dir, 'app/page.tsx'), 'utf8')).toContain('shadow-floating');
     } finally { rmSync(dir, { recursive: true }); }
   });
   it('styles explicit CSS menu names without restyling generic navigation or containers', () => {
     const css = '.dropdown-menu { position: absolute } .menu-item { display: flex } .glass-menu { width: 240px } .glass-menu-item { display: grid } .popover-content { color: red } .menu { display: flex }';
     const out = elementLayer('menu.css', css, 'site');
     expect(out.styled).toEqual([{selector:'.dropdown-menu',kind:'menu-panel'},{selector:'.menu-item',kind:'menu-item'},{selector:'.glass-menu',kind:'glass-menu'},{selector:'.glass-menu-item',kind:'glass-menu-item'},{selector:'.popover-content',kind:'popover-panel'}]);
-    expect(out.block).toContain('var(--ds-shadow-glass-hover)');
+    expect(out.block).toContain('var(--ds-glass-blur)');
     expect(out.block).toContain('var(--ds-radius-menu)');
     expect(out.block).not.toMatch(/position:|display:|width:/);
     expect(elementLayer('select.css', '.select-content { color: red } .select-item { color: red }', 'site').styled).toEqual([{selector:'.select-content',kind:'menu-panel'},{selector:'.select-item',kind:'menu-item'}]);
@@ -530,7 +525,7 @@ export function Picker(props: any) { return <Select.Root name="card" value={prop
       expect(installed).toBe(readFileSync(join(ROOT, 'registry/components/ui/dropdown-menu.tsx'), 'utf8'));
       expect(installed).toContain('MenuVariant.Provider');
       expect(installed).toContain('collisionPadding = 8');
-      expect(installed).toContain('shadow-glass-hover');
+      expect(installed).toContain('shadow-floating');
       expect(existsSync(join(dir, 'lib/surface.tsx'))).toBe(true);
       expect(existsSync(join(dir, 'hooks/use-hold.ts'))).toBe(true);
       expect(readFileSync(join(dir, 'lib/utils.ts'), 'utf8')).toContain('"glass-hover"');

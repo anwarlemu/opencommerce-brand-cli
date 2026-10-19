@@ -30,14 +30,14 @@ export function Open() {
 
 export function Glass() {
   return (
-    <Surface ground="blue" className="h-60 rounded-panel p-8">
+    <Surface ground="mist" className="h-60 rounded-panel p-8">
       <Popover defaultOpen>
         <PopoverTrigger asChild>
-          <Button variant="on-brand">About the dock</Button>
+          <Button variant="secondary">About monitoring</Button>
         </PopoverTrigger>
         <PopoverContent variant="glass" className="grid gap-1.5">
-          <p className="font-display text-body-sm">Always in reach</p>
-          <p className="text-body-sm leading-relaxed text-fg-on-brand-muted">The dock floats over every page, so the next step is one tap away.</p>
+          <p className="font-display text-body-sm font-medium">Every route, around the clock</p>
+          <p className="text-body-sm leading-relaxed text-fg-muted">Each store your agents buy from is exercised every few minutes, so a broken checkout is caught first.</p>
         </PopoverContent>
       </Popover>
     </Surface>

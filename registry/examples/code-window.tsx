@@ -1,33 +1,30 @@
 import { CodeWindow } from "@/components/ui/code-window";
 
-const KERNEL = `// One card item per purchase, in the
-// user's KERNEL vault
-await kernel.vaults.items.upsert('order', {
-  type: 'card',
-  spec: { provider: 'agentcard',
-    merchant: 'amazon.com',
-    amount: 2306, currency: 'usd' },
+const AGENT = `import { Agentcard } from "@agentcard/sdk";
+
+const agentcard = new Agentcard({
+  clientSecret: process.env.AGENTCARD_SECRET,
+  clientId: process.env.AGENTCARD_ID,
 });
-const browser = await kernel.browsers.create({
-  vaults: [{ id: vault.id }],
+
+// One tool for every store: search, checkout and tracking.
+const tools = [agentcard.tools.commerce()];`;
+
+const STEP = `npm install @agentcard/sdk
+
+import { Agentcard } from "@agentcard/sdk";
+
+const order = await agentcard.purchase({
+  merchant: "target.com",
+  thing: "Two notebooks and a pack of pens",
 });`;
 
-const LINQ = `POST api.linqapp.com/…/v3/payments
-
-{ "handle": "+1 415 555 0134",
-  "amount": 2306,
-  "merchant": "amazon.com" }`;
-
-// On the blue panel, as on the home page's integrations stage.
+// Light, as the hero's code card: the setup lines banded.
 export function Site() {
-  return (
-    <div className="mx-auto flex min-h-105 max-w-162 items-center rounded-panel bg-brand p-[clamp(var(--ds-space-4),2.4vw,var(--ds-space-8))]">
-      <CodeWindow title="kernel.ts" language="ts" code={KERNEL} copy className="w-full sm:w-[88%]" preClassName="pb-15" />
-    </div>
-  );
+  return <CodeWindow title="agent.ts" language="ts" code={AGENT} copy highlight={[2, 3, 4, 5]} className="mx-auto w-full max-w-200" />;
 }
 
-// On white, with a copy key and a request instead of code.
-export function Request() {
-  return <CodeWindow title="payments.http" language="http" code={LINQ} copy className="max-w-xl" />;
+// On ink, for code that runs (the step-by-step's window).
+export function Dark() {
+  return <CodeWindow title="step-2.ts" language="ts" code={STEP} copy dark className="mx-auto w-full max-w-160" preClassName="min-h-60" />;
 }

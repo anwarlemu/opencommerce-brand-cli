@@ -7,16 +7,16 @@
 /* The display steps shrink on phones, as on the brand's pages (brand/site.css). */
 @media (max-width: 47.9375rem) {
   :root {
-    --ds-text-display: 3rem;
+    --ds-text-display: 3.5rem;
     --ds-text-hero: 2.5rem;
-    --ds-text-h1: 2.125rem;
-    --ds-text-h2: 1.75rem;
+    --ds-text-h1: 2.25rem;
+    --ds-text-h2: 2rem;
     --ds-text-h3: 1.25rem;
     --ds-layout-gutter: 1.25rem;
   }
 }
 
-/* In the base layer, so the library's utilities (text-white on the blue band's heading) win over these defaults. */
+/* In the base layer, so the library's utilities win over these defaults. */
 @layer base {
   html {
     color-scheme: light;
@@ -24,6 +24,12 @@
     overflow-x: clip;
     scroll-padding-top: calc(var(--spacing) * 24);
     background-color: var(--ds-color-bg-page);
+  }
+
+  /* No rubber band at the top or bottom of the page, as on the brand's site. */
+  html,
+  body {
+    overscroll-behavior: none;
   }
 
   body {
@@ -42,7 +48,103 @@
     text-wrap: balance;
   }
 
+  :where(button:not(:disabled), [role="button"], [role="tab"], [role="radio"], summary) {
+    cursor: pointer;
+  }
+
   ::selection {
     background-color: var(--ds-color-ring-tint);
+  }
+}
+
+@layer components {
+  /* The header's trays (the brand's dock): squarish frosted glass with a lit top edge and a hairline, flat on the page.
+     The glass is its own layer behind the tray's contents, so the pill sliding inside it never makes the browser
+     rebuild the blur. */
+  .docs-tray {
+    position: relative;
+    z-index: 0;
+    padding: 3px;
+    border-radius: var(--ds-radius-control);
+    border: 1px solid transparent;
+  }
+  .docs-tray::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+    border: 1px solid var(--ds-color-border-glass);
+    background: var(--ds-glass-sheen), var(--ds-color-bg-glass);
+    box-shadow: var(--ds-shadow-glass);
+    -webkit-backdrop-filter: var(--ds-glass-blur);
+    backdrop-filter: var(--ds-glass-blur);
+  }
+
+  /* The pill: the links again, lit (white, blue text), laid exactly over the real ones and clipped to the current one.
+     Only the clip moves, so the pill and its text travel as one piece; it travels and stays on screen, so in-out. */
+  .docs-lit-shadow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 0 0.5px rgb(23 24 24 / 0.22)) drop-shadow(0 1px 1.5px rgb(23 24 24 / 0.14));
+  }
+  .docs-lit {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    background: var(--ds-color-bg-default);
+    transition: clip-path var(--ds-duration-moderate) var(--ds-easing-in-out);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .docs-lit {
+      transition: none;
+    }
+  }
+
+  /* The footer's wordmark: the name as a faint outline, and a spotlight that follows the pointer and draws the letters
+     under it in the brand's blue. Touch screens have no hover, so they keep the outline. */
+  .docs-wordmark-outline,
+  .docs-wordmark-glow {
+    color: transparent;
+  }
+  .docs-wordmark-outline {
+    -webkit-text-stroke: 1px var(--ds-color-border-glass);
+  }
+  .docs-wordmark-glow {
+    pointer-events: none;
+    opacity: 0;
+    -webkit-text-stroke: 1.25px var(--ds-color-text-brand);
+    background: var(--ds-color-wash-selected);
+    -webkit-background-clip: text;
+    background-clip: text;
+    mask-image: radial-gradient(circle clamp(90px, 14vw, 220px) at var(--x, 50%) var(--y, 50%), black 0%, rgb(0 0 0 / 0.55) 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle clamp(90px, 14vw, 220px) at var(--x, 50%) var(--y, 50%), black 0%, rgb(0 0 0 / 0.55) 40%, transparent 100%);
+    transition: opacity var(--ds-duration-slow) var(--ds-easing-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .docs-wordmark:hover .docs-wordmark-glow {
+      opacity: 1;
+    }
+  }
+
+  /* The phone menu drops a few pixels out from under the header as it opens; closing stays instant. */
+  .docs-sheet {
+    transition:
+      opacity var(--ds-duration-base) var(--ds-easing-out),
+      translate var(--ds-duration-base) var(--ds-easing-out);
+    @starting-style {
+      opacity: 0;
+      translate: 0 -6px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .docs-sheet {
+      transition-property: opacity;
+    }
   }
 }

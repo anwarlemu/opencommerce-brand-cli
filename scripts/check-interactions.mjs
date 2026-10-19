@@ -160,11 +160,12 @@ export async function checkInteractions(page, base) {
     assert.equal(await demo.getByRole('textbox', { name: 'Card nickname' }).inputValue(), 'Office agent');
 
     demo = await open('accordion');
-    const question = demo.getByRole('button', { name: 'Do I need to write code?' });
+    const question = demo.locator('[data-slot="accordion-trigger"]').first();
+    const was = await question.getAttribute('aria-expanded');
     await question.click();
-    assert.equal(await question.getAttribute('aria-expanded'), 'true');
+    assert.notEqual(await question.getAttribute('aria-expanded'), was);
     await question.click();
-    assert.equal(await question.getAttribute('aria-expanded'), 'false');
+    assert.equal(await question.getAttribute('aria-expanded'), was);
     demo = await open('collapse');
     const collapse = demo.getByRole('button');
     await collapse.click();
@@ -197,7 +198,7 @@ export async function checkInteractions(page, base) {
     assert.equal(await demo.getByRole('listitem').count(), 2);
     demo = await open('tabs', 'Plain');
     await demo.getByRole('tab', { name: 'Declined', exact: true }).click();
-    assert.equal(await demo.getByRole('tabpanel').textContent(), 'Uber · Declined.');
+    assert.match(await demo.getByRole('tabpanel').textContent(), / · Declined\.$/);
 
     demo = await open('spinner');
     await demo.getByRole('button', { name: 'Create card', exact: true }).click();
@@ -262,14 +263,17 @@ export async function checkInteractions(page, base) {
   await demo.getByRole('status').filter({ hasText: 'Travel agent · Active' }).waitFor();
 
   // Exercise a real click through the sandbox without contacting the external service.
-  await page.context().route('https://app.agentcard.sh/**', route => route.fulfill({ body: '<title>Agentcard destination</title>' }));
   demo = await open('site-header');
+  const action = demo.getByRole('link', { name: 'Get started' }).first();
+  const destination = new URL(await action.getAttribute('href'), base);
+  const pattern = `${destination.origin}/**`;
+  await page.context().route(pattern, route => route.fulfill({ body: '<title>Destination</title>' }));
   const popupEvent = page.waitForEvent('popup');
-  await demo.getByRole('link', { name: 'Get started' }).click();
+  await action.click();
   const popup = await popupEvent;
   await popup.waitForLoadState();
-  assert.equal(new URL(popup.url()).hostname, 'app.agentcard.sh');
+  assert.equal(new URL(popup.url()).hostname, destination.hostname);
   await popup.close();
-  await page.context().unroute('https://app.agentcard.sh/**');
+  await page.context().unroute(pattern);
   console.log('PASS: clipboard success/failure/retry, toast actions and external navigation from sandboxed previews.');
 }

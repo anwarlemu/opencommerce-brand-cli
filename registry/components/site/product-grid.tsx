@@ -3,11 +3,11 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-// The products (agentcard.sh home, "Explore our products"; .v7-sol): large raised cards, white with 20px corners, a
-// hairline and the hard 7px offset shadow, each holding a blue stage for the product's picture and its copy. A `lead`
-// card spans the row, the stage on one side and the copy on the other (each lead turns the other way from the last);
-// `half` cards pair up, stage above copy, their stages and copy lined up across the pair. Titles are the display face
-// at 36px and 400, the line 19px at 60 percent ink, then the blue key. Below 1024px every card stacks, stage first.
+// Products or use cases as large cards, in the home page's voice: white with 12px corners, a hairline and the window's
+// soft drop, each holding a mist stage for the product's picture and its copy. A `lead` card spans the row, the stage on
+// one side and the copy on the other (each lead turns the other way from the last); `half` cards pair up, stage above
+// copy, their stages and copy lined up across the pair. Titles are the display face at 44px (32px on phones) and 500,
+// the line 16px muted, then the blue key. Below 1024px every card stacks, stage first.
 
 type ProductAction = { label: React.ReactNode; href: string; icon?: React.ReactNode };
 
@@ -36,14 +36,12 @@ function Action({ action, className }: { action: ProductItem["action"]; classNam
   );
 }
 
-// The stage: the blue ground under the brand's horizontal lines, darkened toward its edges.
+// The stage: mist under a hairline, the picture centered on it.
 function Stage({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div
       className={cn(
-        "relative isolate flex min-h-80 items-center justify-center overflow-hidden rounded-card bg-brand p-[clamp(0.875rem,1.8vw,1.375rem)]",
-        "before:absolute before:inset-0 before:-z-10 before:bg-[repeating-linear-gradient(0deg,color-mix(in_srgb,var(--ds-color-ink)_58%,transparent)_0_3px,transparent_3px_5px)]",
-        "after:pointer-events-none after:absolute after:inset-0 after:-z-10 after:bg-[radial-gradient(ellipse_at_center,transparent_55%,color-mix(in_srgb,var(--ds-color-ink)_38%,transparent)),linear-gradient(90deg,color-mix(in_srgb,var(--ds-color-ink)_34%,transparent),transparent_16%,transparent_84%,color-mix(in_srgb,var(--ds-color-ink)_34%,transparent))]",
+        "relative isolate flex min-h-80 items-center justify-center overflow-hidden rounded-card border border-line bg-subtle p-[clamp(0.875rem,1.8vw,1.375rem)]",
         className,
       )}
     >
@@ -52,9 +50,9 @@ function Stage({ children, className }: { children: React.ReactNode; className?:
   );
 }
 
-const CARD = "rounded-shell border border-hairline bg-surface p-3 text-fg shadow-raised max-lg:mx-auto max-lg:w-full max-lg:max-w-140";
-const TITLE = "mb-3 font-display text-h2 leading-display font-normal tracking-tighter";
-const LINE = "text-body-lg leading-snug tracking-tight opacity-60";
+const CARD = "rounded-panel border border-line-strong bg-surface p-3 text-fg shadow-card max-lg:mx-auto max-lg:w-full max-lg:max-w-140";
+const TITLE = "mb-3 font-display text-h2 leading-display font-medium tracking-tighter";
+const LINE = "text-body leading-lead text-fg-muted";
 
 function LeadCard({ product, reverse }: { product: ProductItem; reverse: boolean }) {
   return (

@@ -1,101 +1,73 @@
-"use client";
-
 import * as React from "react";
-import * as TabsPrimitive from "@radix-ui/react-tabs";
 
+import { SectionHeading } from "@/components/site/section";
 import { Button } from "@/components/ui/button";
 import { Window } from "@/components/ui/window";
 import { cn } from "@/lib/utils";
 
-// The pricing page (agentcard.sh/pricing; .v7-pricing, .plan-tabs, .v7-offer-card): a 52px title, product tabs on the
-// brand's sunken track with the blue key gliding to the chosen one, and that product's plans as windows, two across. A
-// plan window has the sky bar (vault-free.plan; blue for the featured plan), its name at 24px, who it is for, the figure
-// at 36px with its unit, a dotted rule, the features (a blue check, the title in ink, the detail muted), a dotted rule
-// and the full-width blue key, over the hard 6px offset shadow. Plans side by side share rows, so their figures, lists
-// and keys line up. Switching products slides the new plans up in turn; the old ones fade out at once.
+// Pricing (the opencommerce site, pricing.tsx): the centered heading, then the plans side by side in the 800px column,
+// each in a window named after it (free.plan). A plan has its name at 20px, the figure at 44px in the display face with
+// its unit in 14px muted type beside it, a line on who it is for, then the compared rows on hairlines (the label muted
+// at the left, the value at the right) and a full-width key. The featured plan carries a small mono tag in the pale blue,
+// sets its values in blue and takes the blue key; the others take the white key. Rows line up across plans because
+// every plan answers the same `rows`.
 
-type PlanFeature = { title: React.ReactNode; detail?: React.ReactNode };
 type PlanAction = { label: React.ReactNode; href: string };
 
 type Plan = {
-  /** The plan's full name, as its title ("Vault Free"). */
   name: string;
-  /** Who it is for, under the name. */
-  line?: React.ReactNode;
-  price?: React.ReactNode;
-  /** Beside the figure: "up to 5,000 users", "/ month". */
+  /** A small tag beside the name (the featured plan's). */
+  badge?: React.ReactNode;
+  price: React.ReactNode;
+  /** Beside the figure: "of each completed order", "/ month". */
   unit?: React.ReactNode;
-  /** Points at the plan this one builds on, above its own features ("All features in the Free plan, plus:"). */
-  includes?: React.ReactNode;
-  features?: PlanFeature[];
-  /** The plan's key: a label and href (the full-width blue key), or your own element. */
+  /** Who it is for, under the figure. */
+  blurb?: React.ReactNode;
+  /** One value per row, in the order of `rows`. */
+  values: React.ReactNode[];
+  /** The plan's key: a label and href, or your own element. */
   action?: PlanAction | React.ReactNode;
-  /** The plan to steer toward: its bar is blue. One per product at most. */
+  /** The plan to steer toward: blue values and the blue key. One at most. */
   featured?: boolean;
-  /** The bar's name; defaults to the plan's slug with .plan. */
+  /** The window's name; defaults to the plan's slug with .plan. */
   file?: string;
 };
-
-type PricingProduct = { label: string; plans: Plan[] };
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const isAction = (a: Plan["action"]): a is PlanAction => typeof a === "object" && a !== null && !React.isValidElement(a) && "href" in a;
 
-function Check() {
+function PlanWindow({ plan, rows }: { plan: Plan; rows: React.ReactNode[] }) {
   return (
-    <svg viewBox="0 0 16 16" aria-hidden className="mt-0.75 size-4 fill-none stroke-brand [stroke-linecap:round] [stroke-linejoin:round] [stroke-width:1.8]">
-      <path d="M3.5 8.5 6.5 11.5 12.5 4.5" />
-    </svg>
-  );
-}
-
-function PlanWindow({ plan, index, active }: { plan: Plan; index: number; active: boolean }) {
-  const features = plan.features ?? [];
-  return (
-    <Window
-      name={plan.file ?? `${slug(plan.name)}.plan`}
-      tone={plan.featured ? "blue" : "sky"}
-      // The new product's plans come up one after another; the old ones fade out at once.
-      style={{ transitionDelay: active ? `${index * 35}ms` : "0ms" }}
-      className={cn(
-        "shadow-plan lg:row-span-5 lg:grid lg:grid-rows-subgrid lg:gap-0",
-        "transition-[opacity,translate] duration-(--ds-duration-moderate) ease-out motion-reduce:transition-none",
-        !active && "opacity-0 duration-150 motion-safe:translate-y-2",
-      )}
-      bodyClassName="flex flex-col gap-3 p-5.5 md:px-7 md:py-5 lg:row-[2/-1] lg:grid lg:grid-rows-subgrid lg:gap-y-3"
-    >
-      <header className="flex flex-col gap-1.5">
-        <h3 className="font-display text-h3 leading-display font-medium tracking-tight">{plan.name}</h3>
-        {plan.line && <p className="text-body-sm leading-5.5 text-fg-muted">{plan.line}</p>}
-      </header>
-      <p className="flex items-baseline gap-2">
-        {plan.price && <span className="font-display text-h2 leading-none font-medium tracking-tight">{plan.price}</span>}
-        {plan.unit && <span className="text-body-sm leading-5.5 text-fg-muted">{plan.unit}</span>}
-      </p>
-      <div className="flex min-h-18 flex-1 flex-col items-start border-y-2 border-dotted border-line py-5">
-        {plan.includes && <p className="mb-3 text-body-sm leading-normal font-medium last:mb-0">{plan.includes}</p>}
-        {features.length > 0 && (
-          <ul className="flex flex-col gap-3 self-stretch text-body-sm leading-normal">
-            {features.map((feature, i) => (
-              <li key={i} className="grid grid-cols-[1rem_minmax(0,1fr)] items-start gap-2.5">
-                <Check />
-                <span>
-                  <b className="block font-medium">{feature.title}</b>
-                  {feature.detail && <small className="block text-body-sm leading-5 opacity-65">{feature.detail}</small>}
-                </span>
-              </li>
+    <Window name={plan.file ?? `${slug(plan.name)}.plan`} bodyClassName="flex flex-col">
+      <div className="flex flex-1 flex-col p-6">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="font-display text-h4 leading-snug font-medium tracking-tight">{plan.name}</h3>
+          {plan.badge && <span className="rounded-chip bg-tint px-2 py-1 font-mono text-caption leading-none text-fg-brand">{plan.badge}</span>}
+        </div>
+        <p className="mt-5 flex items-baseline gap-2">
+          <span className="font-display text-h2 leading-none font-medium tracking-hero">{plan.price}</span>
+          {plan.unit && <span className="text-body-sm text-fg-muted">{plan.unit}</span>}
+        </p>
+        {plan.blurb && <p className="mt-3 text-button leading-relaxed text-fg-muted">{plan.blurb}</p>}
+        {rows.length > 0 && (
+          <dl className="mt-6 border-t border-line">
+            {rows.map((row, i) => (
+              <div key={i} className="flex items-baseline justify-between gap-4 border-b border-line py-3.5 text-body-sm">
+                <dt className="text-fg-muted">{row}</dt>
+                <dd className={cn("text-right", plan.featured && "text-fg-brand")}>{plan.values[i]}</dd>
+              </div>
             ))}
-          </ul>
+          </dl>
         )}
-      </div>
-      <div className="lg:self-end">
-        {isAction(plan.action) ? (
-          <Button asChild className="w-full">
-            <a href={plan.action.href}>{plan.action.label}</a>
-          </Button>
-        ) : (
-          plan.action
-        )}
+        <div className="mt-auto pt-7">
+          {isAction(plan.action) ? (
+            <Button asChild variant={plan.featured ? "primary" : "secondary"} className="w-full">
+              <a href={plan.action.href}>{plan.action.label}</a>
+            </Button>
+          ) : (
+            plan.action
+          )}
+        </div>
       </div>
     </Window>
   );
@@ -103,60 +75,22 @@ function PlanWindow({ plan, index, active }: { plan: Plan; index: number; active
 
 function Pricing({
   title,
-  products,
+  description,
+  rows = [],
+  plans,
   className,
   ...props
-}: Omit<React.ComponentProps<"section">, "title"> & { title?: React.ReactNode; products: PricingProduct[] }) {
-  const [active, setActive] = React.useState(0);
-  const index = Math.min(active, products.length - 1);
+}: Omit<React.ComponentProps<"div">, "title"> & { title?: React.ReactNode; description?: React.ReactNode; rows?: React.ReactNode[]; plans: Plan[] }) {
   return (
-    <section data-slot="pricing" className={cn("flex flex-col items-center gap-5", className)} {...props}>
-      {title && <h2 className="text-center font-display text-h1 leading-heading font-medium tracking-tight">{title}</h2>}
-      <TabsPrimitive.Root value={String(index)} onValueChange={(v) => setActive(Number(v))} className="flex w-full flex-col items-center gap-5">
-        {products.length > 1 && (
-          <TabsPrimitive.List
-            aria-label="Products"
-            style={{ "--tabs": products.length, "--tab": index } as React.CSSProperties}
-            className="relative isolate grid w-full max-w-170 grid-cols-[repeat(var(--tabs),minmax(0,1fr))] gap-1 rounded-card border border-hairline bg-subtle p-1 shadow-well"
-          >
-            {/* The blue key: one thumb under the labels, travelling to the chosen tab. */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute top-1 bottom-1 left-1 w-[calc((100%-0.5rem-(var(--tabs)-1)*0.25rem)/var(--tabs))] translate-x-[calc(var(--tab)*(100%+0.25rem))] rounded-control border border-line-brand-edge bg-primary shadow-key-brand transition-[translate] duration-(--ds-duration-moderate) ease-in-out motion-reduce:transition-none"
-            />
-            {products.map((product, i) => (
-              <TabsPrimitive.Trigger
-                key={product.label}
-                value={String(i)}
-                className="relative z-10 flex h-10 items-center justify-center rounded-control border border-transparent px-4 font-display text-body-sm whitespace-nowrap text-fg-muted outline-none transition-[background-color,color] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--ds-color-ink)_6%,transparent)] hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring data-[state=active]:text-on-primary data-[state=active]:delay-100 data-[state=active]:hover:bg-transparent max-sm:px-0 motion-reduce:transition-none"
-              >
-                {product.label}
-              </TabsPrimitive.Trigger>
-            ))}
-          </TabsPrimitive.List>
-        )}
-        {/* Every product's plans share one cell, so the page keeps the tallest group's height between tabs. */}
-        <div className="mt-3 grid w-full max-w-130 lg:max-w-250">
-          {products.map((product, p) => (
-            <TabsPrimitive.Content
-              key={product.label}
-              value={String(p)}
-              forceMount
-              className={cn(
-                "grid grid-cols-1 gap-x-6 gap-y-4 self-start outline-none [grid-area:1/1] lg:gap-y-0",
-                product.plans.length === 1 ? "lg:grid-cols-[minmax(0,calc(50%-0.75rem))] lg:justify-center" : "lg:grid-cols-2",
-                "transition-[visibility] duration-150 data-[state=inactive]:pointer-events-none data-[state=inactive]:invisible motion-reduce:transition-none",
-              )}
-            >
-              {product.plans.map((plan, i) => (
-                <PlanWindow key={plan.name} plan={plan} index={i} active={p === index} />
-              ))}
-            </TabsPrimitive.Content>
-          ))}
-        </div>
-      </TabsPrimitive.Root>
-    </section>
+    <div data-slot="pricing" className={cn("w-full", className)} {...props}>
+      {title && <SectionHeading title={title} description={description} />}
+      <div className={cn("mx-auto grid max-w-(--ds-layout-medium) gap-5 md:gap-6", plans.length > 1 && "md:grid-cols-2")}>
+        {plans.map((plan) => (
+          <PlanWindow key={plan.name} plan={plan} rows={rows} />
+        ))}
+      </div>
+    </div>
   );
 }
 
-export { Pricing, type Plan, type PlanFeature, type PricingProduct };
+export { Pricing, type Plan, type PlanAction };

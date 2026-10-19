@@ -3,17 +3,17 @@ name: code-window
 title: Code window
 type: ui
 surface: site
-description: "Code block with a filename, highlighting and optional copy action."
+description: "Code in a window: the file name in the bar, Copy at the right, light or on ink, with banded lines."
 kinds: [code-window]
-use_for: "Use for commands, integration examples and API requests. Pass code as a string for highlighting and copying, or pass rendered children."
-never: [A full syntax theme with many colors, A light code window, Rounded corners above 8px, Code set in a monospace other than the display face]
-source: "agentcard-website src/components/v7/integrations.tsx (CodePane), src/app/globals.css:3341 (.v7-intg-code); agentcard.sh / (computed: .v7-intg-stage [class*=code])"
+use_for: "Use for the code a page shows: the hero's setup file, a step's code, an API request. Pass code as a string for highlighting and copying, or pass rendered children. Light by default; dark for code that runs."
+never: [A full syntax theme with many colors, Code in a proportional face, Rounded corners other than 12px, Horizontal scrolling for long lines (they wrap and hang)]
+source: "opencommerce-agentcard-web src/components/code-block.tsx, hero.tsx, in-action.tsx; src/app/globals.css (.code, .code-dark, .tok-*, .code-line)"
 ---
 
-`CodeWindow` props: `title` (the file name in the bar), `code` (string) or `children`, `language` (only picks the comment
-marker for highlighting: `ts`, `sh`, `py`, `sql`, `text`...), `copy` (adds the copy key; needs `code`), `preClassName`
-(a fixed height or the home stage's 60px of bottom room, `pb-15`). It also exports `tokenize(code, language)`.
+`CodeWindow` props: `title` (the file name in the bar), `code` (string) or `children`, `language` (picks the comment
+marker and turns keywords off for `text` and `http`), `copy` (puts the Copy key in the bar; needs `code`), `dark` (the
+body on ink), `highlight` (zero-based line numbers to band; a run reads as one inset block) and `preClassName` (a fixed
+height, or `text-caption leading-snug` for a tighter hero card). It also exports `tokenize(code, language)`.
 
-On the brand's page the window sits at 88 percent of a blue panel (`bg-brand`, 12px corners, 32px padding). The site
-has no separate terminal style live (the guides are not published), so there is no `Terminal` export: use a code window
-titled `Terminal` with `language="sh"`.
+Three voices only: keywords in the blue, strings in the deep blue (sky on ink), comments faint. Long lines wrap and hang
+two columns past their own indent, so the structure still reads on a phone.

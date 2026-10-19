@@ -1,11 +1,11 @@
 {
-	"name": "Agentcard",
-	"bin": "agentcard-ds",
-	"source": "github:anwarlemu/agentcard-brand-cli#release",
+	"name": "opencommerce",
+	"bin": "opencommerce-ds",
+	"source": "github:anwarlemu/opencommerce-brand-cli#release",
 	"reviewModel": "claude-opus-5-5",
 	"reviewThreshold": 7,
-	"registryUrl": "https://agentcard-ds.vercel.app",
-	"site": "https://www.agentcard.sh",
+	"registryUrl": "https://opencommerce-ds.vercel.app",
+	"site": "https://opencommerce-agentcard-web.vercel.app",
 	"surfaces": [
 		"site"
 	],
@@ -20,16 +20,11 @@
 				}
 			}
 		],
-		"native": "Add Inter (text) to the app as a font and set it on its text styles; headings, labels and buttons use Helvetica Neue (the system's on Apple platforms)"
+		"native": "Add Inter (text, buttons and links) to the app as a font and set it on its text styles; headings use Helvetica Neue (the system's on Apple platforms) and code, tags and figures use the system monospace"
 	},
-	"touches": {
-		"hero": {
-			"attribute": "data-ds-hero",
-			"does": "the blue ground, white type and the stepped bands into the page below; a header that sits over the hero takes data-ds-ground=\"blue\" so its marks turn white"
-		}
-	},
+	"touches": {},
 	"type": {
-		"caps": true
+		"caps": false
 	},
 	"variants": {
 		"site": {

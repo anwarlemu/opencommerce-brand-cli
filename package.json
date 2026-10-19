@@ -1,10 +1,10 @@
 {
-  "name": "agentcard-ds",
+  "name": "opencommerce-ds",
   "version": "2.0.0",
-  "description": "Components, design tokens and checks for building Agentcard pages and interfaces.",
+  "description": "Components, design tokens and checks for building opencommerce pages and interfaces.",
   "type": "module",
   "bin": {
-    "agentcard-ds": "./bin.js"
+    "opencommerce-ds": "./bin.js"
   },
   "files": [
     "bin.js",

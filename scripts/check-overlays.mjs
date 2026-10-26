@@ -23,7 +23,7 @@ export async function checkOverlays(page, base) {
     let frame = await frameFor('dropdown-menu');
     if (width === 1440) {
       const actual = await frame.locator('body').evaluate(() => innerWidth);
-      assert.ok(actual >= 600 && actual <= 720, 'Primitive previews should render at the column width');
+      assert.ok(actual >= 600 && actual <= 800, `Primitive previews should render at the column width (${actual})`);
     }
     const trigger = frame.getByRole('button', { name: 'Card actions' });
     await trigger.click();

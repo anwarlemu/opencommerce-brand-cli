@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { Window } from "@/components/ui/window";
-import { Block, Command, Page, PageIntro } from "@www/components/chrome";
+import { Command, PageBody, PageHead, Section } from "@www/components/chrome";
 import { Code } from "@www/components/code";
 import { BIN, CLI_COMMAND, registryName } from "@www/lib/registry";
 
@@ -43,12 +43,12 @@ function Swatch({ name, value }: { name: string; value: string }) {
 
 export default function ThemePage() {
   return (
-    <Page>
-      <PageIntro title="Design tokens" lead="Use these tokens for colors, typography, spacing, corners, shadows and motion. Components already use them; use the same tokens for custom layouts.">
-        <Command command={`${CLI_COMMAND} add theme`} />
-      </PageIntro>
+    <>
+      <PageHead eyebrow="Docs" title="Theme" description="Use these tokens for colors, typography, spacing, corners, shadows and motion. Components already use them; use the same tokens for custom layouts." />
+      <PageBody>
+      <Command command={`${CLI_COMMAND} add theme`} />
 
-      <Block title="Color" description="Choose tokens by their role: surface, text, border, action or status.">
+      <Section title="Color" description="Choose tokens by their role: surface, text, border, action or status.">
         <div className="grid gap-6">
           {GROUPS.map((g) => {
             const list = colors.filter(([k]) => g.test.test(k) && !GROUPS.slice(0, GROUPS.indexOf(g)).some((p) => p.test.test(k)));
@@ -64,9 +64,9 @@ export default function ThemePage() {
             );
           })}
         </div>
-      </Block>
+      </Section>
 
-      <Block title="Type" description="Neue Haas Grotesk Display (Helvetica Neue where it is not installed) for headings and the wordmark, Inter for text, buttons and links, and the platform mono for code, window bars, tags and figures.">
+      <Section title="Type" description="Neue Haas Grotesk Display (Helvetica Neue where it is not installed) for headings and the wordmark, Inter for text, buttons and links, and the platform mono for code, window bars, tags and figures.">
         <Window name="type.css" bodyClassName="divide-y divide-line-subtle px-5">
           {SCALE.map(([name, value]) => (
             <div key={name} className="grid items-baseline gap-2 py-5 sm:grid-cols-[11rem_1fr]">
@@ -79,9 +79,9 @@ export default function ThemePage() {
             </div>
           ))}
         </Window>
-      </Block>
+      </Section>
 
-      <Block title="Corners and shadows" description="Use the token assigned to the component. Keep the same corner radius and shadow for the same kind of element.">
+      <Section title="Corners and shadows" description="Use the token assigned to the component. Keep the same corner radius and shadow for the same kind of element.">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {RADII.map(([name, value]) => (
             <div key={name} className="flex flex-col gap-3">
@@ -100,16 +100,17 @@ export default function ThemePage() {
             </div>
           ))}
         </div>
-      </Block>
+      </Section>
 
-      <Block title="Import the theme" description={`The CLI creates _${BIN}/brand.css and _${BIN}/theme.css beside the main stylesheet and adds the imports below. The brand stylesheet includes the tokens and base styles.`}>
+      <Section title="Import the theme" description={`The CLI creates _${BIN}/brand.css and _${BIN}/theme.css beside the main stylesheet and adds the imports below. The brand stylesheet includes the tokens and base styles.`}>
         <Code
           title="app/globals.css"
           code={`@import "tailwindcss";
 @import "./_${BIN}/brand.css";
 @import "./_${BIN}/theme.css";`}
         />
-      </Block>
-    </Page>
+      </Section>
+      </PageBody>
+    </>
   );
 }

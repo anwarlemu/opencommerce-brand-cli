@@ -4,14 +4,18 @@ export async function checkInteractions(page, base) {
   const open = async (component, example = 'Site') => {
     await page.goto(`${base}/components/${component}`);
     const frame = page.locator(`iframe[src="/preview/${component}/${example}"]`);
-    if (["command", "dialog", "dropdown-menu", "popover", "select", "sheet", "tooltip", "site-header"].includes(component)) {
+    // Overlay and full-page examples render in a frame (the docs decide which); the rest render in place. A framed
+    // preview shows its "Open alone" link at once and mounts the iframe after measuring its panel, so wait for it.
+    await page.locator('main figure').first().waitFor();
+    if (await page.locator(`main a[href="/preview/${component}/${example}"]`).count()) {
+      await frame.waitFor();
       await frame.scrollIntoViewIfNeeded();
       const content = await frame.contentFrame();
       await content.locator('[data-preview-ready]').waitFor();
       return content;
     }
     const label = example === 'Site' ? 'Preview' : example.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().replace(/^./, c => c.toUpperCase());
-    const preview = page.locator('article figure').filter({ has: page.locator('figcaption', { hasText: new RegExp(`^${label}$`) }) });
+    const preview = page.locator('main figure').filter({ has: page.locator('figcaption', { hasText: new RegExp(`^${label}$`) }) });
     await preview.waitFor();
     return preview;
   };

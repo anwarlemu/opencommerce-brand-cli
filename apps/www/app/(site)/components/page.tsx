@@ -1,12 +1,11 @@
 import Link from "next/link";
 
 import { Window } from "@/components/ui/window";
-import { Block, Page, PageIntro } from "@www/components/chrome";
-import { DocsSearch } from "@www/components/docs-search";
+import { PageBody, PageHead, Section } from "@www/components/chrome";
 import { InlineCode, Prose } from "@www/components/prose";
 import { Thumb } from "@www/components/thumb";
 import { examples } from "@www/lib/examples.generated";
-import { CLI_COMMAND, GROUPS, items, registryName } from "@www/lib/registry";
+import { CLI_COMMAND, RAIL, items, registryName } from "@www/lib/registry";
 
 export const metadata = { title: "Library" };
 
@@ -23,25 +22,16 @@ const FRAMED = new Set(["command"]);
 
 export default function Library() {
   return (
-    <Page>
-      <PageIntro
-        title="Component library"
-        lead={`React components and page templates for ${registryName}. Each item includes a preview, usage notes, source and an install command.`}
-      >
-        <div className="mx-auto grid w-full max-w-140 gap-4">
-          <DocsSearch entries={items.map((i) => ({ name: i.name, title: i.title, group: GROUPS.find((g) => g.type === i.type)?.label ?? "Library", href: `/components/${i.name}` }))} />
-          <p className="text-body-sm text-fg-muted">
-            Requires React and Tailwind 4. Use <InlineCode>{`${CLI_COMMAND} add <item>`}</InlineCode> to add an item.
-          </p>
-        </div>
-      </PageIntro>
-      {GROUPS.map((g) => {
-        const list = items.filter((i) => i.type === g.type);
-        if (!list.length) return null;
-        return (
-          <Block key={g.type} id={g.id} title={g.label} description={g.blurb}>
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {list.map((i) => {
+    <>
+      <PageHead eyebrow="Library" title="All components" description={`${items.length} React components, sections and page templates for ${registryName}. Each has previews, usage notes, source and an install command.`} />
+      <PageBody>
+        <p className="text-body-sm text-fg-muted">
+          Requires React and Tailwind 4. Use <InlineCode>{`${CLI_COMMAND} add <item>`}</InlineCode> to add an item.
+        </p>
+        {RAIL.map((g) => (
+          <Section key={g.type} id={g.id} title={g.label} description={g.blurb}>
+            <ul className="grid gap-4 sm:grid-cols-2">
+              {g.items.map((i) => {
                 const main = examples[i.name]?.Block ?? examples[i.name]?.Site ?? Object.values(examples[i.name] ?? {})[0];
                 const thumb = THUMB[i.type] ?? THUMB.ui;
                 return (
@@ -64,9 +54,9 @@ export default function Library() {
                 );
               })}
             </ul>
-          </Block>
-        );
-      })}
-    </Page>
+          </Section>
+        ))}
+      </PageBody>
+    </>
   );
 }

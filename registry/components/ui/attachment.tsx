@@ -61,7 +61,7 @@ function AttachmentTitle({ className, ...props }: React.ComponentProps<"span">) 
   return (
     <span
       data-slot="attachment-title"
-      className={cn("block max-w-full min-w-0 truncate font-sans font-medium text-fg group-data-[state=processing]/attachment:animate-pulse group-data-[state=uploading]/attachment:animate-pulse motion-reduce:animate-none", className)}
+      className={cn("block max-w-full min-w-0 truncate font-sans font-medium text-fg group-data-[state=processing]/attachment:animate-pulse-soft group-data-[state=uploading]/attachment:animate-pulse-soft motion-reduce:animate-none", className)}
       {...props}
     />
   );

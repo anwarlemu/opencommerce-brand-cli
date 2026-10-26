@@ -32,7 +32,7 @@ function TraceLine({ className, status, ...props }: React.ComponentProps<"span">
       data-slot="trace-line"
       data-status={status}
       className={cn(
-        "flex w-fit max-w-full min-w-0 items-center gap-2 font-sans text-body-sm leading-relaxed text-fg-muted transition-[color] duration-160 ease-out in-[a,button]:cursor-pointer in-[a:hover,button:hover]:text-fg data-[status=error]:text-danger data-[status=error]:in-[a:hover,button:hover]:text-danger data-[status=pending]:opacity-60 data-[status=running]:*:data-[slot=trace-title]:animate-pulse motion-reduce:transition-none motion-reduce:data-[status=running]:*:data-[slot=trace-title]:animate-none",
+        "flex w-fit max-w-full min-w-0 items-center gap-2 font-sans text-body-sm leading-relaxed text-fg-muted transition-[color] duration-160 ease-out in-[a,button]:cursor-pointer in-[a:hover,button:hover]:text-fg data-[status=error]:text-danger data-[status=error]:in-[a:hover,button:hover]:text-danger data-[status=pending]:opacity-60 data-[status=running]:*:data-[slot=trace-title]:animate-pulse-soft motion-reduce:transition-none motion-reduce:data-[status=running]:*:data-[slot=trace-title]:animate-none",
         className,
       )}
       {...props}

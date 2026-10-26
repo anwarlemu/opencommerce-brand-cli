@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "name": "nav-dock",
+  "useFor": "SiteHeader renders it from its links; use it alone only for a custom header. Link on-page sections by #id so the pill follows the reader, or set spy={false} and mark the current page.",
+  "constraints": [
+    "More than six links",
+    "Icons instead of labels",
+    "A colored tray",
+    "A dark glass tray on the white page",
+    "Moving the pill with a spring"
+  ],
+  "documentation": "`NavDock` props: `links` ({ label, href, current }[]), `spy` (default true), `spyLine` (px from the top, default\n120), `label` (the landmark's name, default \"Main\"), plus nav props. `TRAY` is the glass's class list, for a tray of\nyour own.\n\nMotion: links wash on hover and shrink to 0.96 on press (160ms ease-out); the pill's clip slides between links (250ms,\nin-out); with reduced motion it jumps.",
+  "source": "opencommerce-agentcard-web src/components/nav-pills.tsx, src/app/globals.css (.nav-tray, .nav-link, .nav-lit)",
+  "exports": [
+    "NavDock",
+    "TRAY",
+    "DockLink",
+    "NavDockProps"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/nav-dock",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/nav-dock.md",
+  "examples": [
+    {
+      "path": "examples/nav-dock.tsx",
+      "content": "import { NavDock } from \"@/components/site/nav-dock\";\n\nexport function Site() {\n  return (\n    <div className=\"flex justify-center bg-subtle py-16\">\n      <NavDock\n        spy={false}\n        links={[\n          { label: \"Home\", href: \"#top\" },\n          { label: \"Features\", href: \"#features\", current: true },\n          { label: \"Pricing\", href: \"#pricing\" },\n          { label: \"Docs\", href: \"https://docs.example.com\" },\n        ]}\n      />\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "nav-dock"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/nav-dock/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Nav dock",
+  "description": "The header's tray of links in frosted glass, with a lit pill that slides to the current section.",
+  "surface": "site",
+  "kinds": [
+    "nav-dock",
+    "nav-link"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/nav-dock.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The header's links (the opencommerce site, nav-pills.tsx and .nav-tray): one tray of frosted glass, mostly white with\n// a breath of ink over a heavy blur, a hairline and a lit top edge, flat on the page. Its links are 14px muted labels\n// that wash on hover and give a little when pressed. A white pill marks where you are: a second copy of the links, lit\n// (white ground, blue text), laid exactly over the real ones and clipped down to the current one. Only the clip moves\n// (250ms, the in-out curve, since the pill travels and stays on screen), so the pill and its blue text travel as one\n// piece and nothing is laid out again. The copy is decoration: hidden from readers, never focused or clicked.\n//\n// With `spy` (the default), the pill follows the section you are reading: the last linked section whose top has passed\n// under the header. Links that leave the page never take the pill. Without `spy`, the link marked `current` takes it.\n// The glass is its own layer behind the links: a backdrop blur that holds moving content rebuilds every frame.\n\ntype DockLink = { label: string; href: string; current?: boolean };\n\n/** The frosted glass every tray of the header is made of, drawn on a layer behind the tray's contents. */\nconst TRAY =\n  \"relative isolate rounded-control border border-transparent before:pointer-events-none before:absolute before:-inset-px before:-z-10 before:rounded-[inherit] before:border before:border-line-glass before:bg-glass before:bg-(image:--ds-glass-sheen) before:shadow-glass before:[backdrop-filter:var(--ds-glass-blur)]\";\n\nconst LINK =\n  \"relative flex items-center rounded-menu px-3.5 py-2.25 text-body-sm leading-none whitespace-nowrap text-fg-muted outline-none transition-[background-color,color,scale] duration-(--ds-duration-fast) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring active:scale-96 motion-reduce:transition-none motion-reduce:active:scale-100\";\n\ntype NavDockProps = Omit<React.ComponentProps<\"nav\">, \"children\"> & {\n  links: DockLink[];\n  /** Follow the section in view (links to #ids). Off: the link marked current takes the pill. */\n  spy?: boolean;\n  /** Where the header's foot sits, in px from the top: a section counts as read once its top passes it. */\n  spyLine?: number;\n  /** The landmark's name. */\n  label?: string;\n};\n\nfunction NavDock({ links, spy = true, spyLine = 120, label = \"Main\", className, ...props }: NavDockProps) {\n  const initial = links.find((l) => l.current)?.href ?? links[0]?.href ?? \"\";\n  const [active, setActive] = React.useState(initial);\n  const [pill, setPill] = React.useState<{ x: number; w: number; tray: number } | null>(null);\n  const tray = React.useRef<HTMLDivElement>(null);\n\n  // Scroll spy, read once per frame at most: each read forces layout.\n  React.useEffect(() => {\n    if (!spy) return;\n    const ids = links.map((l) => l.href).filter((h) => /^#.+/.test(h));\n    if (!ids.length) return;\n    let frame = 0;\n    const read = () => {\n      frame = 0;\n      let current = links[0]?.href ?? \"\";\n      for (const id of ids) {\n        const el = document.getElementById(id.slice(1));\n        if (el && el.getBoundingClientRect().top <= spyLine) current = id;\n      }\n      setActive(current);\n    };\n    const onScroll = () => {\n      if (!frame) frame = requestAnimationFrame(read);\n    };\n    read();\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    return () => {\n      cancelAnimationFrame(frame);\n      window.removeEventListener(\"scroll\", onScroll);\n    };\n  }, [spy, spyLine, links]);\n\n  // Measure the active link so the pill can slide to it.\n  React.useLayoutEffect(() => {\n    const measure = () => {\n      const el = tray.current?.querySelector<HTMLElement>(`a[data-href=\"${CSS.escape(active)}\"]`);\n      if (el && tray.current) setPill({ x: el.offsetLeft, w: el.offsetWidth, tray: tray.current.clientWidth });\n      else setPill(null);\n    };\n    measure();\n    const ro = new ResizeObserver(measure);\n    if (tray.current) ro.observe(tray.current);\n    return () => ro.disconnect();\n  }, [active]);\n\n  return (\n    <nav data-slot=\"nav-dock\" aria-label={label} className={className} {...props}>\n      <div ref={tray} className={cn(TRAY, \"flex items-center gap-0.5 p-0.75\")}>\n        {links.map((link) => (\n          <a\n            key={link.href + link.label}\n            href={link.href}\n            data-href={link.href}\n            aria-current={link.href === active ? (spy && link.href.startsWith(\"#\") ? \"location\" : \"page\") : undefined}\n            className={cn(LINK, \"hover:bg-wash-hover hover:text-fg aria-[current]:text-fg-brand aria-[current]:hover:bg-transparent\")}\n          >\n            {link.label}\n          </a>\n        ))}\n        {pill && (\n          <div aria-hidden className=\"pointer-events-none absolute inset-0 [filter:drop-shadow(0_0_0.5px_color-mix(in_srgb,var(--ds-color-ink)_22%,transparent))_drop-shadow(0_1px_1.5px_color-mix(in_srgb,var(--ds-color-ink)_14%,transparent))]\">\n            <div\n              className=\"absolute inset-0 flex items-center gap-0.5 bg-surface p-0.75 transition-[clip-path] duration-(--ds-duration-moderate) ease-in-out motion-reduce:transition-none\"\n              style={{ clipPath: `inset(3px ${pill.tray - pill.x - pill.w}px 3px ${pill.x}px round 5px)` }}\n            >\n              {links.map((link) => (\n                <span key={link.href + link.label} className={cn(LINK, \"text-fg-brand\")}>\n                  {link.label}\n                </span>\n              ))}\n            </div>\n          </div>\n        )}\n      </div>\n    </nav>\n  );\n}\n\nexport { NavDock, TRAY };\nexport type { DockLink, NavDockProps };\n"
+    }
+  ]
+}

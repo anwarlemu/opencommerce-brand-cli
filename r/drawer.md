@@ -1,0 +1,280 @@
+# Drawer
+A window pulled from an edge with a handle, that can be dragged away.
+
+Install: npx opencommerce-ds add drawer
+Requires: theme, surface, utils
+Packages: @radix-ui/react-dialog
+Exports: Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger
+Client boundary: yes
+Reference: Extension from opencommerce-agentcard-web src/app/globals.css (.win) and sheet.tsx
+
+
+## Usage
+Use on phones for a short task or a choice that belongs to the page under it (pick a shipping address, review a cart). Set direction for top, left or right; bottom is the default. Mark a scrolling list inside it with data-drawer-no-drag so scrolling does not drag the drawer.
+- Avoid: A drawer on desktop for a long form (use a sheet or dialog)
+- Avoid: Content that needs the full height of the screen
+- Avoid: A drawer opened from another drawer
+
+
+## Examples
+Example components: npx opencommerce-ds add drawer button
+[Site](https://opencommerce-ds.vercel.app/preview/drawer/Site) | [Right](https://opencommerce-ds.vercel.app/preview/drawer/Right) | [Open](https://opencommerce-ds.vercel.app/preview/drawer/Open)
+
+examples/drawer.tsx
+
+```tsx
+"use client";
+
+import * as React from "react";
+
+import { Button } from "@/components/ui/button";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+
+const ADDRESSES = [
+  { id: "home", name: "Home", line: "18 Harbor St, Portland, OR 97209" },
+  { id: "office", name: "Office", line: "400 Market St, Floor 6, San Francisco, CA 94105" },
+  { id: "locker", name: "Parcel locker", line: "Locker 22, Union Station, Portland, OR 97209" },
+];
+
+function ShipTo({ defaultOpen = false, direction }: { defaultOpen?: boolean; direction?: "bottom" | "top" | "left" | "right" }) {
+  const [chosen, setChosen] = React.useState("home");
+  const [open, setOpen] = React.useState(defaultOpen);
+  const current = ADDRESSES.find((a) => a.id === chosen)!;
+  return (
+    <div className="grid justify-items-start gap-3">
+      <Drawer open={open} onOpenChange={setOpen} direction={direction}>
+        <DrawerTrigger asChild>
+          <Button variant="secondary">Ship to: {current.name}</Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Where should it ship?</DrawerTitle>
+            <DrawerDescription>The agent uses this address at checkout for order ord_8KQ2.</DrawerDescription>
+          </DrawerHeader>
+          <div role="radiogroup" aria-label="Shipping address" className="grid gap-2 px-6 pb-4" data-drawer-no-drag>
+            {ADDRESSES.map((a) => (
+              <button
+                key={a.id}
+                type="button"
+                role="radio"
+                aria-checked={chosen === a.id}
+                onClick={() => setChosen(a.id)}
+                className="grid gap-0.5 rounded-control border border-hairline px-4 py-3 text-left outline-none transition-[background-color,border-color] duration-150 ease-out hover:bg-subtle focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring aria-checked:border-line-brand aria-checked:bg-blue-5 motion-reduce:transition-none"
+              >
+                <span className="text-body-sm font-medium text-fg">{a.name}</span>
+                <span className="text-caption text-fg-muted">{a.line}</span>
+              </button>
+            ))}
+          </div>
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button variant="secondary">Cancel</Button>
+            </DrawerClose>
+            <DrawerClose asChild>
+              <Button>Use this address</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+      <p role="status" className="text-body-sm text-fg-muted">
+        Shipping to {current.line}.
+      </p>
+    </div>
+  );
+}
+
+export function Site() {
+  return <ShipTo />;
+}
+
+export function Right() {
+  return <ShipTo direction="right" />;
+}
+
+export function Open() {
+  return (
+    <div className="h-130">
+      <ShipTo defaultOpen />
+    </div>
+  );
+}
+
+```
+
+## Source
+
+components/ui/drawer.tsx
+
+```tsx
+"use client";
+
+import * as React from "react";
+import * as DrawerPrimitive from "@radix-ui/react-dialog";
+
+import { usePortalContainer } from "@/lib/surface";
+import { cn } from "@/lib/utils";
+
+// A panel pulled from an edge, drawn as the brand's sheet (sheet.tsx): one of its windows, white with a 16 percent ink
+// edge, 12px corners and the soft long drop, floating 8px in from the screen's edge over the ink scrim, with a 40 by 4px
+// handle in the 35 percent ink where a window's bar would be. It slides in from its edge as it fades (300ms ease-out on
+// translate) and can be dragged away: a flick (faster than 0.11px per ms) or a pull past a third of its size sends it
+// off its edge (200ms ease-out) and closes it; a shorter pull springs back (300ms ease-out); pulling the other way meets
+// growing resistance instead of a wall. The drag follows the pointer off the panel (pointer capture) and ignores a
+// second finger. Reduced motion keeps only the fade on the way in.
+type Direction = "bottom" | "top" | "left" | "right";
+
+const DrawerContext = React.createContext<{ direction: Direction; setOpen: (open: boolean) => void }>({ direction: "bottom", setOpen: () => {} });
+
+function Drawer({ open: openProp, defaultOpen = false, onOpenChange, direction = "bottom", ...props }: React.ComponentProps<typeof DrawerPrimitive.Root> & { direction?: Direction }) {
+  const [uncontrolled, setUncontrolled] = React.useState(defaultOpen);
+  const open = openProp ?? uncontrolled;
+  const setOpen = React.useCallback(
+    (next: boolean) => {
+      if (openProp === undefined) setUncontrolled(next);
+      onOpenChange?.(next);
+    },
+    [openProp, onOpenChange],
+  );
+  return (
+    <DrawerContext.Provider value={{ direction, setOpen }}>
+      <DrawerPrimitive.Root data-slot="drawer" open={open} onOpenChange={setOpen} {...props} />
+    </DrawerContext.Provider>
+  );
+}
+
+function DrawerTrigger(props: React.ComponentProps<typeof DrawerPrimitive.Trigger>) {
+  return <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />;
+}
+
+function DrawerPortal(props: React.ComponentProps<typeof DrawerPrimitive.Portal>) {
+  const container = usePortalContainer();
+  return <DrawerPrimitive.Portal data-slot="drawer-portal" container={container} {...props} />;
+}
+
+function DrawerClose(props: React.ComponentProps<typeof DrawerPrimitive.Close>) {
+  return <DrawerPrimitive.Close data-slot="drawer-close" {...props} />;
+}
+
+function DrawerOverlay({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Overlay>) {
+  return <DrawerPrimitive.Overlay data-slot="drawer-overlay" className={cn("fixed inset-0 z-50 bg-scrim backdrop-blur-xs transition-opacity duration-300 ease-out starting:opacity-0", className)} {...props} />;
+}
+
+const PLACE: Record<Direction, string> = {
+  bottom: "inset-x-2 bottom-2 max-h-[85dvh] flex-col starting:translate-y-full",
+  top: "inset-x-2 top-2 max-h-[85dvh] flex-col-reverse starting:-translate-y-full",
+  right: "inset-y-2 right-2 w-[min(24rem,calc(100vw-1rem))] flex-row-reverse starting:translate-x-full",
+  left: "inset-y-2 left-2 w-[min(24rem,calc(100vw-1rem))] flex-row starting:-translate-x-full",
+};
+
+// Where a pull closes the drawer: toward its own edge (positive for bottom and right).
+const AXIS: Record<Direction, { axis: "x" | "y"; sign: 1 | -1 }> = { bottom: { axis: "y", sign: 1 }, top: { axis: "y", sign: -1 }, right: { axis: "x", sign: 1 }, left: { axis: "x", sign: -1 } };
+const VELOCITY = 0.11;
+const SKIP = "button, a, input, textarea, select, [role=slider], [contenteditable=true], [data-drawer-no-drag]";
+
+function useDrag(direction: Direction, close: () => void) {
+  const panel = React.useRef<HTMLDivElement>(null);
+  const drag = React.useRef<{ id: number; start: number; at: number; time: number } | null>(null);
+  const { axis, sign } = AXIS[direction];
+  const translate = (px: number) => (axis === "y" ? `translateY(${px}px)` : `translateX(${px}px)`);
+
+  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (drag.current || event.button !== 0) return; // one pointer only
+    if ((event.target as Element).closest(SKIP)) return;
+    if (window.getSelection()?.toString()) return;
+    const start = axis === "y" ? event.clientY : event.clientX;
+    drag.current = { id: event.pointerId, start, at: 0, time: performance.now() };
+    event.currentTarget.setPointerCapture(event.pointerId);
+    if (panel.current) panel.current.style.transition = "none";
+  };
+
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d || d.id !== event.pointerId || !panel.current) return;
+    const raw = (axis === "y" ? event.clientY : event.clientX) - d.start;
+    const toward = raw * sign;
+    // Toward the edge it follows the pointer; away from it, resistance grows with distance.
+    const moved = toward >= 0 ? toward : -Math.sqrt(-toward) * 2;
+    d.at = moved;
+    panel.current.style.transform = translate(moved * sign);
+  };
+
+  const end = (event: React.PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d || d.id !== event.pointerId || !panel.current) return;
+    drag.current = null;
+    const el = panel.current;
+    const size = axis === "y" ? el.offsetHeight : el.offsetWidth;
+    const velocity = Math.abs(d.at) / Math.max(1, performance.now() - d.time);
+    const dismiss = d.at > 0 && (d.at > size / 3 || velocity > VELOCITY);
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (dismiss && reduce) {
+      close();
+      return;
+    }
+    // Off its edge (and then closed), or back into place.
+    el.style.transition = dismiss ? "transform 200ms var(--ds-easing-out)" : "transform 300ms var(--ds-easing-out)";
+    el.style.transform = dismiss ? translate((size + 16) * sign) : "";
+    const done = (e: TransitionEvent) => {
+      if (e.target !== el || e.propertyName !== "transform") return;
+      el.removeEventListener("transitionend", done);
+      if (dismiss) close();
+      else el.style.transition = "";
+    };
+    el.addEventListener("transitionend", done);
+  };
+
+  return { panel, handlers: { onPointerDown, onPointerMove, onPointerUp: end, onPointerCancel: end } };
+}
+
+function DrawerContent({ className, children, ...props }: React.ComponentProps<typeof DrawerPrimitive.Content>) {
+  const { direction, setOpen } = React.useContext(DrawerContext);
+  const { panel, handlers } = useDrag(direction, () => setOpen(false));
+  const vertical = direction === "bottom" || direction === "top";
+  return (
+    <DrawerPortal>
+      <DrawerOverlay />
+      <DrawerPrimitive.Content
+        ref={panel}
+        data-slot="drawer-content"
+        data-direction={direction}
+        className={cn(
+          "group/drawer fixed z-50 flex touch-none overflow-hidden rounded-panel border border-line-window bg-surface text-fg shadow-floating outline-none transition-[translate,opacity] duration-300 ease-out starting:opacity-0 motion-reduce:starting:translate-x-0 motion-reduce:starting:translate-y-0",
+          PLACE[direction],
+          className,
+        )}
+        {...handlers}
+        {...props}
+      >
+        <div aria-hidden data-slot="drawer-handle" className={cn("shrink-0 rounded-pill bg-line-strong", vertical ? "mx-auto my-3 h-1 w-10" : "mx-3 my-auto h-10 w-1")} />
+        <div className="flex min-h-0 min-w-0 flex-1 touch-auto flex-col overflow-auto">{children}</div>
+      </DrawerPrimitive.Content>
+    </DrawerPortal>
+  );
+}
+
+function DrawerHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="drawer-header"
+      className={cn("flex flex-col gap-2 px-6 pt-2 pb-4 group-data-[direction=bottom]/drawer:text-center group-data-[direction=top]/drawer:text-center md:group-data-[direction=bottom]/drawer:text-left md:group-data-[direction=top]/drawer:text-left", className)}
+      {...props}
+    />
+  );
+}
+
+function DrawerFooter({ className, ...props }: React.ComponentProps<"div">) {
+  return <div data-slot="drawer-footer" className={cn("mt-auto flex flex-col gap-3 border-t border-line px-6 py-4 sm:flex-row sm:justify-end", className)} {...props} />;
+}
+
+// 24px display at 500, tracked tight, like the sheet's title.
+function DrawerTitle({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Title>) {
+  return <DrawerPrimitive.Title data-slot="drawer-title" className={cn("font-display text-h3 leading-display font-medium tracking-tight text-fg", className)} {...props} />;
+}
+
+function DrawerDescription({ className, ...props }: React.ComponentProps<typeof DrawerPrimitive.Description>) {
+  return <DrawerPrimitive.Description data-slot="drawer-description" className={cn("text-body-sm leading-relaxed text-fg-muted", className)} {...props} />;
+}
+
+export { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerOverlay, DrawerPortal, DrawerTitle, DrawerTrigger };
+
+```

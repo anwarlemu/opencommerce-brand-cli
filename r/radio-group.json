@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "name": "radio-group",
+  "useFor": "Use for one choice among two to five options that should stay visible (a checkout mode, a shipping speed). Label every option with a Label (variant control) beside its circle, and give the group a name for FormData. For more options use Select; for a compact row of choices use Toggle Group.",
+  "constraints": [
+    "A radio for a yes or no setting (use Switch)",
+    "Options without a visible label",
+    "A filled blue circle with no white ring"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (the checkbox and the blue key)",
+  "exports": [
+    "RadioGroup",
+    "RadioGroupItem"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/radio-group",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/radio-group.md",
+  "examples": [
+    {
+      "path": "examples/radio-group.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { Label } from \"@/components/ui/label\";\nimport { RadioGroup, RadioGroupItem } from \"@/components/ui/radio-group\";\n\nconst MODES = [\n  { value: \"auto\", label: \"Buy automatically\", hint: \"The agent checks out when the total is under the budget.\" },\n  { value: \"confirm\", label: \"Ask before buying\", hint: \"The agent stops at payment and waits for a yes.\" },\n  { value: \"quote\", label: \"Quote only\", hint: \"The agent builds the cart and returns a price.\" },\n];\n\nexport function Site() {\n  const [mode, setMode] = React.useState(\"confirm\");\n  return (\n    <div className=\"grid max-w-110 gap-3\">\n      <p id=\"checkout-mode\" className=\"font-sans text-caption text-fg-muted\">\n        Checkout mode\n      </p>\n      <RadioGroup value={mode} onValueChange={setMode} name=\"mode\" aria-labelledby=\"checkout-mode\">\n        {MODES.map((m) => (\n          <div key={m.value} className=\"flex items-start gap-2.5\">\n            <RadioGroupItem value={m.value} id={`mode-${m.value}`} className=\"mt-0.5\" />\n            <div className=\"grid gap-0.5\">\n              <Label variant=\"control\" htmlFor={`mode-${m.value}`}>\n                {m.label}\n              </Label>\n              <p className=\"font-sans text-body-sm text-fg-muted\">{m.hint}</p>\n            </div>\n          </div>\n        ))}\n      </RadioGroup>\n    </div>\n  );\n}\n\nexport function States() {\n  return (\n    <RadioGroup defaultValue=\"standard\" aria-label=\"Shipping speed\" className=\"max-w-80\">\n      <div className=\"flex items-center gap-2.5\">\n        <RadioGroupItem value=\"standard\" id=\"ship-standard\" />\n        <Label variant=\"control\" htmlFor=\"ship-standard\">Standard</Label>\n      </div>\n      <div className=\"flex items-center gap-2.5\">\n        <RadioGroupItem value=\"express\" id=\"ship-express\" />\n        <Label variant=\"control\" htmlFor=\"ship-express\">Express</Label>\n      </div>\n      <div className=\"flex items-center gap-2.5\">\n        <RadioGroupItem value=\"same-day\" id=\"ship-same-day\" disabled />\n        <Label variant=\"control\" htmlFor=\"ship-same-day\">Same day (not offered by this store)</Label>\n      </div>\n      <div className=\"flex items-center gap-2.5\">\n        <RadioGroupItem value=\"pickup\" id=\"ship-pickup\" aria-invalid />\n        <Label variant=\"control\" htmlFor=\"ship-pickup\">Store pickup (needs an address)</Label>\n      </div>\n    </RadioGroup>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "States"
+      ],
+      "requires": [
+        "radio-group",
+        "label"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/radio-group/Site"
+        },
+        {
+          "name": "States",
+          "url": "https://opencommerce-ds.vercel.app/preview/radio-group/States"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Radio Group",
+  "description": "18px white circles on the hairline; the chosen one takes the blue edge and a blue dot.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "field",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-radio-group"
+  ],
+  "files": [
+    {
+      "path": "components/ui/radio-group.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as RadioGroupPrimitive from \"@radix-ui/react-radio-group\";\n\nimport { useFieldControl } from \"@/components/ui/field\";\nimport { cn } from \"@/lib/utils\";\n\n// Extrapolated from the brand's checkbox and keys: an 18px white circle on the 16 percent ink edge; chosen, it takes the\n// blue key's darker blue edge and a 8px blue dot at its center. Options stack 10px apart, each label 15px Inter 8px from\n// its circle (wrap item and label in a `label`, or pair them with htmlFor). The edge and dot change color in 160ms.\nfunction RadioGroup({ className, ...props }: React.ComponentProps<typeof RadioGroupPrimitive.Root>) {\n  const { required, ...control } = useFieldControl(props);\n  return <RadioGroupPrimitive.Root data-slot=\"radio-group\" required={required} className={cn(\"grid gap-2.5\", className)} {...control} />;\n}\n\nfunction RadioGroupItem({ className, ...props }: React.ComponentProps<typeof RadioGroupPrimitive.Item>) {\n  return (\n    <RadioGroupPrimitive.Item\n      data-slot=\"radio-group-item\"\n      className={cn(\n        \"peer grid aspect-square size-4.5 shrink-0 cursor-pointer place-items-center rounded-pill border border-hairline bg-surface outline-none transition-[border-color] duration-160 ease-out hover:border-line-field-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger data-[state=checked]:border-line-brand-edge motion-reduce:transition-none\",\n        className,\n      )}\n      {...props}\n    >\n      <RadioGroupPrimitive.Indicator data-slot=\"radio-group-indicator\" className=\"block size-2 rounded-pill bg-primary\" />\n    </RadioGroupPrimitive.Item>\n  );\n}\n\nexport { RadioGroup, RadioGroupItem };\n"
+    }
+  ]
+}

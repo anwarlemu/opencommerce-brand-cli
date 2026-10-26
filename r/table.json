@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "name": "table",
+  "useFor": "Use for live records (merchants, routes, orders) or a plan comparison. Set figures in the mono (font-mono text-snippet). Give each TableCell after the first a label for the mobile layout. Use Badge for statuses.",
+  "constraints": [
+    "Zebra stripes",
+    "Bold or caps headers",
+    "Rules between columns",
+    "Tables nested in a card (the table is its own frame; inside a Window drop its frame with your own classes)"
+  ],
+  "documentation": "",
+  "source": "opencommerce-agentcard-web src/components/monitoring.tsx (the merchant table)",
+  "exports": [
+    "Table",
+    "TableBody",
+    "TableCaption",
+    "TableCell",
+    "TableFooter",
+    "TableHead",
+    "TableHeader",
+    "TableRow"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/table",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/table.md",
+  "examples": [
+    {
+      "path": "examples/table.tsx",
+      "content": "import { Badge } from \"@/components/ui/badge\";\nimport { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from \"@/components/ui/table\";\n\nconst ROWS = [\n  { merchant: \"DoorDash\", success: \"100%\", last: \"5 min ago\", duration: \"12 sec\", status: \"Operational\" },\n  { merchant: \"Amazon\", success: \"99.9%\", last: \"1 min ago\", duration: \"9 sec\", status: \"Operational\" },\n  { merchant: \"Best Buy\", success: \"99.6%\", last: \"7 min ago\", duration: \"16 sec\", status: \"Degraded\" },\n] as const;\n\nexport function Site() {\n  return (\n    <Table label=\"Merchant monitoring\">\n      <TableHeader>\n        <TableRow>\n          <TableHead>Merchant</TableHead>\n          <TableHead>Success rate</TableHead>\n          <TableHead>Last purchase</TableHead>\n          <TableHead>Duration</TableHead>\n          <TableHead>Status</TableHead>\n        </TableRow>\n      </TableHeader>\n      <TableBody>\n        {ROWS.map((row) => (\n          <TableRow key={row.merchant}>\n            <TableCell className=\"font-medium\">{row.merchant}</TableCell>\n            <TableCell label=\"Success rate\" className=\"font-mono text-snippet\">\n              {row.success}\n            </TableCell>\n            <TableCell label=\"Last purchase\" className=\"text-fg-muted\">\n              {row.last}\n            </TableCell>\n            <TableCell label=\"Duration\" className=\"font-mono text-snippet text-fg-muted\">\n              {row.duration}\n            </TableCell>\n            <TableCell label=\"Status\">\n              <Badge variant={row.status === \"Operational\" ? \"success\" : \"warning\"}>{row.status}</Badge>\n            </TableCell>\n          </TableRow>\n        ))}\n      </TableBody>\n    </Table>\n  );\n}\n\n// A comparison, the row names in the first column.\nexport function Compare() {\n  const rows = [\n    [\"Merchants\", \"5 of your choice\", \"Every merchant\"],\n    [\"Payment providers\", \"2\", \"Every provider\"],\n    [\"Platform fee\", \"None\", \"1% of each completed order\"],\n  ];\n  return (\n    <Table label=\"Free and Standard compared\">\n      <TableHeader>\n        <TableRow>\n          <TableHead>\n            <span className=\"sr-only\">Topic</span>\n          </TableHead>\n          <TableHead>Free</TableHead>\n          <TableHead>Standard</TableHead>\n        </TableRow>\n      </TableHeader>\n      <TableBody>\n        {rows.map(([topic, free, standard]) => (\n          <TableRow key={topic}>\n            <TableCell className=\"text-fg-muted\">{topic}</TableCell>\n            <TableCell label=\"Free\">{free}</TableCell>\n            <TableCell label=\"Standard\" className=\"text-fg-brand\">{standard}</TableCell>\n          </TableRow>\n        ))}\n      </TableBody>\n    </Table>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Compare"
+      ],
+      "requires": [
+        "table",
+        "badge"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/table/Site"
+        },
+        {
+          "name": "Compare",
+          "url": "https://opencommerce-ds.vercel.app/preview/table/Compare"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Table",
+  "description": "Responsive table that stacks row content on phones.",
+  "surface": "site",
+  "kinds": [
+    "table"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/ui/table.tsx",
+      "content": "import * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The brand's table (monitoring.tsx, the live merchant table; computed): a white frame with 12px corners on the 16\n// percent ink edge and the window's soft drop; the head's labels in 12px Inter at 64 percent ink, normal weight, on a 9\n// percent rule; 14px Inter rows, each on a 9 percent rule, that take the mist under the pointer (160ms). Figures read best\n// in the mono (font-mono and the 13px code size on the cell). It scrolls sideways inside its frame when too wide, never the page. On a\n// phone (below 640px) each row stacks: the first cell as its title, then each other cell under its column's name (pass\n// `label` to TableCell), the head kept for screen readers.\nfunction Table({ className, label = \"Table\", ...props }: React.ComponentProps<\"table\"> & { label?: string }) {\n  return (\n    <div\n      data-slot=\"table-container\"\n      role=\"region\"\n      aria-label={label}\n      tabIndex={0}\n      className=\"relative w-full overflow-x-auto rounded-panel border border-line-window bg-surface shadow-card outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring\"\n    >\n      <table data-slot=\"table\" className={cn(\"w-full caption-bottom border-collapse text-left text-body-sm leading-normal text-fg max-sm:block\", className)} {...props} />\n    </div>\n  );\n}\n\nfunction TableHeader({ className, ...props }: React.ComponentProps<\"thead\">) {\n  return <thead data-slot=\"table-header\" className={cn(\"max-sm:sr-only\", className)} {...props} />;\n}\n\nfunction TableBody({ className, ...props }: React.ComponentProps<\"tbody\">) {\n  return <tbody data-slot=\"table-body\" className={cn(\"max-sm:block [@media(hover:hover)]:[&>tr:hover]:bg-subtle\", className)} {...props} />;\n}\n\nfunction TableFooter({ className, ...props }: React.ComponentProps<\"tfoot\">) {\n  return <tfoot data-slot=\"table-footer\" className={cn(\"font-medium max-sm:block\", className)} {...props} />;\n}\n\nfunction TableRow({ className, ...props }: React.ComponentProps<\"tr\">) {\n  return <tr data-slot=\"table-row\" className={cn(\"transition-[background-color] duration-160 ease-out data-[state=selected]:bg-wash-selected motion-reduce:transition-none max-sm:block max-sm:py-3 max-sm:[&+&]:border-t max-sm:[&+&]:border-line\", className)} {...props} />;\n}\n\nfunction TableHead({ className, ...props }: React.ComponentProps<\"th\">) {\n  return (\n    <th\n      data-slot=\"table-head\"\n      className={cn(\"px-4 py-3 align-bottom font-sans text-caption font-normal whitespace-nowrap text-fg-muted\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction TableCell({ className, label, ...props }: React.ComponentProps<\"td\"> & { label?: string }) {\n  return (\n    <td\n      data-slot=\"table-cell\"\n      data-label={label}\n      className={cn(\n        \"min-w-35 border-t border-line px-4 py-4 align-middle text-body-sm leading-normal text-fg tabular-nums\",\n        // A phone's stacked row: no rules inside it, the first cell its title, the others under their column's name.\n        \"max-sm:block max-sm:min-w-0 max-sm:border-0 max-sm:px-3.5 max-sm:py-1 max-sm:text-left max-sm:first:font-medium \",\n        \"max-sm:data-label:not-first:before:mb-0.5 max-sm:data-label:not-first:before:block max-sm:data-label:not-first:before:font-sans max-sm:data-label:not-first:before:text-caption max-sm:data-label:not-first:before:text-fg-muted max-sm:data-label:not-first:before:content-[attr(data-label)]\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nfunction TableCaption({ className, ...props }: React.ComponentProps<\"caption\">) {\n  return <caption data-slot=\"table-caption\" className={cn(\"px-4 py-3 text-left text-body-sm text-fg-muted\", className)} {...props} />;\n}\n\nexport { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow };\n"
+    }
+  ]
+}

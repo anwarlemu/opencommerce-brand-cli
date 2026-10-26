@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "name": "feature-rows",
+  "useFor": "Use FeatureGrid for the home page's four features in a medium SiteSection, FeatureRows for a product page that needs more room. Draw each picture from the page's own parts and key its motion off group-data-[state=…]/feature.",
+  "constraints": [
+    "Icons in place of pictures",
+    "Stock photos",
+    "More than one blue voice in a picture",
+    "Pictures that loop",
+    "A move that does not end on the finished frame",
+    "More than six features in the grid"
+  ],
+  "documentation": "`FeatureGrid` and `FeatureRows` take `features` ({ title, description, media, file, tags }[]) plus list props.\n`FeatureTag` is the small mono tag (FeatureRows shows `tags` with it).\n\nA picture's motion: the card's `data-state` is absent (the finished frame: the server render and reduced motion),\n`idle` (the opening frame) or `play` (the move). Write the finished frame as the default, the opening frame under\n`group-data-[state=idle]/feature:` and the move under `group-data-[state=play]/feature:` with fill-mode backwards, so\neach piece holds its opening frame through its delay. Keep moves at 300ms or less each, ease-out; a sequence may\nstagger them (30 to 80ms apart).",
+  "source": "opencommerce-agentcard-web src/components/features.tsx, src/components/feature-play.tsx, src/app/globals.css (THE FEATURE PICTURES)",
+  "exports": [
+    "FeatureGrid",
+    "FeatureRows",
+    "FeatureTag",
+    "Feature"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/feature-rows",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/feature-rows.md",
+  "examples": [
+    {
+      "path": "examples/feature-rows.tsx",
+      "content": "import { FeatureGrid, FeatureRows } from \"@/components/site/feature-rows\";\n\n// Thirty days drawn in left to right when the card is first seen; the one rough day stays pale.\nfunction Uptime() {\n  return (\n    <div aria-hidden className=\"w-full max-w-75 font-mono text-snippet\">\n      <div className=\"flex items-baseline justify-between text-fg-muted\">\n        <span className=\"flex items-center gap-2\">\n          <span className=\"size-1.5 rounded-full bg-brand\" />\n          Uptime\n        </span>\n        <span className=\"text-fg\">99.9%</span>\n      </div>\n      <div className=\"mt-2.5 flex h-14 items-end gap-0.75\">\n        {Array.from({ length: 30 }, (_, i) => (\n          <span\n            key={i}\n            style={{ animationDelay: `${i * 26}ms` }}\n            className={`h-full flex-1 origin-bottom rounded-chip group-data-[state=idle]/feature:scale-y-0 group-data-[state=play]/feature:animate-chart-bar ${i === 19 ? \"bg-brand/25\" : \"bg-brand\"}`}\n          />\n        ))}\n      </div>\n      <div className=\"mt-2 flex justify-between text-caption text-fg-faint\">\n        <span>30 days ago</span>\n        <span>Today</span>\n      </div>\n    </div>\n  );\n}\n\nfunction Race() {\n  return (\n    <div aria-hidden className=\"flex w-full max-w-75 flex-col gap-5 font-mono text-snippet\">\n      <div>\n        <div className=\"flex justify-between text-fg-muted\">\n          <span>Cold route</span>\n          <span>2m 40s</span>\n        </div>\n        <div className=\"mt-2 h-2.5 rounded-chip bg-line-strong\" />\n      </div>\n      <div>\n        <div className=\"flex items-center justify-between\">\n          <span className=\"flex items-center gap-2\">\n            <span className=\"text-fg-brand\">Warmed route</span>\n            <span className=\"rounded-chip bg-brand px-1.5 py-0.5 text-micro leading-none text-on-brand\">18× faster</span>\n          </span>\n          <span>9s</span>\n        </div>\n        <div className=\"mt-2 h-2.5 overflow-hidden rounded-chip bg-line\">\n          <div className=\"h-full w-[6%] bg-brand\" />\n        </div>\n      </div>\n    </div>\n  );\n}\n\nconst FEATURES = [\n  { title: \"Every store, one endpoint\", description: \"Search the catalogue, check out and track the order at any store through the same call.\", media: <Race /> },\n  { title: \"Uptime you can see\", description: \"Every route is exercised around the clock, so you know a store works before your agent tries it.\", media: <Uptime /> },\n  { title: \"Warmed routes\", description: \"The stores your agents use most stay warm, so a purchase takes seconds, not minutes.\", media: <Race /> },\n  { title: \"Checkout that finishes\", description: \"Payment, shipping and confirmation, with the order number back in your agent’s hands.\", media: <Uptime /> },\n];\n\nexport function Site() {\n  return (\n    <div className=\"py-16\">\n      <FeatureGrid features={FEATURES} />\n    </div>\n  );\n}\n\nexport function Rows() {\n  return (\n    <div className=\"mx-auto w-(--ds-frame-column) py-16\">\n      <FeatureRows features={FEATURES.slice(0, 2).map((f, i) => ({ ...f, tags: [i ? \"Monitoring\" : \"Routing\"] }))} />\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Rows"
+      ],
+      "requires": [
+        "feature-rows"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/feature-rows/Site"
+        },
+        {
+          "name": "Rows",
+          "url": "https://opencommerce-ds.vercel.app/preview/feature-rows/Rows"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Feature rows",
+  "description": "Features as windows two to a row (picture, title, line), or one to a row beside their window; pictures play when first seen.",
+  "surface": "site",
+  "kinds": [
+    "window",
+    "window-bar",
+    "card-title",
+    "body-text",
+    "chip"
+  ],
+  "requires": [
+    "theme",
+    "window",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/feature-rows.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { Window } from \"@/components/ui/window\";\nimport { cn } from \"@/lib/utils\";\n\n// What you get (the opencommerce site, features.tsx). FeatureGrid: the features two to a row in the 800px column, each\n// a window named after it (merchants.feature). The window opens on its picture (224px tall, centered on white, a\n// hairline under it), then the 20px title and a 16px muted line. Pictures are small and flat, drawn from the page's own\n// parts: hairlines on white and blue as the only voice. FeatureRows: one feature to a row, the copy beside its window,\n// alternating sides, for a product page that needs more room per feature.\n//\n// Each picture can tell its line in one short move: the card plays it once, the first time it is well into view, and\n// again when the pointer comes onto it (never over a run still going). The card sets data-state on itself, so a picture\n// keys its motion off its ancestor with group-data-[state=…]/feature: no state is the finished frame (the server render,\n// no script, reduced motion), `idle` the opening frame, `play` the move, which must end on the finished frame. A replay\n// fades the picture out and back in (150ms each) rather than cutting to the opening frame.\n\ntype Feature = {\n  title: React.ReactNode;\n  description?: React.ReactNode;\n  /** The picture: a small diagram, a chart, a card. */\n  media?: React.ReactNode;\n  /** The window's name; defaults to the title's slug with .feature. */\n  file?: string;\n  /** Small mono tags over the title (FeatureRows). */\n  tags?: React.ReactNode[];\n};\n\nconst RUN_MS = 3000;\nconst FADE_MS = 150;\nconst EASE_OUT = \"cubic-bezier(0.22, 1, 0.36, 1)\";\n\nconst slug = (s: React.ReactNode, i: number) => (typeof s === \"string\" ? s.toLowerCase().replace(/[^a-z0-9]+/g, \"-\").replace(/^-|-$/g, \"\") : `feature-${i + 1}`);\n\n/** Plays a card's picture once on first sight and again on hover. See the note above. */\nfunction usePlay<T extends HTMLElement>() {\n  const ref = React.useRef<T>(null);\n  const busy = React.useRef(false);\n  const seen = React.useRef(false);\n  const timer = React.useRef<number | undefined>(undefined);\n\n  const play = React.useCallback(() => {\n    const el = ref.current;\n    if (!el || busy.current || el.dataset.state === undefined) return;\n    busy.current = true;\n    const start = () => {\n      el.dataset.state = \"idle\";\n      void el.offsetWidth;\n      el.dataset.state = \"play\";\n      window.clearTimeout(timer.current);\n      timer.current = window.setTimeout(() => (busy.current = false), RUN_MS);\n    };\n    const pic = el.querySelector<HTMLElement>(\"[data-feature-picture] > *\");\n    if (el.dataset.state !== \"play\" || !pic) return start();\n    pic.animate([{ opacity: 1 }, { opacity: 0 }], { duration: FADE_MS, easing: EASE_OUT }).finished.then(() => {\n      start();\n      pic.animate([{ opacity: 0 }, { opacity: 1 }], { duration: FADE_MS, easing: EASE_OUT });\n    });\n  }, []);\n\n  React.useEffect(() => {\n    const el = ref.current;\n    if (!el || window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    el.dataset.state = \"idle\";\n    const io = new IntersectionObserver(\n      ([entry]) => {\n        if (!entry.isIntersecting) return;\n        seen.current = true;\n        play();\n        io.disconnect();\n      },\n      { threshold: 0.45 },\n    );\n    io.observe(el);\n    return () => {\n      io.disconnect();\n      window.clearTimeout(timer.current);\n    };\n  }, [play]);\n\n  return { ref, onPointerEnter: () => seen.current && play() };\n}\n\n/** A small mono tag over a feature's title. */\nfunction FeatureTag({ className, children }: { className?: string; children: React.ReactNode }) {\n  return <span className={cn(\"inline-flex items-center rounded-chip bg-tint px-2 py-1 font-mono text-caption leading-none text-fg-brand\", className)}>{children}</span>;\n}\n\nfunction FeatureCard({ feature, index }: { feature: Feature; index: number }) {\n  const play = usePlay<HTMLLIElement>();\n  return (\n    <li {...play} className=\"group/feature flex\">\n      <Window name={feature.file ?? `${slug(feature.title, index)}.feature`} className=\"w-full\" bodyClassName=\"flex flex-col\">\n        {feature.media && (\n          <div data-feature-picture=\"\" className=\"flex h-56 items-center justify-center border-b border-line bg-surface px-6\">\n            {feature.media}\n          </div>\n        )}\n        <div className=\"px-6 pt-6 pb-7 md:px-8 md:pt-7 md:pb-8\">\n          <h3 className=\"font-display text-h4 leading-snug font-medium tracking-tight\">{feature.title}</h3>\n          {feature.description && <p className=\"mt-2 max-w-md text-body leading-relaxed text-fg-muted\">{feature.description}</p>}\n        </div>\n      </Window>\n    </li>\n  );\n}\n\nfunction FeatureGrid({ features, className, ...props }: Omit<React.ComponentProps<\"ul\">, \"children\"> & { features: Feature[] }) {\n  return (\n    <ul data-slot=\"feature-grid\" className={cn(\"mx-auto grid w-full max-w-(--ds-layout-medium) list-none gap-5 p-0 sm:grid-cols-2\", className)} {...props}>\n      {features.map((feature, i) => (\n        <FeatureCard key={i} feature={feature} index={i} />\n      ))}\n    </ul>\n  );\n}\n\nfunction FeatureRow({ feature, index }: { feature: Feature; index: number }) {\n  const play = usePlay<HTMLLIElement>();\n  const flip = index % 2 === 1;\n  return (\n    <li {...play} className=\"group/feature grid grid-cols-1 items-center gap-8 lg:grid-cols-2 lg:gap-14\">\n      <div className={cn(flip && \"lg:order-2\")}>\n        {feature.tags && feature.tags.length > 0 && (\n          <div className=\"mb-4 flex flex-wrap gap-2\">\n            {feature.tags.map((tag, i) => (\n              <FeatureTag key={i}>{tag}</FeatureTag>\n            ))}\n          </div>\n        )}\n        <h3 className=\"font-display text-h3 leading-snug font-medium tracking-tighter\">{feature.title}</h3>\n        {feature.description && <p className=\"mt-3 max-w-md text-body leading-relaxed text-fg-muted\">{feature.description}</p>}\n      </div>\n      <Window name={feature.file ?? `${slug(feature.title, index)}.feature`} className={cn(flip && \"lg:order-1\")} bodyClassName=\"flex\">\n        <div data-feature-picture=\"\" className=\"flex min-h-64 w-full items-center justify-center px-6 py-8\">\n          {feature.media}\n        </div>\n      </Window>\n    </li>\n  );\n}\n\nfunction FeatureRows({ features, className, ...props }: Omit<React.ComponentProps<\"ol\">, \"children\"> & { features: Feature[] }) {\n  return (\n    <ol data-slot=\"feature-rows\" className={cn(\"mx-auto grid w-full max-w-(--ds-layout-column) list-none gap-16 p-0 md:gap-24\", className)} {...props}>\n      {features.map((feature, i) => (\n        <FeatureRow key={i} feature={feature} index={i} />\n      ))}\n    </ol>\n  );\n}\n\nexport { FeatureGrid, FeatureRows, FeatureTag };\nexport type { Feature };\n"
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "name": "section",
+  "useFor": "Use SiteSection for each band of the page and SectionHeading to open it. Pick width medium (800px) for features, pricing and questions, wide (1200px) for a table, the steps or the closing card. Add bottom padding only to the section that closes the page.",
+  "constraints": [
+    "A blue section",
+    "Rules between sections",
+    "Left-aligned section titles over centered content",
+    "Bold titles",
+    "Eyebrows in caps",
+    "Two tinted sections in a row"
+  ],
+  "documentation": "`SiteSection` props: `ground` (\"white\" | \"mist\", default white), `width` (\"wide\" | \"medium\", default wide),\n`contained` (default true), `innerClassName`, plus section props. `SectionHeading` props: `title`, `description`,\n`eyebrow`, `as` (\"h1\" | \"h2\" | \"h3\", default h2), `align` (\"center\" | \"start\"). `Eyebrow` takes paragraph props.",
+  "source": "opencommerce-agentcard-web src/components/band.tsx, src/components/section-head.tsx, src/app/globals.css (.sec, .h-section, .lead)",
+  "exports": [
+    "SiteSection",
+    "SectionHeading",
+    "Eyebrow",
+    "SectionGround"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/section",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/section.md",
+  "examples": [
+    {
+      "path": "examples/section.tsx",
+      "content": "import { SectionHeading, SiteSection } from \"@/components/site/section\";\nimport { Window } from \"@/components/ui/window\";\n\nfunction Placeholder({ name }: { name: string }) {\n  return (\n    <Window name={name} className=\"h-48\" bodyClassName=\"flex items-center justify-center font-mono text-caption text-fg-muted\">\n      Content\n    </Window>\n  );\n}\n\nexport function Site() {\n  return (\n    <>\n      <SiteSection width=\"medium\">\n        <SectionHeading title=\"Everything your agent needs to buy\" description=\"One endpoint for every store: search the catalogue, check out and track the order, with the uptime to rely on.\" />\n        <div className=\"grid gap-5 sm:grid-cols-2\">\n          <Placeholder name=\"merchants.feature\" />\n          <Placeholder name=\"checkout.feature\" />\n        </div>\n      </SiteSection>\n      <SiteSection className=\"pb-18 md:pb-30\">\n        <SectionHeading eyebrow=\"Monitoring\" title=\"Merchant monitoring\" description=\"Every route is exercised around the clock.\" />\n        <Placeholder name=\"monitoring.live\" />\n      </SiteSection>\n    </>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "section",
+        "window"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/section/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Section",
+  "description": "Page section with generous air above, the centered section heading and an optional label.",
+  "surface": "site",
+  "kinds": [
+    "section",
+    "column",
+    "section-heading",
+    "section-description",
+    "eyebrow"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/section.tsx",
+      "content": "import * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// A section of the page (the opencommerce site, .sec): generous air above (120px, 72px on phones) and nothing ruled;\n// the next section's air is the gap, so a section has no padding below unless it closes the page (add pb-18\n// md:pb-30). Content sits on the 1200px frame with 40px of gutter (20px on phones); `width=\"medium\"` narrows it to the\n// 800px column most sections use (features, pricing, the questions), `wide` keeps the frame (a live table, the steps,\n// the closing card). The page is white throughout; `mist` is the one tint, for an inset band.\nconst GROUNDS = {\n  white: \"bg-surface text-fg\",\n  mist: \"bg-subtle text-fg\",\n} as const;\n\nconst WIDTHS = {\n  wide: \"w-(--ds-frame-column)\",\n  medium: \"w-(--ds-frame-column) max-w-(--ds-layout-medium)\",\n} as const;\n\ntype SectionGround = keyof typeof GROUNDS;\n\nfunction SiteSection({\n  ground = \"white\",\n  width = \"wide\",\n  contained = true,\n  className,\n  innerClassName,\n  children,\n  ...props\n}: React.ComponentProps<\"section\"> & {\n  ground?: SectionGround;\n  /** The column: the 1200px frame (wide) or the 800px medium column. */\n  width?: keyof typeof WIDTHS;\n  /** Hold the content to the column. Off for a band whose content runs edge to edge. */\n  contained?: boolean;\n  innerClassName?: string;\n}) {\n  return (\n    <section data-slot=\"site-section\" data-ground={ground} className={cn(\"relative pt-18 md:pt-30\", GROUNDS[ground], className)} {...props}>\n      {contained ? <div className={cn(\"mx-auto\", WIDTHS[width], innerClassName)}>{children}</div> : children}\n    </section>\n  );\n}\n\n/** A small label over a title: the platform mono, small, in the brand blue. Sentence case, never caps. */\nfunction Eyebrow({ className, ...props }: React.ComponentProps<\"p\">) {\n  return <p data-slot=\"eyebrow\" className={cn(\"font-mono text-caption leading-body tracking-label text-fg-label\", className)} {...props} />;\n}\n\n/**\n * A section's opening, centered as the brand sets them: the 44px display title (32px on phones) tracked tight, and\n * its 16px standfirst 16px below in muted ink, held to 576px. 48px (56px on wide screens) of air before the content.\n */\nfunction SectionHeading({\n  title,\n  description,\n  eyebrow,\n  as: Heading = \"h2\",\n  align = \"center\",\n  className,\n  ...props\n}: Omit<React.ComponentProps<\"div\">, \"title\"> & {\n  title: React.ReactNode;\n  description?: React.ReactNode;\n  eyebrow?: React.ReactNode;\n  as?: \"h1\" | \"h2\" | \"h3\";\n  align?: \"center\" | \"start\";\n}) {\n  const centered = align === \"center\";\n  return (\n    <div data-slot=\"section-heading\" className={cn(\"pb-12 md:pb-14\", centered ? \"mx-auto max-w-(--ds-layout-heading) text-center\" : \"text-left\", className)} {...props}>\n      {eyebrow && <Eyebrow className=\"mb-3\">{eyebrow}</Eyebrow>}\n      <Heading className=\"font-display text-h2 leading-display font-medium tracking-tighter text-balance\">{title}</Heading>\n      {description && <p className={cn(\"mt-4 max-w-(--ds-layout-text) text-body leading-lead text-pretty text-fg-muted\", centered && \"mx-auto\")}>{description}</p>}\n    </div>\n  );\n}\n\nexport { SiteSection, SectionHeading, Eyebrow };\nexport type { SectionGround };\n"
+    }
+  ]
+}

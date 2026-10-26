@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "name": "typography",
+  "useFor": "Use for text a page writes by hand, outside Prose: headings with TypographyH1 to H4, body with TypographyP, the line under a heading with TypographyLead, inline code with TypographyInlineCode. For a whole article from markdown, use Prose.",
+  "constraints": [
+    "Bold or caps headings",
+    "Tracking body text",
+    "Headings in Inter"
+  ],
+  "documentation": "",
+  "source": "opencommerce-agentcard-web src/app/globals.css (h1 to h3, .lead, .mono); prose.tsx",
+  "exports": [
+    "TypographyBlockquote",
+    "TypographyH1",
+    "TypographyH2",
+    "TypographyH3",
+    "TypographyH4",
+    "TypographyInlineCode",
+    "TypographyLarge",
+    "TypographyLead",
+    "TypographyList",
+    "TypographyMuted",
+    "TypographyP",
+    "TypographySmall",
+    "TypographyTable"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/typography",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/typography.md",
+  "examples": [
+    {
+      "path": "examples/typography.tsx",
+      "content": "import { TypographyBlockquote, TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyInlineCode, TypographyLarge, TypographyLead, TypographyList, TypographyMuted, TypographyP, TypographySmall, TypographyTable } from \"@/components/ui/typography\";\n\nexport function Site() {\n  return (\n    <article className=\"mx-auto w-full max-w-2xl\">\n      <TypographyH1>Open router for commerce</TypographyH1>\n      <TypographyLead className=\"mt-4\">Buy from any online store from a single endpoint.</TypographyLead>\n      <TypographyH2 className=\"mt-12\">Built for agents that buy</TypographyH2>\n      <TypographyP className=\"mt-4\">\n        One SDK sits in front of every storefront. Call <TypographyInlineCode>agentcard.purchase()</TypographyInlineCode> with what to buy, and opencommerce\n        finds the route, fills the cart and checks out.\n      </TypographyP>\n      <TypographyH3 className=\"mt-8\">What every order reports</TypographyH3>\n      <TypographyList>\n        <li>The cart, with each item and its price</li>\n        <li>The payment, with the card that paid</li>\n        <li>The confirmation number from the merchant</li>\n      </TypographyList>\n      <TypographyBlockquote>Routes are cached and warmed, so a purchase lands in seconds instead of minutes.</TypographyBlockquote>\n      <TypographyH4 className=\"mt-8\">Route timings</TypographyH4>\n      <TypographyTable>\n        <thead>\n          <tr>\n            <th>Route</th>\n            <th>Time</th>\n          </tr>\n        </thead>\n        <tbody>\n          <tr>\n            <td>Cold</td>\n            <td className=\"font-mono text-snippet\">2m 40s</td>\n          </tr>\n          <tr>\n            <td>Warmed</td>\n            <td className=\"font-mono text-snippet\">9s</td>\n          </tr>\n        </tbody>\n      </TypographyTable>\n    </article>\n  );\n}\n\nexport function Small() {\n  return (\n    <div className=\"mx-auto grid w-full max-w-2xl gap-3\">\n      <TypographyLarge>Checkout completion</TypographyLarge>\n      <TypographySmall>Updated 2 minutes ago</TypographySmall>\n      <TypographyMuted>Carts, payment and confirmation are handled end to end, and every step reports back.</TypographyMuted>\n      <TypographyList ordered>\n        <li>Add the Commerce SDK tool to your agent</li>\n        <li>Navigate catalogues and place orders</li>\n        <li>Follow orders and report back to users</li>\n      </TypographyList>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Small"
+      ],
+      "requires": [
+        "typography"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/typography/Site"
+        },
+        {
+          "name": "Small",
+          "url": "https://opencommerce-ds.vercel.app/preview/typography/Small"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Typography",
+  "description": "The brand type as parts: display-face headings at 500 tracked tight, 16px Inter body, muted leads, blue-marked lists, mono inline code.",
+  "surface": "site",
+  "kinds": [
+    "section-heading",
+    "body-text"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/ui/typography.tsx",
+      "content": "import * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The brand's type as parts (globals.css h1 to h3, .lead, .mono; prose.tsx). Headings are the display face at 500,\n// tracked tight: 48px for a page title, 44px for a section, 24px and 20px below; never bold, never caps. Body is 16px\n// Inter at 1.6; secondary copy at 64 percent ink. Inline code is the platform mono in blue on the pale blue chip; a quote\n// hangs on a 2px blue rule; lists take blue markers; a table has a mist head on hairlines.\nfunction TypographyH1({ className, ...props }: React.ComponentProps<\"h1\">) {\n  return <h1 className={cn(\"font-display text-h1 leading-heading font-medium tracking-hero text-balance text-fg\", className)} {...props} />;\n}\n\nfunction TypographyH2({ className, ...props }: React.ComponentProps<\"h2\">) {\n  return <h2 className={cn(\"font-display text-h2 leading-heading font-medium tracking-tighter text-balance text-fg\", className)} {...props} />;\n}\n\nfunction TypographyH3({ className, ...props }: React.ComponentProps<\"h3\">) {\n  return <h3 className={cn(\"font-display text-h3 leading-snug font-medium tracking-tight text-fg\", className)} {...props} />;\n}\n\nfunction TypographyH4({ className, ...props }: React.ComponentProps<\"h4\">) {\n  return <h4 className={cn(\"font-display text-h4 leading-snug font-medium tracking-tight text-fg\", className)} {...props} />;\n}\n\nfunction TypographyP({ className, ...props }: React.ComponentProps<\"p\">) {\n  return <p className={cn(\"text-body leading-body text-pretty text-fg [&:not(:first-child)]:mt-4\", className)} {...props} />;\n}\n\n/** The line under a section heading: 16px at 64 percent ink, 576px wide at most. */\nfunction TypographyLead({ className, ...props }: React.ComponentProps<\"p\">) {\n  return <p className={cn(\"max-w-(--ds-layout-text) text-body-lg leading-lead text-pretty text-fg-muted\", className)} {...props} />;\n}\n\nfunction TypographyLarge({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div className={cn(\"font-display text-h5 leading-snug font-medium tracking-tight text-fg\", className)} {...props} />;\n}\n\nfunction TypographySmall({ className, ...props }: React.ComponentProps<\"small\">) {\n  return <small className={cn(\"text-body-sm leading-snug font-medium text-fg\", className)} {...props} />;\n}\n\nfunction TypographyMuted({ className, ...props }: React.ComponentProps<\"p\">) {\n  return <p className={cn(\"text-body-sm leading-relaxed text-fg-muted\", className)} {...props} />;\n}\n\nfunction TypographyBlockquote({ className, ...props }: React.ComponentProps<\"blockquote\">) {\n  return <blockquote className={cn(\"mt-6 border-l-2 border-brand pl-4 text-body leading-body text-fg-muted\", className)} {...props} />;\n}\n\nfunction TypographyList({ className, ordered = false, ...props }: Omit<React.ComponentProps<\"ul\">, \"ref\"> & { ordered?: boolean }) {\n  const Comp = ordered ? \"ol\" : \"ul\";\n  return <Comp className={cn(\"my-4 flex flex-col gap-2 pl-5.5 text-body leading-body text-fg-muted marker:text-fg-brand\", ordered ? \"list-decimal\" : \"list-disc\", className)} {...props} />;\n}\n\nfunction TypographyInlineCode({ className, ...props }: React.ComponentProps<\"code\">) {\n  return <code className={cn(\"rounded-chip bg-tint px-1.5 py-px font-mono text-snippet text-fg-brand [overflow-wrap:anywhere]\", className)} {...props} />;\n}\n\n/** A small table in running text: a mist head on hairlines, 14px rows. */\nfunction TypographyTable({ className, ...props }: React.ComponentProps<\"table\">) {\n  return (\n    <div className=\"my-4.5 w-full overflow-x-auto\">\n      <table\n        className={cn(\n          \"w-full border-collapse text-body-sm leading-relaxed [&_td]:border-b [&_td]:border-line [&_td]:px-3 [&_td]:py-2.5 [&_td]:align-top [&_th]:border-b [&_th]:border-line [&_th]:bg-subtle [&_th]:px-3 [&_th]:py-2.5 [&_th]:text-left [&_th]:font-normal [&_th]:text-fg-muted\",\n          className,\n        )}\n        {...props}\n      />\n    </div>\n  );\n}\n\nexport { TypographyBlockquote, TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyInlineCode, TypographyLarge, TypographyLead, TypographyList, TypographyMuted, TypographyP, TypographySmall, TypographyTable };\n"
+    }
+  ]
+}

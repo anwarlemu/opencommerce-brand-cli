@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "logo-strip",
+  "useFor": "Pass the brands with an image src (drawn as a mask, so any color works), a mark node in currentColor, or just a name. Use once, in the hero.",
+  "constraints": [
+    "Logos in their own colors",
+    "Tiles or borders around the marks",
+    "A fast drift",
+    "Two strips on a page"
+  ],
+  "documentation": "`LogoStrip` props: `brands` ({ name, src, logo, ratio }[]), `label` (the list's name, default \"Stores\"),\n`duration` (seconds a lap, default 100), plus div props. Built on Marquee.",
+  "source": "opencommerce-agentcard-web src/components/logo-strip.tsx, src/components/merchant-logo.tsx, src/app/globals.css (THE LOGO STRIP, .logo-mask)",
+  "exports": [
+    "LogoStrip",
+    "Brand"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/logo-strip",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/logo-strip.md",
+  "examples": [
+    {
+      "path": "examples/logo-strip.tsx",
+      "content": "import { LogoStrip } from \"@/components/site/logo-strip\";\n\nconst Dot = () => (\n  <svg viewBox=\"0 0 24 24\" className=\"fill-current\">\n    <circle cx=\"12\" cy=\"12\" r=\"9\" />\n  </svg>\n);\nconst Square = () => (\n  <svg viewBox=\"0 0 24 24\" className=\"fill-current\">\n    <rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"3\" />\n  </svg>\n);\n\nconst NAMES = [\"Northwind\", \"Acme Supply\", \"Globex\", \"Initech\", \"Umbrella\", \"Hooli\", \"Vandelay\", \"Soylent\", \"Wonka\", \"Pied Piper\"];\n\nexport function Site() {\n  return (\n    <div className=\"py-12\">\n      <LogoStrip brands={NAMES.map((name, i) => (i % 3 === 0 ? { name, logo: i % 2 ? <Square /> : <Dot /> } : { name }))} />\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "logo-strip"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/logo-strip/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Logo strip",
+  "description": "The stores or customers as bare grey marks drifting left in one row under the hero's keys.",
+  "surface": "site",
+  "kinds": [
+    "logo-strip"
+  ],
+  "requires": [
+    "theme",
+    "marquee",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/logo-strip.tsx",
+      "content": "import * as React from \"react\";\n\nimport { Marquee } from \"@/components/visuals/marquee\";\nimport { cn } from \"@/lib/utils\";\n\n// The stores a product reaches (the opencommerce hero, logo-strip.tsx): the marks bare, no tiles, in grey, in one row\n// as wide as the 800px column, drifting left and fading out at both ends (the Marquee). A mark given as an image `src`\n// is drawn as a mask, so a white silhouette or a colored logo takes the strip's grey alike; a mark given as a node\n// should draw in currentColor. Square marks stand 20px tall; long wordmarks are held to 84px wide, so they carry about\n// the same weight.\n\ntype Brand = {\n  name: string;\n  /** An image of the mark (any color; it is used as a mask). */\n  src?: string;\n  /** Or the mark itself, drawn in currentColor. */\n  logo?: React.ReactNode;\n  /** Width over height, for an image; default 1. */\n  ratio?: number;\n};\n\nfunction Mark({ brand }: { brand: Brand }) {\n  if (brand.logo) {\n    return (\n      <span role=\"img\" aria-label={brand.name} className=\"flex h-5 items-center [&>svg]:h-full [&>svg]:w-auto\">\n        {brand.logo}\n      </span>\n    );\n  }\n  if (brand.src) {\n    const ratio = brand.ratio ?? 1;\n    const height = Math.round(Math.min(20, 84 / ratio));\n    const mask = `url(\"${brand.src}\") center / contain no-repeat`;\n    return <span role=\"img\" aria-label={brand.name} className=\"block bg-current\" style={{ height, width: Math.round(height * ratio), mask, WebkitMask: mask }} />;\n  }\n  return <span className=\"font-display text-h5 leading-none font-medium tracking-tight\">{brand.name}</span>;\n}\n\nfunction LogoStrip({ brands, label = \"Stores\", duration, className, ...props }: Omit<React.ComponentProps<\"div\">, \"children\"> & { brands: Brand[]; label?: string; duration?: number }) {\n  return <Marquee data-slot=\"logo-strip\" label={label} duration={duration} items={brands.map((b) => <Mark key={b.name} brand={b} />)} className={cn(\"mx-auto max-w-(--ds-layout-medium)\", className)} {...props} />;\n}\n\nexport { LogoStrip };\nexport type { Brand };\n"
+    }
+  ]
+}

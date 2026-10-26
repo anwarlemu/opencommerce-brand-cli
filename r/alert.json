@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "name": "alert",
+  "useFor": "Use inside a form, card or window for a note the reader should see in place: info for guidance, warning for something to check, destructive for a failure, success for a confirmation. Put a lucide glyph first, then AlertTitle and AlertDescription; add AlertAction for one small key. For a page-level notice with a title bar, use Banner.",
+  "constraints": [
+    "A glyph and title in the same color as a warning",
+    "Filled colored backgrounds",
+    "Bold titles",
+    "More than one action"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (banner.tsx sheet and type, globals.css .win edge and the status badge colors)",
+  "exports": [
+    "Alert",
+    "AlertAction",
+    "AlertDescription",
+    "AlertTitle",
+    "alertVariants"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/alert",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/alert.md",
+  "examples": [
+    {
+      "path": "examples/alert.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\nimport { CircleAlert, CircleCheck, Info, TriangleAlert } from \"lucide-react\";\n\nimport { Alert, AlertAction, AlertDescription, AlertTitle } from \"@/components/ui/alert\";\nimport { Button } from \"@/components/ui/button\";\n\nexport function Site() {\n  const [retried, setRetried] = useState(false);\n  return (\n    <div className=\"grid w-full max-w-2xl gap-4\">\n      <Alert variant=\"info\">\n        <Info strokeWidth={1.5} />\n        <AlertTitle>Checkout runs in test mode</AlertTitle>\n        <AlertDescription>Orders placed with a test key are routed to the merchant&apos;s sandbox. Nothing is charged.</AlertDescription>\n      </Alert>\n      <Alert variant=\"destructive\">\n        <CircleAlert strokeWidth={1.5} />\n        <AlertTitle>{retried ? \"Retrying the order\" : \"Payment was declined at Staples\"}</AlertTitle>\n        <AlertDescription>{retried ? \"The route is warming up again. This usually takes under ten seconds.\" : \"The card on file reached its daily limit. Raise the limit or retry tomorrow.\"}</AlertDescription>\n        <AlertAction>\n          <Button size=\"sm\" variant=\"secondary\" disabled={retried} onClick={() => setRetried(true)}>\n            Retry\n          </Button>\n        </AlertAction>\n      </Alert>\n    </div>\n  );\n}\n\nexport function Variants() {\n  return (\n    <div className=\"grid w-full max-w-2xl gap-4\">\n      <Alert>\n        <Info strokeWidth={1.5} />\n        <AlertTitle>One endpoint for every store</AlertTitle>\n        <AlertDescription>\n          Send the same request to Amazon, Target or Best Buy. <a href=\"#docs\">Read the guide</a>.\n        </AlertDescription>\n      </Alert>\n      <Alert variant=\"success\">\n        <CircleCheck strokeWidth={1.5} />\n        <AlertTitle>Order #A-10293 confirmed</AlertTitle>\n        <AlertDescription>2 items, $48.20, arriving Thursday.</AlertDescription>\n      </Alert>\n      <Alert variant=\"warning\">\n        <TriangleAlert strokeWidth={1.5} />\n        <AlertTitle>Wayfair is responding slowly</AlertTitle>\n        <AlertDescription>Purchases still go through; expect checkouts to take up to a minute.</AlertDescription>\n      </Alert>\n      <Alert>\n        <AlertTitle>Without a glyph</AlertTitle>\n        <AlertDescription>The title and detail take the full width.</AlertDescription>\n      </Alert>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Variants"
+      ],
+      "requires": [
+        "alert",
+        "button"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/alert/Site"
+        },
+        {
+          "name": "Variants",
+          "url": "https://opencommerce-ds.vercel.app/preview/alert/Variants"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Alert",
+  "description": "An inline notice: a white or pale blue sheet on the window edge with a blue glyph, a display-face title and muted detail.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/alert.tsx",
+      "content": "import * as React from \"react\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { cn } from \"@/lib/utils\";\n\n// An inline notice: the banner's sheet without its window bar, for a note that sits inside a form, a card or a window\n// (extrapolated from banner.tsx and globals.css .win). The 16 percent ink edge with 6px corners on white, 14px by 16px\n// inside; a 16px lucide glyph at stroke 1.5, the title in the 16px display face at 500 tracked tight, the detail in 14px\n// Inter at 64 percent ink. `default` keeps the glyph blue; `info` sets the sheet on the pale blue (the guides' note);\n// `warning`, `success` and `destructive` tell themselves apart by the glyph's and the title's color only, as the\n// brand's status badges do. Actions (AlertAction) sit at the right. Nothing moves.\nconst alertVariants = cva(\n  \"group/alert relative grid w-full grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3 gap-y-1 rounded-card border px-4 py-3.5 font-sans text-body-sm leading-relaxed text-fg has-[>svg]:grid-cols-[auto_minmax(0,1fr)_auto] [&>svg]:mt-0.5 [&>svg]:size-4 [&>svg]:shrink-0\",\n  {\n    variants: {\n      variant: {\n        default: \"border-line-window bg-surface [&>svg]:text-fg-brand\",\n        info: \"border-line-window bg-note [&>svg]:text-fg-brand\",\n        success: \"border-line-window bg-surface [&>svg]:text-success [&>[data-slot=alert-title]]:text-success\",\n        warning: \"border-line-window bg-surface [&>svg]:text-warning [&>[data-slot=alert-title]]:text-warning\",\n        destructive: \"border-line-window bg-surface [&>svg]:text-danger [&>[data-slot=alert-title]]:text-danger\",\n      },\n    },\n    defaultVariants: { variant: \"default\" },\n  },\n);\n\nfunction Alert({ className, variant, role, ...props }: React.ComponentProps<\"div\"> & VariantProps<typeof alertVariants>) {\n  return <div data-slot=\"alert\" data-variant={variant ?? \"default\"} role={role ?? (variant === \"destructive\" ? \"alert\" : \"status\")} className={cn(alertVariants({ variant }), className)} {...props} />;\n}\n\nfunction AlertTitle({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"alert-title\" className={cn(\"col-start-1 min-w-0 font-display text-body leading-snug font-medium tracking-tight text-fg group-has-[>svg]/alert:col-start-2\", className)} {...props} />;\n}\n\nfunction AlertDescription({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"alert-description\" className={cn(\"col-start-1 min-w-0 text-body-sm leading-relaxed text-fg-muted group-has-[>svg]/alert:col-start-2 [&_a]:text-fg-brand [&_a]:underline [&_a]:underline-offset-3 [&_p]:leading-relaxed\", className)} {...props} />;\n}\n\n/** What sits at the right of an alert: a small key or a link. */\nfunction AlertAction({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"alert-action\" className={cn(\"col-start-2 row-span-2 row-start-1 flex items-center gap-2 self-center group-has-[>svg]/alert:col-start-3\", className)} {...props} />;\n}\n\nexport { Alert, AlertAction, AlertDescription, AlertTitle, alertVariants };\n"
+    }
+  ]
+}

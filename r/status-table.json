@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "name": "status-table",
+  "useFor": "Use for live health of the things a product depends on (stores, routes, providers), in a wide SiteSection. Pass the columns, one value per column per row, and the day history.",
+  "constraints": [
+    "Red and green bars (the brand's blue only)",
+    "More than six columns",
+    "Live data faked as live",
+    "A dark table"
+  ],
+  "documentation": "`StatusTable` props: `rows` ({ name, logo, values, days }[]), `columns` ({ label, mono, muted }[]), `name` (the\nwindow's name, default \"monitoring.live\"), `nameLabel`, `daysLabel`, `live`, `filterLabel`, `filterPlaceholder`,\n`note`, plus div props. `days` is \"up\" | \"degraded\" | \"down\", oldest first. On a phone each row stacks.",
+  "source": "opencommerce-agentcard-web src/components/monitoring.tsx",
+  "exports": [
+    "StatusTable",
+    "DayStatus",
+    "StatusColumn",
+    "StatusRow"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/status-table",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/status-table.md",
+  "examples": [
+    {
+      "path": "examples/status-table.tsx",
+      "content": "import { StatusTable, type DayStatus } from \"@/components/site/status-table\";\n\n// Deterministic per name, so the server and the browser draw the same bars.\nfunction history(name: string): DayStatus[] {\n  let seed = [...name].reduce((a, c) => a * 31 + c.charCodeAt(0), 7) >>> 0;\n  return Array.from({ length: 45 }, () => {\n    seed = (seed * 1664525 + 1013904223) >>> 0;\n    const r = seed / 2 ** 32;\n    return r < 0.03 ? \"down\" : r < 0.08 ? \"degraded\" : \"up\";\n  });\n}\n\nconst ROWS = [\n  [\"Northwind\", \"100%\", \"5 min ago\", \"12 sec\"],\n  [\"Acme Supply\", \"99.9%\", \"1 min ago\", \"9 sec\"],\n  [\"Globex\", \"99.8%\", \"2 min ago\", \"14 sec\"],\n  [\"Initech\", \"100%\", \"4 min ago\", \"11 sec\"],\n].map(([name, ...values]) => ({ name, values, days: history(name) }));\n\nexport function Site() {\n  return (\n    <div className=\"mx-auto w-(--ds-frame-column) py-16\">\n      <StatusTable\n        nameLabel=\"Merchant\"\n        columns={[{ label: \"Success rate\", mono: true }, { label: \"Last purchase\", muted: true }, { label: \"Duration\", mono: true, muted: true }]}\n        daysLabel=\"Uptime · 45 days\"\n        filterLabel=\"Filter merchants\"\n        filterPlaceholder=\"Filter merchants…\"\n        note=\"+ 4000 more merchants\"\n        rows={ROWS}\n      />\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "status-table"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/status-table/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Status table",
+  "description": "A live table in a window: a live dot and filter, rows with marks, mono figures and day bars, a legend.",
+  "surface": "site",
+  "kinds": [
+    "table",
+    "window",
+    "window-bar",
+    "input"
+  ],
+  "requires": [
+    "theme",
+    "window",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/status-table.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { Window } from \"@/components/ui/window\";\nimport { cn } from \"@/lib/utils\";\n\n// A live status table (the opencommerce site, monitoring.tsx): one window across the column (monitoring.live). A mist\n// strip on top holds the live dot (the blue dot with a ping ring, still with reduced motion) and a filter field; then\n// the table: 12px muted heads, rows on hairlines that take the mist under the pointer, each with the item's mark in a\n// small tile and its name, figures in 13px mono, and a run of day bars (blue up, pale blue degraded, faint ink down). A\n// mist strip at the foot holds the legend and a note. On a phone each row becomes a stacked entry with the same bars.\n\ntype DayStatus = \"up\" | \"degraded\" | \"down\";\ntype StatusColumn = { label: React.ReactNode; mono?: boolean; muted?: boolean };\ntype StatusRow = {\n  name: string;\n  /** The item's mark, about 14px, drawn in currentColor. */\n  logo?: React.ReactNode;\n  /** One value per column, in the order of `columns`. */\n  values: React.ReactNode[];\n  /** The day bars, oldest first. */\n  days?: DayStatus[];\n};\n\nconst BAR: Record<DayStatus, string> = { up: \"bg-brand\", degraded: \"bg-brand/35\", down: \"bg-ink/20\" };\nconst LEGEND: Record<DayStatus, string> = { up: \"Operational\", degraded: \"Degraded\", down: \"Down\" };\n\nfunction Days({ name, days, className }: { name: string; days: DayStatus[]; className: string }) {\n  return (\n    <div role=\"img\" aria-label={`${name}: ${days.filter((d) => d === \"up\").length} of ${days.length} days operational`} className={cn(\"flex\", className)}>\n      {days.map((s, i) => (\n        <span key={i} title={LEGEND[s]} className={cn(\"flex-1 rounded-chip\", BAR[s])} />\n      ))}\n    </div>\n  );\n}\n\nfunction Tile({ row }: { row: StatusRow }) {\n  return (\n    <span aria-hidden className=\"grid size-8 shrink-0 place-items-center rounded-chip border border-line bg-surface text-fg/70 [&>svg]:h-3.5 [&>svg]:w-auto\">\n      {row.logo ?? <span className=\"font-mono text-caption\">{row.name.slice(0, 1)}</span>}\n    </span>\n  );\n}\n\nfunction StatusTable({\n  rows,\n  columns,\n  name = \"monitoring.live\",\n  nameLabel = \"Name\",\n  daysLabel,\n  live = \"Live\",\n  filterLabel = \"Filter\",\n  filterPlaceholder = \"Filter…\",\n  note,\n  className,\n  ...props\n}: Omit<React.ComponentProps<\"div\">, \"children\"> & {\n  rows: StatusRow[];\n  /** The columns between the name and the bars. */\n  columns: StatusColumn[];\n  /** The window's name. */\n  name?: string;\n  nameLabel?: React.ReactNode;\n  /** The bars' heading (\"Uptime · 45 days\"). */\n  daysLabel?: React.ReactNode;\n  live?: React.ReactNode;\n  filterLabel?: string;\n  filterPlaceholder?: string;\n  /** The foot's note at the right (\"+ 4000 more merchants\"). */\n  note?: React.ReactNode;\n}) {\n  const [filter, setFilter] = React.useState(\"\");\n  const fieldId = React.useId();\n  const shown = rows.filter((r) => r.name.toLowerCase().includes(filter.trim().toLowerCase()));\n  const hasDays = rows.some((r) => r.days?.length);\n  const empty = `Nothing matches “${filter}”.`;\n\n  return (\n    <Window name={name} data-slot=\"status-table\" className={cn(\"relative z-10\", className)} {...props}>\n      <div className=\"flex items-center justify-between gap-4 border-b border-line bg-subtle px-5 py-3\">\n        <span className=\"flex items-center gap-2 text-snippet text-fg-muted\">\n          <span aria-hidden className=\"relative flex size-2\">\n            <span className=\"absolute inset-0 animate-ping rounded-full bg-brand/40 motion-reduce:hidden\" />\n            <span className=\"relative size-2 rounded-full bg-brand\" />\n          </span>\n          {live}\n        </span>\n        <label className=\"sr-only\" htmlFor={fieldId}>\n          {filterLabel}\n        </label>\n        <input\n          id={fieldId}\n          value={filter}\n          onChange={(e) => setFilter(e.target.value)}\n          placeholder={filterPlaceholder}\n          className=\"h-9 w-48 min-w-0 rounded-control border border-line-field bg-surface px-3 text-body-sm text-fg outline-none transition-colors duration-(--ds-duration-fast) ease-out placeholder:text-fg-faint focus:border-brand max-sm:w-40 motion-reduce:transition-none\"\n        />\n      </div>\n\n      <ul className=\"list-none p-0 md:hidden\">\n        {shown.map((r) => (\n          <li key={r.name} className=\"border-b border-line px-4 py-4 last:border-b-0\">\n            <div className=\"flex items-center justify-between gap-3\">\n              <span className=\"flex items-center gap-3 text-body-sm font-medium\">\n                <Tile row={r} />\n                {r.name}\n              </span>\n              <span className=\"font-mono text-snippet\">{r.values[0]}</span>\n            </div>\n            {r.values.length > 1 && (\n              <p className=\"mt-2 text-caption text-fg-muted\">\n                {r.values.slice(1).map((v, i) => (\n                  <React.Fragment key={i}>\n                    {i > 0 && \" · \"}\n                    <span className={cn(columns[i + 1]?.mono && \"font-mono\")}>{v}</span>\n                  </React.Fragment>\n                ))}\n              </p>\n            )}\n            {r.days && <Days name={r.name} days={r.days} className=\"mt-3 h-6 gap-0.5\" />}\n          </li>\n        ))}\n        {shown.length === 0 && <li className=\"px-4 py-10 text-center text-body-sm text-fg-muted\">{empty}</li>}\n      </ul>\n\n      <div className=\"overflow-x-auto max-md:hidden\">\n        <table className=\"w-full min-w-190 border-collapse text-body-sm\">\n          <thead>\n            <tr className=\"border-b border-line text-left text-caption text-fg-muted\">\n              <th className=\"px-5 py-3 font-normal\">{nameLabel}</th>\n              {columns.map((c, i) => (\n                <th key={i} className=\"px-3 py-3 font-normal\">\n                  {c.label}\n                </th>\n              ))}\n              {hasDays && <th className=\"px-5 py-3 font-normal\">{daysLabel}</th>}\n            </tr>\n          </thead>\n          <tbody>\n            {shown.map((r) => (\n              <tr key={r.name} className=\"border-b border-line transition-colors duration-(--ds-duration-fast) ease-out last:border-b-0 hover:bg-subtle motion-reduce:transition-none\">\n                <td className=\"px-5 py-4 font-medium\">\n                  <span className=\"flex items-center gap-3\">\n                    <Tile row={r} />\n                    {r.name}\n                  </span>\n                </td>\n                {columns.map((c, i) => (\n                  <td key={i} className={cn(\"px-3 py-4\", c.mono && \"font-mono text-snippet\", c.muted && \"text-fg-muted\")}>\n                    {r.values[i]}\n                  </td>\n                ))}\n                {hasDays && <td className=\"px-5 py-4\">{r.days && <Days name={r.name} days={r.days} className=\"h-7 gap-0.75\" />}</td>}\n              </tr>\n            ))}\n            {shown.length === 0 && (\n              <tr>\n                <td colSpan={columns.length + 1 + (hasDays ? 1 : 0)} className=\"px-5 py-10 text-center text-fg-muted\">\n                  {empty}\n                </td>\n              </tr>\n            )}\n          </tbody>\n        </table>\n      </div>\n\n      {(hasDays || note) && (\n        <div className=\"flex flex-wrap items-center gap-5 border-t border-line bg-subtle px-5 py-3 text-caption text-fg-muted\">\n          {hasDays &&\n            (Object.keys(BAR) as DayStatus[]).map((s) => (\n              <span key={s} className=\"flex items-center gap-2\">\n                <span aria-hidden className={cn(\"h-3 w-1.5 rounded-chip\", BAR[s])} />\n                {LEGEND[s]}\n              </span>\n            ))}\n          {note && <span className=\"ml-auto\">{note}</span>}\n        </div>\n      )}\n    </Window>\n  );\n}\n\nexport { StatusTable };\nexport type { DayStatus, StatusColumn, StatusRow };\n"
+    }
+  ]
+}

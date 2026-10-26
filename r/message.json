@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "name": "message",
+  "useFor": "Use for each turn of an agent conversation: MessageAvatar, then MessageContent holding MessageHeader (the name, then a time element), the Bubble parts and an optional MessageFooter (Delivered). Set align end for the agent's own messages. Stack turns in MessageGroup or MessageScroller.",
+  "constraints": [
+    "Round avatars",
+    "Bold sender names",
+    "Timestamps in Inter"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (avatar.tsx, mono figures)",
+  "exports": [
+    "Message",
+    "MessageAvatar",
+    "MessageContent",
+    "MessageFooter",
+    "MessageGroup",
+    "MessageHeader"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/message",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/message.md",
+  "examples": [
+    {
+      "path": "examples/message.tsx",
+      "content": "import { CheckCheck } from \"lucide-react\";\n\nimport { Bubble, BubbleContent, BubbleGroup } from \"@/components/ui/bubble\";\nimport { Message, MessageAvatar, MessageContent, MessageFooter, MessageGroup, MessageHeader } from \"@/components/ui/message\";\n\nexport function Site() {\n  return (\n    <MessageGroup className=\"mx-auto w-full max-w-xl\">\n      <Message>\n        <MessageAvatar>JM</MessageAvatar>\n        <MessageContent>\n          <MessageHeader>\n            Jordan Miles <time dateTime=\"2026-10-14T09:12\">9:12 AM</time>\n          </MessageHeader>\n          <BubbleGroup>\n            <Bubble variant=\"secondary\">\n              <BubbleContent>Order more printer paper for the office.</BubbleContent>\n            </Bubble>\n            <Bubble variant=\"secondary\">\n              <BubbleContent>The usual, ten reams.</BubbleContent>\n            </Bubble>\n          </BubbleGroup>\n        </MessageContent>\n      </Message>\n      <Message align=\"end\">\n        <MessageAvatar>OA</MessageAvatar>\n        <MessageContent>\n          <MessageHeader>\n            Office agent <time dateTime=\"2026-10-14T09:13\">9:13 AM</time>\n          </MessageHeader>\n          <Bubble align=\"end\">\n            <BubbleContent>Ordered ten reams from Staples for $62.40. They arrive Thursday.</BubbleContent>\n          </Bubble>\n          <MessageFooter>\n            <CheckCheck aria-hidden strokeWidth={1.5} />\n            Delivered\n          </MessageFooter>\n        </MessageContent>\n      </Message>\n    </MessageGroup>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "message",
+        "bubble"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/message/Site"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Message",
+  "description": "One message: a 32px square avatar, the sender with the time in mono, the bubbles and a mono footer, mirrored for the agent's own.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/ui/message.tsx",
+      "content": "import * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// One message in an agent conversation (extrapolated from avatar.tsx and the site's mono figures; computed): a 32px\n// avatar square (the merchant tile's 6px corners on the 9 percent edge, initials in the display face, blue on the pale\n// blue), the sender in 14px Inter at 500 with the time in the 11.5px platform mono at 64 percent ink beside it, the\n// bubbles, and a mono footer (Delivered). The agent's own messages (align end) mirror to the right.\nfunction MessageGroup({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"message-group\" className={cn(\"flex min-w-0 flex-col gap-4\", className)} {...props} />;\n}\n\nfunction Message({ className, align = \"start\", ...props }: React.ComponentProps<\"div\"> & { align?: \"start\" | \"end\" }) {\n  return <div data-slot=\"message\" data-align={align} className={cn(\"group/message relative flex w-full min-w-0 gap-2.5 font-sans text-body-sm data-[align=end]:flex-row-reverse\", className)} {...props} />;\n}\n\nfunction MessageAvatar({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"message-avatar\"\n      className={cn(\n        \"flex size-8 shrink-0 items-center justify-center self-end overflow-hidden rounded-card border border-line bg-blue-5 font-display text-caption leading-none text-fg-brand group-has-data-[slot=message-footer]/message:-translate-y-6 *:[img]:size-full *:[img]:object-cover\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nfunction MessageContent({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"message-content\" className={cn(\"flex w-full min-w-0 flex-col gap-1.5 break-words group-data-[align=end]/message:items-end\", className)} {...props} />;\n}\n\n/** The sender and the time: the name in ink at 500, the time in the mono at 64 percent ink. */\nfunction MessageHeader({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"message-header\"\n      className={cn(\"flex max-w-full min-w-0 items-baseline gap-2 px-1 text-body-sm leading-tight font-medium text-fg group-data-[align=end]/message:flex-row-reverse [&_time]:font-mono [&_time]:text-bar [&_time]:font-normal [&_time]:text-fg-muted group-has-data-[variant=ghost]/message:px-0\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction MessageFooter({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"message-footer\"\n      className={cn(\"flex max-w-full min-w-0 items-center gap-1 px-1 font-mono text-bar leading-tight text-fg-muted group-data-[align=end]/message:justify-end group-has-data-[variant=ghost]/message:px-0 [&_svg:not([class*='size-'])]:size-3\", className)}\n      {...props}\n    />\n  );\n}\n\nexport { Message, MessageAvatar, MessageContent, MessageFooter, MessageGroup, MessageHeader };\n"
+    }
+  ]
+}

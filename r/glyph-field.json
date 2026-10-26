@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "name": "glyph-field",
+  "useFor": "Put it behind the hero's code window (fade out, spilling past the card) or inside the closing card (fade in, gathering at the edges). Position it absolutely in a relative, isolated parent and keep it under the content.",
+  "constraints": [
+    "The field over text",
+    "More than three fields on a page",
+    "Blue as the main color of the field",
+    "A field on a dark ground"
+  ],
+  "documentation": "`GlyphField` props: `seed` (another map, default 3), `fade` (\"out\" | \"in\" | \"none\", default out), plus canvas props.\nSize it with classes; it redraws when its box changes. It flickers only while on screen and is still with reduced\nmotion.",
+  "source": "opencommerce-agentcard-web src/components/binary-stage.tsx, src/lib/noise.ts, src/app/globals.css (.hero-binary, .cta-binary)",
+  "exports": [
+    "GlyphField",
+    "GlyphFieldProps"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/glyph-field",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/glyph-field.md",
+  "examples": [
+    {
+      "path": "examples/glyph-field.tsx",
+      "content": "import { GlyphField } from \"@/components/visuals/glyph-field\";\n\nexport function Site() {\n  return (\n    <div className=\"grid gap-8 py-10\">\n      <div className=\"relative isolate mx-auto h-72 w-full max-w-200\">\n        <GlyphField className=\"absolute inset-0 -z-10 size-full\" />\n        <div className=\"relative mx-auto mt-16 h-40 max-w-120 rounded-panel border border-line-strong bg-surface shadow-card\" />\n      </div>\n      <div className=\"relative isolate overflow-hidden rounded-shell border border-line bg-subtle px-6 py-20 text-center\">\n        <GlyphField seed={11} fade=\"in\" className=\"absolute inset-0 size-full\" />\n        <p className=\"relative font-display text-h2 leading-display font-medium tracking-tighter\">Copy sits on clean ground</p>\n      </div>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "glyph-field"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/glyph-field/Site"
+        }
+      ]
+    }
+  ],
+  "type": "visual",
+  "title": "Glyph field",
+  "description": "A faint canvas field of *s and @s in clumps, with a few blue runs, that flickers while on screen.",
+  "surface": "site",
+  "kinds": [
+    "media-frame"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/visuals/glyph-field.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The field of *s and @s (the opencommerce site's binary stage): Agentcard's mark and the address sign set on a\n// character lattice, their density following a noise map, so they read as solid clumps that crumble into scattered\n// glyphs at their coasts with open ground between. Mostly faint ink, with a few short runs in the brand blue deep inside\n// a clump. A few glyphs flip now and then while the field is on screen; under reduced motion it is still. The colors and\n// the face are read from the brand tokens, never written here. `fade` shapes it across its box: \"out\" is solid in the\n// middle and gone at the edges (behind a card), \"in\" is clear in the middle and gathers at the edges (round a card's\n// copy). The fade is baked into each glyph rather than laid on as a mask, so a flicker repaints a cell, not the layer.\n\n/** The lattice cell and the glyph size, in CSS pixels. */\nconst CW = 9;\nconst CH = 13;\nconst FONT_PX = 11;\n\ntype Glyph = { x: number; y: number; alpha: number; blue: boolean; star: boolean };\ntype Fade = \"out\" | \"in\" | \"none\";\n\n/** Deterministic hash to [0, 1): the pattern is the same on every load; only the flicker is random. */\nfunction hash(x: number, y: number) {\n  let h = (x * 374761393 + y * 668265263) ^ 0x5bf03635;\n  h = Math.imul(h ^ (h >>> 13), 1274126177);\n  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;\n}\n\nfunction smooth(t: number) {\n  return t * t * (3 - 2 * t);\n}\n\n/** Value noise, interpolated between lattice hashes. */\nfunction noise(x: number, y: number, seed: number) {\n  const xi = Math.floor(x);\n  const yi = Math.floor(y);\n  const xf = smooth(x - xi);\n  const yf = smooth(y - yi);\n  const a = hash(xi + seed, yi);\n  const b = hash(xi + 1 + seed, yi);\n  const c = hash(xi + seed, yi + 1);\n  const d = hash(xi + 1 + seed, yi + 1);\n  return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;\n}\n\n/** Three octaves: big landmasses with ragged coasts. */\nfunction fbm(x: number, y: number, seed: number) {\n  return noise(x, y, seed) * 0.55 + noise(x * 2.1, y * 2.1, seed + 17) * 0.3 + noise(x * 4.3, y * 4.3, seed + 41) * 0.15;\n}\n\n/** How much of a glyph survives at (nx, ny), each from -1 to 1 across the box. */\nfunction fadeAt(fade: Fade, nx: number, ny: number) {\n  if (fade === \"none\") return 1;\n  if (fade === \"out\") {\n    const d = Math.hypot(nx, ny);\n    return 1 - smooth(Math.min(1, Math.max(0, (d - 0.68) / 0.32)));\n  }\n  const d = Math.hypot(nx / 1.44, ny / 1.7);\n  return Math.min(1, Math.max(0, (d - 0.48) / 0.52));\n}\n\ntype GlyphFieldProps = Omit<React.ComponentProps<\"canvas\">, \"children\"> & {\n  /** Another seed gives another map. */\n  seed?: number;\n  fade?: Fade;\n};\n\nfunction GlyphField({ seed = 3, fade = \"out\", className, ...props }: GlyphFieldProps) {\n  const ref = React.useRef<HTMLCanvasElement>(null);\n\n  React.useEffect(() => {\n    const canvas = ref.current;\n    const ctx = canvas?.getContext(\"2d\");\n    if (!canvas || !ctx) return;\n\n    const css = getComputedStyle(canvas);\n    const token = (name: string, fallback: string) => css.getPropertyValue(name).trim() || fallback;\n    const ink = token(\"--ds-color-ink\", \"currentColor\");\n    const blue = token(\"--ds-color-brand\", \"currentColor\");\n    const mono = token(\"--ds-font-mono\", \"monospace\");\n    const still = window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches;\n\n    let glyphs: Glyph[] = [];\n    let timer = 0;\n    let visible = false;\n\n    const paint = (g: Glyph) => {\n      ctx.globalAlpha = g.alpha;\n      ctx.fillStyle = g.blue ? blue : ink;\n      ctx.fillText(g.star ? \"*\" : \"@\", g.x + CW / 2, g.y);\n    };\n\n    const build = () => {\n      const dpr = Math.min(window.devicePixelRatio || 1, 2);\n      const { width, height } = canvas.getBoundingClientRect();\n      if (!width || !height) return;\n      canvas.width = Math.round(width * dpr);\n      canvas.height = Math.round(height * dpr);\n      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);\n      ctx.font = `400 ${FONT_PX}px ${mono}`;\n      ctx.textAlign = \"center\";\n      ctx.textBaseline = \"top\";\n\n      const cols = Math.ceil(width / CW);\n      const rows = Math.ceil(height / CH);\n      glyphs = [];\n      for (let r = 0; r < rows; r++) {\n        for (let c = 0; c < cols; c++) {\n          const land = fbm(c / 16, r / 11, seed);\n          // Solid inside a clump; at the coast a glyph survives only now and then, so the edges crumble.\n          const odds = smooth(Math.min(1, Math.max(0, (land - 0.4) / 0.16)));\n          if (hash(c * 7 + 11, r * 13 + 5) > odds) continue;\n          const f = fadeAt(fade, ((c + 0.5) * CW * 2) / width - 1, ((r + 0.5) * CH * 2) / height - 1);\n          if (f < 0.03) continue;\n          // Blue comes in short horizontal runs, deep inside a clump.\n          const isBlue = land > 0.56 && fbm(c / 7 + 40, r / 3.5, seed + 6) > 0.64;\n          glyphs.push({ x: c * CW, y: r * CH, blue: isBlue, alpha: (isBlue ? 0.6 : 0.12 + odds * 0.08) * f, star: hash(c * 3 + 1, r * 5 + 2) > 0.45 });\n        }\n      }\n      ctx.clearRect(0, 0, width, height);\n      glyphs.forEach(paint);\n      ctx.globalAlpha = 1;\n    };\n\n    const flicker = () => {\n      if (!glyphs.length) return;\n      const n = Math.max(1, Math.round(glyphs.length * 0.01));\n      for (let i = 0; i < n; i++) {\n        const g = glyphs[(Math.random() * glyphs.length) | 0];\n        g.star = !g.star;\n        ctx.clearRect(g.x, g.y, CW, CH);\n        paint(g);\n      }\n      ctx.globalAlpha = 1;\n    };\n\n    const start = () => {\n      window.clearInterval(timer);\n      if (visible && !still) timer = window.setInterval(flicker, 140);\n    };\n\n    const ro = new ResizeObserver(build);\n    const io = new IntersectionObserver(([entry]) => {\n      visible = entry.isIntersecting;\n      start();\n    });\n\n    let cancelled = false;\n    document.fonts.ready.then(() => {\n      if (cancelled) return;\n      ro.observe(canvas);\n      io.observe(canvas);\n    });\n    return () => {\n      cancelled = true;\n      window.clearInterval(timer);\n      ro.disconnect();\n      io.disconnect();\n    };\n  }, [seed, fade]);\n\n  return <canvas ref={ref} aria-hidden data-slot=\"glyph-field\" className={cn(\"pointer-events-none block\", className)} {...props} />;\n}\n\nexport { GlyphField };\nexport type { GlyphFieldProps };\n"
+    }
+  ]
+}

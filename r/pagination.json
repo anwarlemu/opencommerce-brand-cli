@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "name": "pagination",
+  "useFor": "Use under a table or list that is split into pages. Show the first and last pages, the current one and its neighbors, with PaginationEllipsis between. Mark the current page with isActive and an unavailable Previous or Next with aria-disabled.",
+  "constraints": [
+    "Pagination for fewer than two pages",
+    "Numbered pages for a live feed (load more instead)",
+    "Blue page keys"
+  ],
+  "documentation": "",
+  "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-secondary) and monitoring.tsx",
+  "exports": [
+    "Pagination",
+    "PaginationContent",
+    "PaginationEllipsis",
+    "PaginationItem",
+    "PaginationLink",
+    "PaginationNext",
+    "PaginationPrevious"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/pagination",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/pagination.md",
+  "examples": [
+    {
+      "path": "examples/pagination.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from \"@/components/ui/pagination\";\n\nfunction pages(page: number, count: number): (number | \"gap\")[] {\n  if (count <= 7) return Array.from({ length: count }, (_, i) => i + 1);\n  const set = [...new Set([1, count, page - 1, page, page + 1].filter((p) => p >= 1 && p <= count))].sort((a, b) => a - b);\n  return set.flatMap((p, i) => (i && p - set[i - 1] > 1 ? ([\"gap\", p] as const) : [p]));\n}\n\nfunction Pager({ count, start = 1 }: { count: number; start?: number }) {\n  const [page, setPage] = React.useState(start);\n  const go = (p: number) => (event: React.MouseEvent) => {\n    event.preventDefault();\n    if (p >= 1 && p <= count) setPage(p);\n  };\n  return (\n    <div className=\"grid w-full gap-3\">\n      <Pagination>\n        <PaginationContent>\n          <PaginationItem>\n            <PaginationPrevious href=\"#\" onClick={go(page - 1)} aria-disabled={page === 1 || undefined} tabIndex={page === 1 ? -1 : undefined} />\n          </PaginationItem>\n          {pages(page, count).map((p, i) =>\n            p === \"gap\" ? (\n              <PaginationItem key={`gap-${i}`}>\n                <PaginationEllipsis />\n              </PaginationItem>\n            ) : (\n              <PaginationItem key={p}>\n                <PaginationLink href=\"#\" isActive={p === page} onClick={go(p)} aria-label={`Page ${p}`}>\n                  {p}\n                </PaginationLink>\n              </PaginationItem>\n            ),\n          )}\n          <PaginationItem>\n            <PaginationNext href=\"#\" onClick={go(page + 1)} aria-disabled={page === count || undefined} tabIndex={page === count ? -1 : undefined} />\n          </PaginationItem>\n        </PaginationContent>\n      </Pagination>\n      <p role=\"status\" className=\"text-center text-body-sm text-fg-muted\">\n        Orders {(page - 1) * 25 + 1} to {Math.min(page * 25, count * 25 - 9)} of {count * 25 - 9}\n      </p>\n    </div>\n  );\n}\n\nexport function Site() {\n  return <Pager count={12} start={4} />;\n}\n\nexport function Few() {\n  return <Pager count={3} />;\n}\n",
+      "exports": [
+        "Site",
+        "Few"
+      ],
+      "requires": [
+        "pagination"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/pagination/Site"
+        },
+        {
+          "name": "Few",
+          "url": "https://opencommerce-ds.vercel.app/preview/pagination/Few"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Pagination",
+  "description": "Page keys under a table: the current page a white key, the others bare, Previous and Next with chevrons.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "lucide-react"
+  ],
+  "files": [
+    {
+      "path": "components/ui/pagination.tsx",
+      "content": "import * as React from \"react\";\nimport { ChevronLeft, ChevronRight, MoreHorizontal } from \"lucide-react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// Paging through a long table (the monitoring table's foot): page numbers are 34px keys in 14px Inter, the current one\n// the white key on the 16 percent ink edge with ink text, the others bare at 64 percent ink that take the faint wash and\n// ink text under the pointer (150ms). Previous and Next are bare keys with a chevron. Every key shrinks to 0.97 when\n// pressed, as the brand's keys do. An unavailable step (the first page's Previous) is faded and inert.\nfunction Pagination({ className, ...props }: React.ComponentProps<\"nav\">) {\n  return <nav data-slot=\"pagination\" role=\"navigation\" aria-label=\"pagination\" className={cn(\"mx-auto flex w-full justify-center\", className)} {...props} />;\n}\n\nfunction PaginationContent({ className, ...props }: React.ComponentProps<\"ul\">) {\n  return <ul data-slot=\"pagination-content\" className={cn(\"flex flex-row items-center gap-1\", className)} {...props} />;\n}\n\nfunction PaginationItem(props: React.ComponentProps<\"li\">) {\n  return <li data-slot=\"pagination-item\" {...props} />;\n}\n\ntype PaginationLinkProps = { isActive?: boolean; size?: \"icon\" | \"default\" } & React.ComponentProps<\"a\">;\n\nconst LINK =\n  \"inline-flex h-8.5 shrink-0 items-center justify-center gap-1.5 rounded-control border font-sans text-body-sm leading-none whitespace-nowrap tabular-nums outline-none select-none transition-[background-color,border-color,color,scale] duration-150 ease-out active:scale-97 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring aria-disabled:pointer-events-none aria-disabled:opacity-40 motion-reduce:transition-[background-color,border-color,color] motion-reduce:active:scale-100 [&_svg]:pointer-events-none [&_svg]:size-3.5 [&_svg]:shrink-0\";\n\nfunction PaginationLink({ className, isActive, size = \"icon\", ...props }: PaginationLinkProps) {\n  return (\n    <a\n      data-slot=\"pagination-link\"\n      data-active={isActive || undefined}\n      aria-current={isActive ? \"page\" : undefined}\n      className={cn(\n        LINK,\n        size === \"icon\" ? \"min-w-8.5 px-2\" : \"px-3\",\n        isActive ? \"border-hairline bg-surface text-fg\" : \"border-transparent text-fg-muted hover:bg-wash-hover hover:text-fg\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nfunction PaginationPrevious({ className, children = \"Previous\", ...props }: React.ComponentProps<typeof PaginationLink>) {\n  return (\n    <PaginationLink aria-label=\"Go to previous page\" size=\"default\" className={cn(\"pl-2.5\", className)} {...props}>\n      <ChevronLeft strokeWidth={1.5} />\n      <span className=\"max-sm:sr-only\">{children}</span>\n    </PaginationLink>\n  );\n}\n\nfunction PaginationNext({ className, children = \"Next\", ...props }: React.ComponentProps<typeof PaginationLink>) {\n  return (\n    <PaginationLink aria-label=\"Go to next page\" size=\"default\" className={cn(\"pr-2.5\", className)} {...props}>\n      <span className=\"max-sm:sr-only\">{children}</span>\n      <ChevronRight strokeWidth={1.5} />\n    </PaginationLink>\n  );\n}\n\nfunction PaginationEllipsis({ className, ...props }: React.ComponentProps<\"span\">) {\n  return (\n    <span data-slot=\"pagination-ellipsis\" aria-hidden className={cn(\"flex size-8.5 items-center justify-center text-fg-faint [&_svg]:size-4\", className)} {...props}>\n      <MoreHorizontal strokeWidth={1.5} />\n      <span className=\"sr-only\">More pages</span>\n    </span>\n  );\n}\n\nexport { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious };\n"
+    }
+  ]
+}

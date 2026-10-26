@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "name": "pricing",
+  "useFor": "Pass title, description, the compared rows and two plans with one value per row. Feature at most one plan.",
+  "constraints": [
+    "More than one featured plan",
+    "More than three plans",
+    "Strikethrough prices without a reason",
+    "Check lists in place of compared rows",
+    "A blue window"
+  ],
+  "documentation": "`Pricing` props: `title`, `description`, `rows` (the labels compared), `plans` ({ name, badge, price, unit, blurb,\nvalues, action ({ label, href } or a node), featured, file }[]), plus div props.",
+  "source": "opencommerce-agentcard-web src/components/pricing.tsx, src/lib/content.ts (PRICING)",
+  "exports": [
+    "Pricing",
+    "Plan",
+    "PlanAction"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/pricing",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/pricing.md",
+  "examples": [
+    {
+      "path": "examples/pricing.tsx",
+      "content": "import { Pricing } from \"@/components/site/pricing\";\n\nexport function Site() {\n  return (\n    <section className=\"py-20\">\n      <Pricing\n        title=\"Pricing\"\n        description=\"Start free while you build. Move to Standard when your agent is buying for real.\"\n        rows={[\"Platform fees\", \"Merchants\", \"PSPs\"]}\n        plans={[\n          { name: \"Free\", price: \"$0\", unit: \"while you build\", blurb: \"Everything you need to wire up your agent and make its first purchases.\", values: [\"N/A\", \"5 merchants\", \"2 PSPs\"], action: { label: \"Try free\", href: \"https://app.agentcard.sh\" } },\n          { name: \"Standard\", badge: \"Every merchant\", price: \"1%\", unit: \"of each completed order\", blurb: \"For agents buying for real, across every store and payment provider.\", values: [\"1%\", \"Every merchant\", \"Every PSP\"], featured: true, action: { label: \"Get started\", href: \"https://app.agentcard.sh\" } },\n        ]}\n      />\n    </section>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "pricing"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/pricing/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Pricing",
+  "description": "Plans side by side in windows, with the figure, compared rows and a full-width key; one plan featured.",
+  "surface": "site",
+  "kinds": [
+    "window",
+    "window-bar",
+    "stat",
+    "chip",
+    "button-primary",
+    "button-secondary"
+  ],
+  "requires": [
+    "theme",
+    "section",
+    "button",
+    "window",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/pricing.tsx",
+      "content": "import * as React from \"react\";\n\nimport { SectionHeading } from \"@/components/site/section\";\nimport { Button } from \"@/components/ui/button\";\nimport { Window } from \"@/components/ui/window\";\nimport { cn } from \"@/lib/utils\";\n\n// Pricing (the opencommerce site, pricing.tsx): the centered heading, then the plans side by side in the 800px column,\n// each in a window named after it (free.plan). A plan has its name at 20px, the figure at 44px in the display face with\n// its unit in 14px muted type beside it, a line on who it is for, then the compared rows on hairlines (the label muted\n// at the left, the value at the right) and a full-width key. The featured plan carries a small mono tag in the pale blue,\n// sets its values in blue and takes the blue key; the others take the white key. Rows line up across plans because\n// every plan answers the same `rows`.\n\ntype PlanAction = { label: React.ReactNode; href: string };\n\ntype Plan = {\n  name: string;\n  /** A small tag beside the name (the featured plan's). */\n  badge?: React.ReactNode;\n  price: React.ReactNode;\n  /** Beside the figure: \"of each completed order\", \"/ month\". */\n  unit?: React.ReactNode;\n  /** Who it is for, under the figure. */\n  blurb?: React.ReactNode;\n  /** One value per row, in the order of `rows`. */\n  values: React.ReactNode[];\n  /** The plan's key: a label and href, or your own element. */\n  action?: PlanAction | React.ReactNode;\n  /** The plan to steer toward: blue values and the blue key. One at most. */\n  featured?: boolean;\n  /** The window's name; defaults to the plan's slug with .plan. */\n  file?: string;\n};\n\nconst slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, \"-\").replace(/^-|-$/g, \"\");\nconst isAction = (a: Plan[\"action\"]): a is PlanAction => typeof a === \"object\" && a !== null && !React.isValidElement(a) && \"href\" in a;\n\nfunction PlanWindow({ plan, rows }: { plan: Plan; rows: React.ReactNode[] }) {\n  return (\n    <Window name={plan.file ?? `${slug(plan.name)}.plan`} bodyClassName=\"flex flex-col\">\n      <div className=\"flex flex-1 flex-col p-6\">\n        <div className=\"flex items-center justify-between gap-3\">\n          <h3 className=\"font-display text-h4 leading-snug font-medium tracking-tight\">{plan.name}</h3>\n          {plan.badge && <span className=\"rounded-chip bg-tint px-2 py-1 font-mono text-caption leading-none text-fg-brand\">{plan.badge}</span>}\n        </div>\n        <p className=\"mt-5 flex items-baseline gap-2\">\n          <span className=\"font-display text-h2 leading-none font-medium tracking-hero\">{plan.price}</span>\n          {plan.unit && <span className=\"text-body-sm text-fg-muted\">{plan.unit}</span>}\n        </p>\n        {plan.blurb && <p className=\"mt-3 text-button leading-relaxed text-fg-muted\">{plan.blurb}</p>}\n        {rows.length > 0 && (\n          <dl className=\"mt-6 border-t border-line\">\n            {rows.map((row, i) => (\n              <div key={i} className=\"flex items-baseline justify-between gap-4 border-b border-line py-3.5 text-body-sm\">\n                <dt className=\"text-fg-muted\">{row}</dt>\n                <dd className={cn(\"text-right\", plan.featured && \"text-fg-brand\")}>{plan.values[i]}</dd>\n              </div>\n            ))}\n          </dl>\n        )}\n        <div className=\"mt-auto pt-7\">\n          {isAction(plan.action) ? (\n            <Button asChild variant={plan.featured ? \"primary\" : \"secondary\"} className=\"w-full\">\n              <a href={plan.action.href}>{plan.action.label}</a>\n            </Button>\n          ) : (\n            plan.action\n          )}\n        </div>\n      </div>\n    </Window>\n  );\n}\n\nfunction Pricing({\n  title,\n  description,\n  rows = [],\n  plans,\n  className,\n  ...props\n}: Omit<React.ComponentProps<\"div\">, \"title\"> & { title?: React.ReactNode; description?: React.ReactNode; rows?: React.ReactNode[]; plans: Plan[] }) {\n  return (\n    <div data-slot=\"pricing\" className={cn(\"w-full\", className)} {...props}>\n      {title && <SectionHeading title={title} description={description} />}\n      <div className={cn(\"mx-auto grid max-w-(--ds-layout-medium) gap-5 md:gap-6\", plans.length > 1 && \"md:grid-cols-2\")}>\n        {plans.map((plan) => (\n          <PlanWindow key={plan.name} plan={plan} rows={rows} />\n        ))}\n      </div>\n    </div>\n  );\n}\n\nexport { Pricing, type Plan, type PlanAction };\n"
+    }
+  ]
+}

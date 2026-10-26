@@ -1,0 +1,4124 @@
+{
+  "schemaVersion": 1,
+  "name": "opencommerce",
+  "homepage": "https://opencommerce-ds.vercel.app",
+  "guide": "https://opencommerce-ds.vercel.app/agents.md",
+  "items": [
+    {
+      "schemaVersion": 1,
+      "name": "theme",
+      "type": "theme",
+      "title": "opencommerce theme",
+      "description": "The opencommerce tokens and the Tailwind names that read them.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [],
+      "packages": [],
+      "tokens": {
+        "site": {
+          "--ds-color-brand": "#2E3AE8",
+          "--ds-color-black": "#000000",
+          "--ds-color-white": "#FFFFFF",
+          "--ds-color-ink": "#171818",
+          "--ds-color-paper": "#F9F9F9",
+          "--ds-color-sky": "#CCDBFF",
+          "--ds-color-blue-edge": "#2830AE",
+          "--ds-color-blue-hover": "#4752EB",
+          "--ds-color-blue-5": "#F0F1FD",
+          "--ds-color-blue-10": "#EAEBFD",
+          "--ds-color-blue-mid": "#1520B8",
+          "--ds-color-blue-mist": "#F0F1FD",
+          "--ds-color-sky-wash": "#F9F9F9",
+          "--ds-color-bg-search-selected": "#F0F1FD",
+          "--ds-color-neon": "#4DB8FF",
+          "--ds-color-electric": "#050EF4",
+          "--ds-color-heart": "#F24656",
+          "--ds-color-tint-sage": "#CFE3C9",
+          "--ds-color-tint-rose": "#EFCFD3",
+          "--ds-color-tint-teal": "#C6DFE2",
+          "--ds-color-tint-peach": "#F1D8C6",
+          "--ds-color-tint-butter": "#ECE3C0",
+          "--ds-color-bg-default": "#FFFFFF",
+          "--ds-color-bg-page": "#FFFFFF",
+          "--ds-color-bg-subtle": "#F9F9F9",
+          "--ds-color-bg-frame": "#F9F9F9",
+          "--ds-color-bg-canvas": "#FFFFFF",
+          "--ds-color-bg-tint": "#F0F1FD",
+          "--ds-color-bg-brand": "#2E3AE8",
+          "--ds-color-bg-inverse": "#171818",
+          "--ds-color-bg-dark": "#171818",
+          "--ds-color-bg-code": "#171818",
+          "--ds-color-bg-scrim": "rgb(23 24 24 / 0.4)",
+          "--ds-color-bg-glass": "rgb(255 255 255 / 0.72)",
+          "--ds-color-bg-note": "#F0F1FD",
+          "--ds-color-bg-code-soft": "#232424",
+          "--ds-color-bg-raised-on-brand": "rgb(255 255 255 / 0.07)",
+          "--ds-color-text-default": "#171818",
+          "--ds-color-text-secondary": "#6B6B6B",
+          "--ds-color-text-muted": "#6B6B6B",
+          "--ds-color-text-subtle": "#6B6B6B",
+          "--ds-color-text-nav": "#6B6B6B",
+          "--ds-color-text-faint": "#9E9E9E",
+          "--ds-color-text-inverse": "#FFFFFF",
+          "--ds-color-text-brand": "#2E3AE8",
+          "--ds-color-text-on-brand": "#FFFFFF",
+          "--ds-color-text-on-brand-muted": "rgb(255 255 255 / 0.72)",
+          "--ds-color-text-label": "#2E3AE8",
+          "--ds-color-text-on-brand-label": "#CCDBFF",
+          "--ds-color-text-code": "#E3E3E3",
+          "--ds-color-text-code-key": "#A1A6F5",
+          "--ds-color-text-code-string": "#CCDBFF",
+          "--ds-color-text-code-dim": "#747474",
+          "--ds-color-text-string": "#1520B8",
+          "--ds-color-border-default": "#EAEAEA",
+          "--ds-color-border-subtle": "#EAEAEA",
+          "--ds-color-border-strong": "#DADADA",
+          "--ds-color-border-mid": "#DADADA",
+          "--ds-color-border-rule": "#EAEAEA",
+          "--ds-color-border-field": "#DADADA",
+          "--ds-color-border-field-hover": "rgb(23 24 24 / 0.28)",
+          "--ds-color-border-hairline": "#DADADA",
+          "--ds-color-border-key": "#DADADA",
+          "--ds-color-border-brand": "#2E3AE8",
+          "--ds-color-border-brand-edge": "#2830AE",
+          "--ds-color-border-on-brand": "rgb(255 255 255 / 0.22)",
+          "--ds-color-border-on-brand-strong": "rgb(255 255 255 / 0.45)",
+          "--ds-color-border-window": "#DADADA",
+          "--ds-color-border-glass": "rgb(23 24 24 / 0.1)",
+          "--ds-color-border-on-code": "rgb(255 255 255 / 0.15)",
+          "--ds-color-border-on-code-hover": "rgb(255 255 255 / 0.3)",
+          "--ds-color-wash-hover": "rgb(23 24 24 / 0.05)",
+          "--ds-color-wash-pill": "rgb(23 24 24 / 0.07)",
+          "--ds-color-wash-selected": "rgb(46 58 232 / 0.07)",
+          "--ds-color-wash-on-brand": "rgb(255 255 255 / 0.14)",
+          "--ds-color-wash-glass-hover": "rgb(23 24 24 / 0.05)",
+          "--ds-color-ring-tint": "rgb(46 58 232 / 0.2)",
+          "--ds-color-action-primary": "#2E3AE8",
+          "--ds-color-action-primary-hover": "#4752EB",
+          "--ds-color-action-primary-fg": "#FFFFFF",
+          "--ds-color-status-success": "#15803D",
+          "--ds-color-status-warning": "#B45309",
+          "--ds-color-status-danger": "#D92D3F",
+          "--ds-color-focus-ring": "#2E3AE8",
+          "--ds-color-chart-series-1": "#2E3AE8",
+          "--ds-color-chart-series-2": "#1520B8",
+          "--ds-color-chart-series-3": "#4DB8FF",
+          "--ds-color-chart-series-4": "#CCDBFF",
+          "--ds-color-window-bar": "#F9F9F9",
+          "--ds-color-window-bar-fg": "#2E3AE8",
+          "--ds-font-sans": "var(--font-inter, \"Inter\"), ui-sans-serif, system-ui, sans-serif",
+          "--ds-font-display": "\"Neue Haas Grotesk Display Pro\", \"Neue Haas Grotesk Display\", \"Helvetica Neue\", Helvetica, Arial, sans-serif",
+          "--ds-font-mono": "ui-monospace, \"SF Mono\", SFMono-Regular, Menlo, Consolas, monospace",
+          "--ds-font-code": "ui-monospace, \"SF Mono\", SFMono-Regular, Menlo, Consolas, monospace",
+          "--ds-font-weight-regular": "400",
+          "--ds-font-weight-medium": "500",
+          "--ds-font-weight-heading": "500",
+          "--ds-text-display": "12.5rem",
+          "--ds-text-hero": "3.375rem",
+          "--ds-text-h1": "3rem",
+          "--ds-text-h2": "2.75rem",
+          "--ds-text-h3": "1.5rem",
+          "--ds-text-h4": "1.25rem",
+          "--ds-text-h5": "1.0625rem",
+          "--ds-text-body-lg": "1rem",
+          "--ds-text-body": "1rem",
+          "--ds-text-button": "0.9375rem",
+          "--ds-text-body-sm": "0.875rem",
+          "--ds-text-snippet": "0.8125rem",
+          "--ds-text-caption": "0.75rem",
+          "--ds-text-bar": "0.71875rem",
+          "--ds-text-micro": "0.625rem",
+          "--ds-leading-tight": "1",
+          "--ds-leading-heading": "1.02",
+          "--ds-leading-display": "1.06",
+          "--ds-leading-snug": "1.2",
+          "--ds-leading-lead": "1.55",
+          "--ds-leading-body": "1.6",
+          "--ds-leading-relaxed": "1.625",
+          "--ds-leading-code": "1.75",
+          "--ds-tracking-display": "-0.05em",
+          "--ds-tracking-hero": "-0.03em",
+          "--ds-tracking-tighter": "-0.025em",
+          "--ds-tracking-tight": "-0.02em",
+          "--ds-tracking-snug": "-0.01em",
+          "--ds-tracking-normal": "0",
+          "--ds-tracking-label": "0",
+          "--ds-tracking-caps": "0.08em",
+          "--ds-tracking-mark": "0.3em",
+          "--ds-space-0": "0",
+          "--ds-space-px": "1px",
+          "--ds-space-0-5": "0.125rem",
+          "--ds-space-1": "0.25rem",
+          "--ds-space-1-5": "0.375rem",
+          "--ds-space-2": "0.5rem",
+          "--ds-space-2-5": "0.625rem",
+          "--ds-space-3": "0.75rem",
+          "--ds-space-3-5": "0.875rem",
+          "--ds-space-4": "1rem",
+          "--ds-space-4-5": "1.125rem",
+          "--ds-space-5": "1.25rem",
+          "--ds-space-6": "1.5rem",
+          "--ds-space-7": "1.75rem",
+          "--ds-space-8": "2rem",
+          "--ds-space-9": "2.25rem",
+          "--ds-space-10": "2.5rem",
+          "--ds-space-12": "3rem",
+          "--ds-space-14": "3.5rem",
+          "--ds-space-16": "4rem",
+          "--ds-space-20": "5rem",
+          "--ds-space-24": "6rem",
+          "--ds-space-28": "7rem",
+          "--ds-space-30": "7.5rem",
+          "--ds-space-32": "8rem",
+          "--ds-layout-column": "75rem",
+          "--ds-layout-medium": "50rem",
+          "--ds-layout-gutter": "2.5rem",
+          "--ds-layout-text": "36rem",
+          "--ds-layout-heading": "42rem",
+          "--ds-layout-header": "4rem",
+          "--ds-frame-column": "min(100% - 2 * var(--ds-layout-gutter), var(--ds-layout-column) - 2 * var(--ds-layout-gutter))",
+          "--ds-radius-chip": "2px",
+          "--ds-radius-sm": "0.375rem",
+          "--ds-radius-menu": "0.3125rem",
+          "--ds-radius-control": "0.5rem",
+          "--ds-radius-card": "0.375rem",
+          "--ds-radius-panel": "0.75rem",
+          "--ds-radius-shell": "1rem",
+          "--ds-radius-pill": "9999px",
+          "--ds-shadow-key": "none",
+          "--ds-shadow-key-brand": "none",
+          "--ds-shadow-key-muted": "none",
+          "--ds-shadow-pressed": "none",
+          "--ds-shadow-well": "inset 0 1px 2px rgb(23 24 24 / 0.06)",
+          "--ds-shadow-guide": "0 1px 2px rgb(23 24 24 / 0.04), 0 12px 32px -20px rgb(23 24 24 / 0.22)",
+          "--ds-shadow-inset": "inset 0 1px 2px rgb(23 24 24 / 0.04)",
+          "--ds-shadow-card": "0 1px 2px rgb(23 24 24 / 0.04), 0 12px 32px -20px rgb(23 24 24 / 0.22)",
+          "--ds-shadow-raised": "0 1px 2px rgb(23 24 24 / 0.08), 0 12px 28px -20px rgb(23 24 24 / 0.4)",
+          "--ds-shadow-code": "0 12px 32px -20px rgb(23 24 24 / 0.45)",
+          "--ds-shadow-plan": "0 1px 2px rgb(23 24 24 / 0.04), 0 12px 32px -20px rgb(23 24 24 / 0.22)",
+          "--ds-shadow-tile": "0 1px 2px rgb(23 24 24 / 0.08)",
+          "--ds-shadow-glass": "inset 0 1px 0 rgb(255 255 255 / 0.9)",
+          "--ds-shadow-floating": "0 1px 2px rgb(23 24 24 / 0.06), 0 12px 32px -16px rgb(23 24 24 / 0.28)",
+          "--ds-shadow-lit": "0 0 0.5px rgb(23 24 24 / 0.22), 0 1px 1.5px rgb(23 24 24 / 0.14)",
+          "--ds-shadow-glass-hover": "0 0 0.5px rgb(23 24 24 / 0.22), 0 1px 1.5px rgb(23 24 24 / 0.14)",
+          "--ds-shadow-tooltip": "0 1px 2px rgb(23 24 24 / 0.1), 0 8px 24px rgb(23 24 24 / 0.12)",
+          "--ds-shadow-ring-hover": "0 0 0 3px rgb(46 58 232 / 0.14)",
+          "--ds-glass-sheen": "linear-gradient(180deg, rgb(255 255 255 / 0.6), transparent 70%)",
+          "--ds-glass-blur": "blur(16px) saturate(1.4)",
+          "--ds-band-step": "9px",
+          "--ds-band-mix-1": "24%",
+          "--ds-band-mix-2": "48%",
+          "--ds-band-mix-3": "70%",
+          "--ds-band-mix-4": "88%",
+          "--ds-duration-fast": "160ms",
+          "--ds-duration-base": "200ms",
+          "--ds-duration-moderate": "250ms",
+          "--ds-duration-slow": "300ms",
+          "--ds-easing-out": "cubic-bezier(0.22, 1, 0.36, 1)",
+          "--ds-easing-in-out": "cubic-bezier(0.77, 0, 0.175, 1)",
+          "--ds-easing-pop": "cubic-bezier(0.34, 1.56, 0.64, 1)"
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "about-page",
+      "useFor": "Use as a starting point for company pages. Replace the sample people, links and content.",
+      "constraints": [
+        "Photos in color beside gray ones",
+        "A colored window bar"
+      ],
+      "source": "Extension in the opencommerce site's voice (opencommerce-agentcard-web src/components); the structure from agentcard.sh /about",
+      "exports": [
+        "AboutPage"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/about-page",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/about-page.md",
+      "type": "block",
+      "title": "About page",
+      "description": "About page template with the header, the page's opening, team directories and the footer.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "page-header",
+        "section",
+        "site-footer",
+        "site-header",
+        "team-directory"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "accordion",
+      "useFor": "Use for FAQs or details that can stay collapsed, in a reading column (800px at most). Pull the list out by its row padding (-mx-4) so the questions line up with the heading. The WithTopics example adds topic tabs.",
+      "constraints": [
+        "Chevrons or typed plus signs",
+        "Bold questions",
+        "Borders or shadows around each question",
+        "More than one answer open by default"
+      ],
+      "source": "opencommerce-agentcard-web src/components/faq.tsx; src/app/globals.css (details[open] > .faq-answer)",
+      "exports": [
+        "Accordion",
+        "AccordionContent",
+        "AccordionItem",
+        "AccordionMark",
+        "AccordionTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/accordion",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/accordion.md",
+      "type": "ui",
+      "title": "Accordion",
+      "description": "Expandable questions or sections with keyboard navigation.",
+      "surface": "site",
+      "kinds": [
+        "faq"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-accordion"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "alert-dialog",
+      "useFor": "Use to confirm an action that is hard to undo (cancel an order, revoke an API key). Say what will happen in the description. Put the white AlertDialogCancel before the AlertDialogAction; set variant=\"destructive\" on the action for something destructive. Set name for the title bar and size=\"sm\" for a short, centered question with an AlertDialogMedia mark.",
+      "constraints": [
+        "A confirmation for an action that can be undone",
+        "A close mark (it must be answered)",
+        "Vague actions such as OK and Yes",
+        "Two destructive actions in one dialog"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar) and dialog.tsx",
+      "exports": [
+        "AlertDialog",
+        "AlertDialogAction",
+        "AlertDialogCancel",
+        "AlertDialogContent",
+        "AlertDialogDescription",
+        "AlertDialogFooter",
+        "AlertDialogHeader",
+        "AlertDialogMedia",
+        "AlertDialogOverlay",
+        "AlertDialogPortal",
+        "AlertDialogTitle",
+        "AlertDialogTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/alert-dialog",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/alert-dialog.md",
+      "type": "ui",
+      "title": "Alert Dialog",
+      "description": "A confirmation in one of the brand's windows: a title bar, a title, a line, and the white Cancel beside the blue or red action.",
+      "surface": "site",
+      "kinds": [
+        "window",
+        "window-bar"
+      ],
+      "requires": [
+        "theme",
+        "button",
+        "window",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-alert-dialog"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "alert",
+      "useFor": "Use inside a form, card or window for a note the reader should see in place: info for guidance, warning for something to check, destructive for a failure, success for a confirmation. Put a lucide glyph first, then AlertTitle and AlertDescription; add AlertAction for one small key. For a page-level notice with a title bar, use Banner.",
+      "constraints": [
+        "A glyph and title in the same color as a warning",
+        "Filled colored backgrounds",
+        "Bold titles",
+        "More than one action"
+      ],
+      "source": "Extrapolated from opencommerce (banner.tsx sheet and type, globals.css .win edge and the status badge colors)",
+      "exports": [
+        "Alert",
+        "AlertAction",
+        "AlertDescription",
+        "AlertTitle",
+        "alertVariants"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/alert",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/alert.md",
+      "type": "ui",
+      "title": "Alert",
+      "description": "An inline notice: a white or pale blue sheet on the window edge with a blue glyph, a display-face title and muted detail.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "aspect-ratio",
+      "useFor": "Use around images, video and screens that must keep their shape (a product shot, a merchant's preview). Round and clip the media inside with the window's corners and edge.",
+      "constraints": [
+        "Stretching media to fill the ratio",
+        "A ratio frame with its own border style"
+      ],
+      "source": "Extrapolated from opencommerce (the windows' framed screens)",
+      "exports": [
+        "AspectRatio"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/aspect-ratio",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/aspect-ratio.md",
+      "type": "ui",
+      "title": "Aspect Ratio",
+      "description": "Holds media at a fixed shape so the layout does not jump while it loads.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme"
+      ],
+      "packages": [
+        "@radix-ui/react-aspect-ratio"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "attachment",
+      "useFor": "Use for files sent with a message or attached to an order: receipts, invoices, exports. Set state to idle, uploading, processing, error or done; add AttachmentActions with AttachmentAction keys (remove, retry, download) and AttachmentTrigger to open the file. Line several up in AttachmentGroup.",
+      "constraints": [
+        "Thumbnails for every file type",
+        "Progress bars inside the card",
+        "Red fills for errors"
+      ],
+      "source": "Extrapolated from opencommerce (card.tsx small card, the merchant tiles, mono figures)",
+      "exports": [
+        "Attachment",
+        "AttachmentAction",
+        "AttachmentActions",
+        "AttachmentContent",
+        "AttachmentDescription",
+        "AttachmentGroup",
+        "AttachmentMedia",
+        "AttachmentTitle",
+        "AttachmentTrigger"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/attachment",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/attachment.md",
+      "type": "ui",
+      "title": "Attachment",
+      "description": "A file card: white on the 9 percent edge with 6px corners, its file in a pale blue tile, the name in 14px Inter and the size in the mono.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "button",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "avatar",
+      "useFor": "Use beside a person’s name or role. Provide alt text on AvatarImage. Use size=\"lg\" for larger profiles.",
+      "constraints": [
+        "Round avatars",
+        "Colored rings for status",
+        "Overlapping avatar stacks"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (the merchant logo tile)",
+      "exports": [
+        "Avatar",
+        "AvatarFallback",
+        "AvatarImage"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/avatar",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/avatar.md",
+      "type": "ui",
+      "title": "Avatar",
+      "description": "A square photo or store mark with 6px corners and an initials fallback.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-avatar"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "badge",
+      "useFor": "Use chip for a plan tag, a count or an endpoint (Every merchant, POST /buy). Use the status pills for an order or route (Processing, then Confirmed in brand). Use tag, tag-ink and tag-heart for added, improved and fixed updates.",
+      "constraints": [
+        "Badges as buttons",
+        "Caps",
+        "Filled color badges",
+        "More than one tone per row"
+      ],
+      "source": "opencommerce-agentcard-web src/components/pricing.tsx (the plan chip), features.tsx and globals.css (.feat-pill, .feat-pill-wait, .feat-pill-done)",
+      "exports": [
+        "Badge",
+        "badgeVariants"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/badge",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/badge.md",
+      "type": "ui",
+      "title": "Badge",
+      "description": "Mono chips for counts and tags, small pills for an order or route status.",
+      "surface": "site",
+      "kinds": [
+        "chip"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "banner",
+      "useFor": "Use info for general notices, brand for announcements and alert for problems. Set name for the title bar and provide an action when one is needed.",
+      "constraints": [
+        "More than one banner at a time",
+        "Banners for marketing copy that belongs in a section",
+        "Bold titles",
+        "Gradients"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar)",
+      "exports": [
+        "Banner"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/banner",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/banner.md",
+      "type": "ui",
+      "title": "Banner",
+      "description": "Notice with a title, message and optional actions.",
+      "surface": "site",
+      "kinds": [
+        "window-bar"
+      ],
+      "requires": [
+        "theme",
+        "window",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "breadcrumb",
+      "useFor": "Use on pages two or more levels deep (Orders, then an order, then a refund). Link every ancestor and end with BreadcrumbPage. For a long trail, fold the middle into a BreadcrumbEllipsis that opens a dropdown of the hidden steps.",
+      "constraints": [
+        "A breadcrumb on a top-level page",
+        "The current page as a link",
+        "Breadcrumbs as the only navigation"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-link)",
+      "exports": [
+        "Breadcrumb",
+        "BreadcrumbEllipsis",
+        "BreadcrumbItem",
+        "BreadcrumbLink",
+        "BreadcrumbList",
+        "BreadcrumbPage",
+        "BreadcrumbSeparator"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/breadcrumb",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/breadcrumb.md",
+      "type": "ui",
+      "title": "Breadcrumb",
+      "description": "Where a page sits: muted ancestors, the page in ink, faint chevrons between them.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "bubble",
+      "useFor": "Use for the lines of an agent conversation, inside Message. Use default for the agent's own messages (align end), secondary for the person or store it talks to, tinted for another agent, muted for a system line, destructive for a message that failed. Group consecutive bubbles in BubbleGroup.",
+      "constraints": [
+        "Gradients or shadows on bubbles",
+        "Animating bubbles in",
+        "Round pill-shaped bubbles"
+      ],
+      "source": "Extrapolated from opencommerce (the blue key, the window edge and mist, 12px window corners)",
+      "exports": [
+        "Bubble",
+        "BubbleContent",
+        "BubbleGroup",
+        "BubbleReactions",
+        "bubbleVariants"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/bubble",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/bubble.md",
+      "type": "ui",
+      "title": "Bubble",
+      "description": "A message bubble: the agent's own in the blue with white text, the other side on the mist, 12px corners with the tail squared.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "button-group",
+      "useFor": "Use to join related actions into one control (a split action, a pager, a copy key beside a field). Put Buttons, Inputs, Selects or ButtonGroupText inside; nest ButtonGroups for separated clusters; use orientation vertical for a stack.",
+      "constraints": [
+        "Gaps between joined keys",
+        "Mixing blue and white keys without a separator",
+        "More than one primary key in a group"
+      ],
+      "source": "Extrapolated from opencommerce (the keys and the header's trays)",
+      "exports": [
+        "ButtonGroup",
+        "ButtonGroupSeparator",
+        "ButtonGroupText",
+        "buttonGroupVariants"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/button-group",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/button-group.md",
+      "type": "ui",
+      "title": "Button Group",
+      "description": "Keys joined into one bar with shared edges, with mist mono text segments and fields.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "button",
+      "useFor": "Use one primary action per section. Pair it with secondary (Get started, then Read the docs); ghost in toolbars; on-brand only on a rare blue band. Wire an onClick handler, use type=\"submit\" for forms, or use asChild with a link for navigation.",
+      "constraints": [
+        "Rounded pill buttons",
+        "Bold labels",
+        "Two blue keys side by side for equal actions",
+        "A gradient or glow on a key",
+        "A drop shadow under a key",
+        "A key that sinks or lifts on press"
+      ],
+      "source": "opencommerce-agentcard-web src/app/globals.css (.btn, .btn-primary, .btn-secondary, .nav-cta)",
+      "exports": [
+        "Button",
+        "buttonVariants"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/button",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/button.md",
+      "type": "ui",
+      "title": "Button",
+      "description": "Flat keys for primary, secondary and toolbar actions.",
+      "surface": "site",
+      "kinds": [
+        "button-primary",
+        "button-secondary",
+        "button-on-brand",
+        "header-action"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "calendar",
+      "useFor": "Use inline when the dates are the content (a delivery window, an availability view); in a field use Date Picker. Choose mode single, multiple or range, disable days that cannot be picked, and set captionLayout to dropdown for dates far away.",
+      "constraints": [
+        "Animating month changes",
+        "Colors other than the blue for selection",
+        "Hiding which day is today"
+      ],
+      "source": "Extrapolated from opencommerce (the keys, the pale blue of a highlighted row and the mono table figures)",
+      "exports": [
+        "Calendar",
+        "CalendarDayButton",
+        "CalendarProps",
+        "DateRange"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/calendar",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/calendar.md",
+      "type": "ui",
+      "title": "Calendar",
+      "description": "A month grid of 36px keys: today in blue, the chosen day the blue key, a range on the pale blue.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "card",
+      "useFor": "Use default for a small group of related lines. Use raised for a card set on a picture (an order, a receipt). For code, plans and features use Window: the brand names its containers like files.",
+      "constraints": [
+        "Gray card backgrounds",
+        "Heavy or offset shadows",
+        "Cards inside cards",
+        "Rounded corners above 8px"
+      ],
+      "source": "opencommerce-agentcard-web src/app/globals.css (.feat-tile, .feat-order)",
+      "exports": [
+        "Card",
+        "CardHeader",
+        "CardFooter",
+        "CardTitle",
+        "CardAction",
+        "CardDescription",
+        "CardContent",
+        "cardVariants"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/card",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/card.md",
+      "type": "ui",
+      "title": "Card",
+      "description": "Container for related content, with default and raised variants.",
+      "surface": "site",
+      "kinds": [
+        "card",
+        "card-raised",
+        "card-title"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "carousel",
+      "useFor": "Use for a few related items people browse one at a time (merchant cards, screenshots of a checkout). Keep Previous and Next visible; use setApi to show the current slide. Set opts.loop to wrap around and orientation=\"vertical\" for a column.",
+      "constraints": [
+        "Auto-playing slides",
+        "Hiding important content in later slides",
+        "A carousel for text people must read in full"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .btn-secondary)",
+      "exports": [
+        "Carousel",
+        "CarouselContent",
+        "CarouselItem",
+        "CarouselNext",
+        "CarouselPrevious",
+        "useCarousel",
+        "CarouselApi"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/carousel",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/carousel.md",
+      "type": "ui",
+      "title": "Carousel",
+      "description": "A row of slides that snap into place, with white keys to step through them.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "chart",
+      "useFor": "Use for figures over time or by category: orders per day, uptime, spend by merchant. Wrap a LineChart, AreaChart, BarChart or PieChart in ChartContainer with a config naming each series, then add ChartTooltip with ChartTooltipContent and ChartLegend with ChartLegendContent. Format figures with valueFormatter.",
+      "constraints": [
+        "More than four series",
+        "Gradients behind text",
+        "3D or exploded charts",
+        "Charts that animate on every hover"
+      ],
+      "source": "Extrapolated from opencommerce (features.tsx uptime and speed bars, monitoring.tsx)",
+      "exports": [
+        "ChartConfig",
+        "AreaChart",
+        "BarChart",
+        "ChartContainer",
+        "ChartLegend",
+        "ChartLegendContent",
+        "ChartStyle",
+        "ChartTooltip",
+        "ChartTooltipContent",
+        "LineChart",
+        "PieChart",
+        "useChart"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/chart",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/chart.md",
+      "type": "ui",
+      "title": "Chart",
+      "description": "SVG line, area, bar and donut charts with hairline rules, mono axis labels, the blue series first and a white tooltip.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "checkbox",
+      "useFor": "Use for multiple selections or a single agreement. Pair it with Label. When passing checked, update it through onCheckedChange.",
+      "constraints": [
+        "Round checkboxes",
+        "Colors other than blue for checked",
+        "A checkbox for an action that happens at once (use a switch)"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-primary, --bevel-edge-blue)",
+      "exports": [
+        "Checkbox"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/checkbox",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/checkbox.md",
+      "type": "ui",
+      "title": "Checkbox",
+      "description": "Checkbox with checked, unchecked, indeterminate and disabled states.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-checkbox",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "code-block",
+      "useFor": "Use when you need shadcn's composable code block: a header with CodeBlockTitle and CodeBlockActions (CodeBlockCopyButton), CodeBlockContent with code as a string, and an optional CodeBlockFooter. Pass dark on CodeBlock for code that runs, lineNumbers and highlight on the content. For a single snippet, CodeWindow does the same in one part.",
+      "constraints": [
+        "A full syntax theme with many colors",
+        "Code in a proportional face",
+        "A dark bar over light code",
+        "Corners other than 12px"
+      ],
+      "source": "opencommerce-agentcard-web src/components/code-block.tsx; code-window.tsx (the same window, bar, tokenizer and colors)",
+      "exports": [
+        "CodeBlock",
+        "CodeBlockActions",
+        "CodeBlockContent",
+        "CodeBlockCopyButton",
+        "CodeBlockFooter",
+        "CodeBlockHeader",
+        "CodeBlockLine",
+        "CodeBlockTitle"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/code-block",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/code-block.md",
+      "type": "ui",
+      "title": "Code Block",
+      "description": "shadcn's code block as the brand's code window: the mist bar with the file name and Copy, the 13px mono body, light or on ink, with line numbers and banded lines.",
+      "surface": "site",
+      "kinds": [
+        "code-window",
+        "window-bar"
+      ],
+      "requires": [
+        "theme",
+        "code-window",
+        "copy-button",
+        "window",
+        "utils"
+      ],
+      "packages": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "code-window",
+      "useFor": "Use for the code a page shows: the hero's setup file, a step's code, an API request. Pass code as a string for highlighting and copying, or pass rendered children. Light by default; dark for code that runs.",
+      "constraints": [
+        "A full syntax theme with many colors",
+        "Code in a proportional face",
+        "Rounded corners other than 12px",
+        "Horizontal scrolling for long lines (they wrap and hang)"
+      ],
+      "source": "opencommerce-agentcard-web src/components/code-block.tsx, hero.tsx, in-action.tsx; src/app/globals.css (.code, .code-dark, .tok-*, .code-line)",
+      "exports": [
+        "CodeWindow",
+        "tokenize",
+        "CodeWindowProps"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/code-window",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/code-window.md",
+      "type": "ui",
+      "title": "Code window",
+      "description": "Code in a window: the file name in the bar, Copy at the right, light or on ink, with banded lines.",
+      "surface": "site",
+      "kinds": [
+        "code-window"
+      ],
+      "requires": [
+        "theme",
+        "copy-button",
+        "window",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "collapse",
+      "useFor": "Use for optional form fields, settings or details. Connect open to state and give the trigger aria-expanded and aria-controls.",
+      "constraints": [
+        "Hiding the main action",
+        "Nesting collapses",
+        "Questions and answers (use the accordion)"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (details[open] > .faq-answer)",
+      "exports": [
+        "Collapse"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/collapse",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/collapse.md",
+      "type": "ui",
+      "title": "Collapse",
+      "description": "Expandable content area that animates its height.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "collapsible",
+      "useFor": "Use to tuck away secondary detail on a page (an order's line items, advanced checkout settings). Make the CollapsibleTrigger a row with its name and a CollapsibleChevron. For a list of questions use the accordion.",
+      "constraints": [
+        "Hiding the main content of a page",
+        "A collapsible inside a collapsible",
+        "Opening on hover"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (the questions' slide) and accordion.tsx",
+      "exports": [
+        "Collapsible",
+        "CollapsibleChevron",
+        "CollapsibleContent",
+        "CollapsibleTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/collapsible",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/collapsible.md",
+      "type": "ui",
+      "title": "Collapsible",
+      "description": "A section that slides open in place under a quiet row with a turning chevron.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-collapsible"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "combobox",
+      "useFor": "Use to choose from a long list where typing is faster than scrolling (a merchant, a store's region). Pass items to Combobox and render ComboboxItem rows in ComboboxList, with a ComboboxInput search row. Set multiple and use ComboboxChips with ComboboxChipsInput for several values.",
+      "constraints": [
+        "A combobox for under seven options (use Select)",
+        "Animating the highlight",
+        "Losing the typed text when the list closes"
+      ],
+      "source": "Extrapolated from opencommerce (the select field and the command palette)",
+      "exports": [
+        "Combobox",
+        "ComboboxChip",
+        "ComboboxChips",
+        "ComboboxChipsInput",
+        "ComboboxClear",
+        "ComboboxCollection",
+        "ComboboxContent",
+        "ComboboxEmpty",
+        "ComboboxGroup",
+        "ComboboxInput",
+        "ComboboxItem",
+        "ComboboxLabel",
+        "ComboboxList",
+        "ComboboxSeparator",
+        "ComboboxTrigger",
+        "ComboboxValue",
+        "useCombobox",
+        "useComboboxAnchor"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/combobox",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/combobox.md",
+      "type": "ui",
+      "title": "Combobox",
+      "description": "The select's field opening a searchable floating panel; chips in the field for several values.",
+      "surface": "site",
+      "kinds": [
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-popover",
+        "cmdk",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "command",
+      "useFor": "Use Command for an inline list and CommandDialog for a palette. Connect each CommandItem onSelect to navigation or an action. Bind the dialog to Cmd/Ctrl K when needed.",
+      "constraints": [
+        "Animating the palette open",
+        "A drop shadow on the panel",
+        "Rows without keyboard support",
+        "Icons in every row instead of a title and a line"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar, .code)",
+      "exports": [
+        "Command",
+        "CommandDialog",
+        "CommandEmpty",
+        "CommandFooter",
+        "CommandGroup",
+        "CommandInput",
+        "CommandItem",
+        "CommandList",
+        "CommandSeparator"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/command",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/command.md",
+      "type": "ui",
+      "title": "Command",
+      "description": "Searchable command list or dialog with keyboard navigation.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "dialog",
+        "window",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-dialog",
+        "cmdk"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "context-menu",
+      "useFor": "Use for shortcuts on an item in a list or table (copy an order ID, retry a checkout). Every action in it must also be reachable another way, such as a row's menu key. Use ContextMenuShortcut for keys, ContextMenuSub for one level of submenu and variant=\"destructive\" on a destructive item.",
+      "constraints": [
+        "The only way to reach an action",
+        "More than one level of submenu",
+        "A context menu on text people want to select"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-tray) and dropdown-menu.tsx",
+      "exports": [
+        "ContextMenu",
+        "ContextMenuCheckboxItem",
+        "ContextMenuContent",
+        "ContextMenuGroup",
+        "ContextMenuItem",
+        "ContextMenuLabel",
+        "ContextMenuPortal",
+        "ContextMenuRadioGroup",
+        "ContextMenuRadioItem",
+        "ContextMenuSeparator",
+        "ContextMenuShortcut",
+        "ContextMenuSub",
+        "ContextMenuSubContent",
+        "ContextMenuSubTrigger",
+        "ContextMenuTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/context-menu",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/context-menu.md",
+      "type": "ui",
+      "title": "Context Menu",
+      "description": "The brand's menu opened with a right click or a long press on an item.",
+      "surface": "site",
+      "kinds": [
+        "menu-panel",
+        "menu-item"
+      ],
+      "requires": [
+        "theme",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-context-menu",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "copy-button",
+      "useFor": "Place beside a command, key or file and pass its value: in a window bar's corner, at the top right of a code card or in an install box. Use dark on ink. Use compact only where there is no room for the word.",
+      "constraints": [
+        "A copy button without a label for screen readers",
+        "Green or red copy states",
+        "Copying without visible feedback",
+        "A key that changes width when it says Copied"
+      ],
+      "source": "opencommerce-agentcard-web src/components/copy-button.tsx; src/app/globals.css (.copy-layer, .key-white, .key-dark)",
+      "exports": [
+        "useCopy",
+        "CopyButton"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/copy-button",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/copy-button.md",
+      "type": "ui",
+      "title": "Copy button",
+      "description": "A small Copy key that swaps to Copied in place, on white or on ink.",
+      "surface": "site",
+      "kinds": [
+        "button-secondary"
+      ],
+      "requires": [
+        "theme",
+        "tooltip",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "cta",
+      "useFor": "Use once near the end of the home page, in a wide SiteSection. Pass the primary and secondary Buttons as actions and InstallTabs as media.",
+      "constraints": [
+        "More than one per page",
+        "A blue card",
+        "Two primary keys",
+        "A gradient or glow behind the headline",
+        "Long copy"
+      ],
+      "source": "opencommerce-agentcard-web src/components/cta.tsx, src/components/install-tabs.tsx, src/app/globals.css (.cta-binary)",
+      "exports": [
+        "Cta",
+        "CtaProps"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/cta",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/cta.md",
+      "type": "site",
+      "title": "CTA",
+      "description": "The closing card: mist, a hairline and 16px corners, the headline, two keys and the install box, glyphs gathering at its edges.",
+      "surface": "site",
+      "kinds": [
+        "card",
+        "button-primary",
+        "button-secondary"
+      ],
+      "requires": [
+        "theme",
+        "glyph-field",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "data-table",
+      "useFor": "Use for records people sort, filter, select and page through (orders, merchants, API keys). Describe each column with an id, a header, an accessor for sorting and filtering, and a cell to render it; set sortable on the columns that can be sorted. Set selectable for a checkbox column and pageSizes to offer rows per page. Put bulk actions in toolbar.",
+      "constraints": [
+        "A data table for fewer than ten rows (use the table)",
+        "Animating rows when sorting or paging",
+        "Hiding the only identifying column"
+      ],
+      "source": "opencommerce-agentcard-web src/components/monitoring.tsx (the merchant table) with table.tsx and pagination.tsx",
+      "exports": [
+        "DataTable",
+        "DataTableColumnHeader",
+        "DataTablePagination",
+        "DataTableViewOptions",
+        "DataTableColumn",
+        "DataTableProps",
+        "SortState"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/data-table",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/data-table.md",
+      "type": "ui",
+      "title": "Data Table",
+      "description": "The brand's table with a search field, sortable heads, row selection, a Columns menu and page keys.",
+      "surface": "site",
+      "kinds": [
+        "table"
+      ],
+      "requires": [
+        "theme",
+        "button",
+        "checkbox",
+        "dropdown-menu",
+        "input",
+        "pagination",
+        "select",
+        "table",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "date-picker",
+      "useFor": "Use for a date in a form or filter (a key's expiry, an order's date range). Use DateRangePicker for ranges; give presets for common choices (Today, Last 7 days). Give it a name for FormData; the value posts as YYYY-MM-DD.",
+      "constraints": [
+        "A free-text date field without a picker",
+        "A picker that stays open after a single date is chosen",
+        "Presets that do not match the calendar's selection"
+      ],
+      "source": "Extrapolated from opencommerce (the select field and the floating panel)",
+      "exports": [
+        "DatePicker",
+        "DateRangePicker",
+        "formatDate",
+        "formatRange",
+        "DatePickerProps",
+        "DateRangePickerProps"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/date-picker",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/date-picker.md",
+      "type": "ui",
+      "title": "Date Picker",
+      "description": "The select's field with a calendar glyph, opening a calendar in the floating panel, with optional presets.",
+      "surface": "site",
+      "kinds": [
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "calendar",
+        "popover",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "dialog",
+      "useFor": "Use for a short form or confirmation. Provide a title and description. Set name for the title bar and size for wider content. Connect form submission and validation to the application.",
+      "constraints": [
+        "Dialogs for long reading",
+        "A dialog opened from another dialog",
+        "Sliding in from an edge (use a sheet)"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar, .win-mark)",
+      "exports": [
+        "Dialog",
+        "DialogBody",
+        "DialogClose",
+        "DialogContent",
+        "DialogDescription",
+        "DialogFooter",
+        "DialogHeader",
+        "DialogOverlay",
+        "DialogPortal",
+        "DialogTitle",
+        "DialogTrigger",
+        "WindowClose"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/dialog",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/dialog.md",
+      "type": "ui",
+      "title": "Dialog",
+      "description": "Modal dialog with a title bar, focus trap and close control.",
+      "surface": "site",
+      "kinds": [
+        "window",
+        "window-bar"
+      ],
+      "requires": [
+        "theme",
+        "window",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-dialog",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "direction",
+      "useFor": "Wrap a right-to-left region (Arabic or Hebrew content) in DirectionProvider with dir=\"rtl\", and set dir on the element too, so menus, sliders and tabs flip.",
+      "constraints": [
+        "Mirroring a layout with CSS alone",
+        "Mixing directions inside one form"
+      ],
+      "source": "Extrapolated from opencommerce (no visible part)",
+      "exports": [
+        "DirectionProvider",
+        "useDirection"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/direction",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/direction.md",
+      "type": "ui",
+      "title": "Direction",
+      "description": "Sets left-to-right or right-to-left reading for every component inside it.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme"
+      ],
+      "packages": [
+        "@radix-ui/react-direction"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "docs-link",
+      "useFor": "Use to link to a guide or reference in a new tab. Provide the destination URL and a descriptive label.",
+      "constraints": [
+        "Links styled as buttons",
+        "Arrows on links that stay on the site",
+        "Underlines in ink"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components/site-footer.tsx (links)",
+      "exports": [
+        "DocsLink"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/docs-link",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/docs-link.md",
+      "type": "ui",
+      "title": "Docs link",
+      "description": "External documentation link with an arrow.",
+      "surface": "site",
+      "kinds": [
+        "link"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "drawer",
+      "useFor": "Use on phones for a short task or a choice that belongs to the page under it (pick a shipping address, review a cart). Set direction for top, left or right; bottom is the default. Mark a scrolling list inside it with data-drawer-no-drag so scrolling does not drag the drawer.",
+      "constraints": [
+        "A drawer on desktop for a long form (use a sheet or dialog)",
+        "Content that needs the full height of the screen",
+        "A drawer opened from another drawer"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win) and sheet.tsx",
+      "exports": [
+        "Drawer",
+        "DrawerClose",
+        "DrawerContent",
+        "DrawerDescription",
+        "DrawerFooter",
+        "DrawerHeader",
+        "DrawerOverlay",
+        "DrawerPortal",
+        "DrawerTitle",
+        "DrawerTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/drawer",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/drawer.md",
+      "type": "ui",
+      "title": "Drawer",
+      "description": "A window pulled from an edge with a handle, that can be dragged away.",
+      "surface": "site",
+      "kinds": [
+        "window"
+      ],
+      "requires": [
+        "theme",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-dialog"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "dropdown-menu",
+      "useFor": "Use for actions on an item or a compact navigation menu. Set variant=\"glass\" for a menu that opens from the header's glass tray. Use onSelect for actions and DropdownMenuHoldItem for destructive actions that require a hold.",
+      "constraints": [
+        "Menus for navigation that should be visible",
+        "More than one level of submenu",
+        "A destructive row that fires on one click"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-tray, .nav-link)",
+      "exports": [
+        "DropdownMenu",
+        "DropdownMenuCheckboxItem",
+        "DropdownMenuContent",
+        "DropdownMenuGroup",
+        "DropdownMenuHoldItem",
+        "DropdownMenuItem",
+        "DropdownMenuLabel",
+        "DropdownMenuRadioGroup",
+        "DropdownMenuRadioItem",
+        "DropdownMenuSeparator",
+        "DropdownMenuShortcut",
+        "DropdownMenuSub",
+        "DropdownMenuSubContent",
+        "DropdownMenuSubTrigger",
+        "DropdownMenuTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/dropdown-menu",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/dropdown-menu.md",
+      "type": "ui",
+      "title": "Dropdown menu",
+      "description": "Action menu with white and frosted glass panels, submenus and selection controls.",
+      "surface": "site",
+      "kinds": [
+        "menu-panel",
+        "menu-item",
+        "glass-menu",
+        "glass-menu-item"
+      ],
+      "requires": [
+        "theme",
+        "use-hold",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-dropdown-menu",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "empty-state",
+      "useFor": "Explain what is missing and provide the next action. Set name for the title bar or null to hide it. Connect actions such as creating an item or clearing a search.",
+      "constraints": [
+        "Illustrations that shout",
+        "More than one action",
+        "Empty states that blame the reader"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar)",
+      "exports": [
+        "EmptyState"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/empty-state",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/empty-state.md",
+      "type": "ui",
+      "title": "Empty state",
+      "description": "Message and optional action for an empty list or search result.",
+      "surface": "site",
+      "kinds": [
+        "window",
+        "window-bar"
+      ],
+      "requires": [
+        "theme",
+        "window",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "empty",
+      "useFor": "Use when a list, search or panel has nothing to show. Put it inside a Window (or use EmptyState) when it stands for a whole list. Give it EmptyMedia with variant icon and a lucide glyph, EmptyTitle, EmptyDescription and one action in EmptyContent.",
+      "constraints": [
+        "Illustrations that shout",
+        "More than one main action",
+        "Copy that blames the reader",
+        "An empty state without a way forward"
+      ],
+      "source": "Extrapolated from opencommerce (empty-state.tsx body, the merchant tiles in features.tsx)",
+      "exports": [
+        "Empty",
+        "EmptyContent",
+        "EmptyDescription",
+        "EmptyHeader",
+        "EmptyMedia",
+        "EmptyTitle"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/empty",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/empty.md",
+      "type": "ui",
+      "title": "Empty",
+      "description": "A quiet centered message for an empty list: an optional merchant-tile mark, a display-face title, one muted line and the next action.",
+      "surface": "site",
+      "kinds": [
+        "window"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "faq",
+      "useFor": "Pass title, lead and items (question and answer). Put it in a medium SiteSection just above the footer, with bottom padding.",
+      "constraints": [
+        "Answers longer than a short paragraph",
+        "Questions in caps",
+        "A chevron in place of the drawn +",
+        "Several answers open at once",
+        "A window around the list"
+      ],
+      "source": "opencommerce-agentcard-web src/components/faq.tsx, src/app/globals.css (.faq-answer)",
+      "exports": [
+        "Faq",
+        "FaqItem"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/faq",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/faq.md",
+      "type": "site",
+      "title": "FAQ",
+      "description": "Centered questions with native expandable answers, one open at a time, on hairlines.",
+      "surface": "site",
+      "kinds": [
+        "faq"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "feature-rows",
+      "useFor": "Use FeatureGrid for the home page's four features in a medium SiteSection, FeatureRows for a product page that needs more room. Draw each picture from the page's own parts and key its motion off group-data-[state=…]/feature.",
+      "constraints": [
+        "Icons in place of pictures",
+        "Stock photos",
+        "More than one blue voice in a picture",
+        "Pictures that loop",
+        "A move that does not end on the finished frame",
+        "More than six features in the grid"
+      ],
+      "source": "opencommerce-agentcard-web src/components/features.tsx, src/components/feature-play.tsx, src/app/globals.css (THE FEATURE PICTURES)",
+      "exports": [
+        "FeatureGrid",
+        "FeatureRows",
+        "FeatureTag",
+        "Feature"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/feature-rows",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/feature-rows.md",
+      "type": "site",
+      "title": "Feature rows",
+      "description": "Features as windows two to a row (picture, title, line), or one to a row beside their window; pictures play when first seen.",
+      "surface": "site",
+      "kinds": [
+        "window",
+        "window-bar",
+        "card-title",
+        "body-text",
+        "chip"
+      ],
+      "requires": [
+        "theme",
+        "window",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "field",
+      "useFor": "Wrap Input, Textarea, TagsInput or SelectTrigger. Derive error from the current value and clear it when valid. Use required for required fields and htmlFor when the control has an explicit id.",
+      "constraints": [
+        "Labels inside the field as placeholders",
+        "Bold or caps labels",
+        "Errors shown only by color"
+      ],
+      "source": "opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter); labels are an extension",
+      "exports": [
+        "Field",
+        "useFieldControl"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/field",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/field.md",
+      "type": "ui",
+      "title": "Field",
+      "description": "Label, help text, error message and accessibility attributes for a form control.",
+      "surface": "site",
+      "kinds": [
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "label",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "form",
+      "useFor": "Use for any form with validation. Create the form with useForm, wrap it in Form, and give each control a FormField with FormItem, FormLabel, FormControl around the control, and FormDescription or FormMessage under it. Validation rules go in FormField's rules or a resolver.",
+      "constraints": [
+        "Red labels on invalid fields",
+        "Validating on every keystroke before the first submit",
+        "Hiding the error message in a tooltip"
+      ],
+      "source": "Extrapolated from opencommerce (the Field: label, control, hint)",
+      "exports": [
+        "Form",
+        "FormControl",
+        "FormDescription",
+        "FormField",
+        "FormItem",
+        "FormLabel",
+        "FormMessage",
+        "useFormField"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/form",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/form.md",
+      "type": "ui",
+      "title": "Form",
+      "description": "react-hook-form wired to the brand's field layout: a 12px muted label, the control, a hint or a red message.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "label",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "react-hook-form"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "glyph-field",
+      "useFor": "Put it behind the hero's code window (fade out, spilling past the card) or inside the closing card (fade in, gathering at the edges). Position it absolutely in a relative, isolated parent and keep it under the content.",
+      "constraints": [
+        "The field over text",
+        "More than three fields on a page",
+        "Blue as the main color of the field",
+        "A field on a dark ground"
+      ],
+      "source": "opencommerce-agentcard-web src/components/binary-stage.tsx, src/lib/noise.ts, src/app/globals.css (.hero-binary, .cta-binary)",
+      "exports": [
+        "GlyphField",
+        "GlyphFieldProps"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/glyph-field",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/glyph-field.md",
+      "type": "visual",
+      "title": "Glyph field",
+      "description": "A faint canvas field of *s and @s in clumps, with a few blue runs, that flickers while on screen.",
+      "surface": "site",
+      "kinds": [
+        "media-frame"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "hero",
+      "useFor": "Use at the top of the home page. Pass the primary and secondary Buttons as actions, LogoStrip as strip and a CodeWindow as media. Use titleClassName to adjust wrapping for a longer headline.",
+      "constraints": [
+        "A blue or tinted hero",
+        "A gradient behind the title",
+        "More than two keys",
+        "Long paragraphs in the hero",
+        "An image in place of the code",
+        "The glyph field over the title"
+      ],
+      "source": "opencommerce-agentcard-web src/components/hero.tsx, src/components/binary-stage.tsx, src/app/globals.css (.h-hero, .lead, .hero-binary)",
+      "exports": [
+        "Hero",
+        "HeroProps"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/hero",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/hero.md",
+      "type": "site",
+      "title": "Hero",
+      "description": "White, centered page opening: a pill, the title, a line, two keys, the strip of marks and a code window over a field of glyphs.",
+      "surface": "site",
+      "kinds": [
+        "hero",
+        "hero-title",
+        "hero-subtitle",
+        "button-primary",
+        "button-secondary"
+      ],
+      "requires": [
+        "theme",
+        "glyph-field",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "hold-button",
+      "useFor": "Use for destructive actions such as cancelling an order or closing a card. Connect onConfirm to the action. Releasing early, leaving the control or losing focus cancels the hold.",
+      "constraints": [
+        "Hold for actions that can be undone",
+        "Hiding how long to hold",
+        "A blue fill for a destructive action"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-secondary, :active scale)",
+      "exports": [
+        "HoldButton"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/hold-button",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/hold-button.md",
+      "type": "ui",
+      "title": "Hold button",
+      "description": "Button that confirms an action after a continuous hold.",
+      "surface": "site",
+      "kinds": [
+        "button-secondary"
+      ],
+      "requires": [
+        "theme",
+        "use-hold",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "home-page",
+      "useFor": "Use as a starting point for an opencommerce landing page. Replace the sample content and pictures, and check every link.",
+      "constraints": [
+        "A blue or dark section",
+        "Two closing cards",
+        "A window bar on the hero's pill",
+        "Sections out of this order without a reason"
+      ],
+      "source": "opencommerce-agentcard-web src/components/home-page.tsx",
+      "exports": [
+        "HomePage"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/home-page",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/home-page.md",
+      "type": "block",
+      "title": "Home page",
+      "description": "Home page template: header, hero, features, steps, live status, pricing, closing card, questions and footer.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "cta",
+        "faq",
+        "feature-rows",
+        "hero",
+        "logo-strip",
+        "pricing",
+        "section",
+        "site-footer",
+        "site-header",
+        "status-table",
+        "steps",
+        "button",
+        "code-window",
+        "install-tabs"
+      ],
+      "packages": [
+        "@agentcard/sdk"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "hover-card",
+      "useFor": "Use to preview what a link points to without leaving the page (a merchant's status, an order's items). The trigger must still work as a link on its own; the card is for sighted pointer users only, so never put the only copy of anything in it.",
+      "constraints": [
+        "Actions or forms inside the card (use a popover)",
+        "A hover card on a button",
+        "The only way to reach information"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win) and popover.tsx",
+      "exports": [
+        "HoverCard",
+        "HoverCardContent",
+        "HoverCardTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/hover-card",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/hover-card.md",
+      "type": "ui",
+      "title": "Hover Card",
+      "description": "A preview of a merchant, an order or a person that opens beside a link under the pointer.",
+      "surface": "site",
+      "kinds": [
+        "popover-panel"
+      ],
+      "requires": [
+        "theme",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-hover-card"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "input-group",
+      "useFor": "Use when something belongs inside the field: a search mark, a unit or domain (segment), a copy or clear key, a count. Put InputGroupInput or InputGroupTextarea inside InputGroup and InputGroupAddon at either end (inline-start, inline-end) or above or below a textarea (block-start, block-end).",
+      "constraints": [
+        "A second border around the inner control",
+        "A glow on focus",
+        "Addons that are not clickable but look like keys"
+      ],
+      "source": "Extrapolated from opencommerce (the input, the search field and the merchant filter in monitoring.live)",
+      "exports": [
+        "InputGroup",
+        "InputGroupAddon",
+        "InputGroupButton",
+        "InputGroupInput",
+        "InputGroupText",
+        "InputGroupTextarea"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/input-group",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/input-group.md",
+      "type": "ui",
+      "title": "Input Group",
+      "description": "The brand's field with glyphs, text, keys or a mist mono segment inside its edge.",
+      "surface": "site",
+      "kinds": [
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "button",
+        "utils"
+      ],
+      "packages": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "input-otp",
+      "useFor": "Use for a one-time code (a login code, a card verification). Set maxLength and pattern (REGEXP_ONLY_DIGITS for numbers), split long codes into groups with InputOTPSeparator, and handle onComplete. Pasting a whole code fills every slot.",
+      "constraints": [
+        "Separate inputs per character",
+        "Hiding the caret",
+        "Auto-submitting without showing the code"
+      ],
+      "source": "Extrapolated from opencommerce (the input field)",
+      "exports": [
+        "InputOTP",
+        "InputOTPGroup",
+        "InputOTPSeparator",
+        "InputOTPSlot",
+        "REGEXP_ONLY_CHARS",
+        "REGEXP_ONLY_DIGITS",
+        "REGEXP_ONLY_DIGITS_AND_CHARS"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/input-otp",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/input-otp.md",
+      "type": "ui",
+      "title": "Input OTP",
+      "description": "Joined 40px slots on the hairline, one character each in the platform mono, the active slot on the blue edge.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "input",
+      "useFor": "Use inside Field for a label and validation message. Set an appropriate input type. Use variant=\"search\" for search or filtering and connect changes to the results.",
+      "constraints": [
+        "Pill-shaped fields",
+        "Gray filled inputs",
+        "Placeholder text as the only label",
+        "A glow or ring on focus (the edge turns blue)"
+      ],
+      "source": "opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter, computed)",
+      "exports": [
+        "Input",
+        "inputVariants"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/input",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/input.md",
+      "type": "ui",
+      "title": "Input",
+      "description": "Single-line text field with standard and search variants.",
+      "surface": "site",
+      "kinds": [
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "field",
+        "utils"
+      ],
+      "packages": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "install-tabs",
+      "useFor": "Use under a closing call to action or in a getting-started section, for the one command that installs the SDK. Pass one entry per package manager.",
+      "constraints": [
+        "More than one command per tab",
+        "A light install box",
+        "Tabs that change anything but the command"
+      ],
+      "source": "opencommerce-agentcard-web src/components/install-tabs.tsx, src/components/cta.tsx",
+      "exports": [
+        "InstallTabs",
+        "Install"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/install-tabs",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/install-tabs.md",
+      "type": "ui",
+      "title": "Install tabs",
+      "description": "One install line on ink, a tab per package manager and a Copy key.",
+      "surface": "site",
+      "kinds": [
+        "code-window",
+        "tabs"
+      ],
+      "requires": [
+        "theme",
+        "copy-button",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "integrations",
+      "useFor": "Pass rows with a title, description and options. Each option supplies a label, icon and panel. Use IntegrationCode and IntegrationScreen to build the preview.",
+      "constraints": [
+        "More than six tools in one row",
+        "Autoplaying the rows",
+        "A blue stage",
+        "Light code windows on the stage"
+      ],
+      "source": "Extension in the opencommerce site's voice (its windows, keys and code; opencommerce-agentcard-web src/components/window.tsx, in-action.tsx); the layout from agentcard.sh / (.v7-intg-row)",
+      "exports": [
+        "Integrations",
+        "IntegrationCode",
+        "IntegrationScreen",
+        "IntegrationRow",
+        "IntegrationOption"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/integrations",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/integrations.md",
+      "type": "site",
+      "title": "Integrations",
+      "description": "Integration sections with selectable tools and matching previews.",
+      "surface": "site",
+      "kinds": [
+        "card",
+        "media-frame",
+        "code-window",
+        "tabs"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-tabs"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "item",
+      "useFor": "Use for lists of things a reader scans and acts on: merchants, orders, agents, files. Group rows in ItemGroup with ItemSeparator between them. Use asChild with a link to make a row navigate; mark the current row with aria-current.",
+      "constraints": [
+        "Bold titles",
+        "Two primary keys in one row",
+        "Rows with no rule or card between them in a long list"
+      ],
+      "source": "Extrapolated from opencommerce (monitoring.tsx rows, in-action.tsx step list, card.tsx)",
+      "exports": [
+        "Item",
+        "ItemActions",
+        "ItemContent",
+        "ItemDescription",
+        "ItemFooter",
+        "ItemGroup",
+        "ItemHeader",
+        "ItemMedia",
+        "ItemSeparator",
+        "ItemTitle"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/item",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/item.md",
+      "type": "ui",
+      "title": "Item",
+      "description": "A row of content: an ink title over a muted line, with a merchant-tile mark and actions; bare, outlined as a small card or on the mist.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "separator",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "kbd",
+      "useFor": "Use in control hints, menu items and command palette instructions. The bare variant is for compact search hints.",
+      "constraints": [
+        "Keys for things that are not keys",
+        "Dark keys",
+        "Keys in body copy larger than the text around them"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.code, --line-strong)",
+      "exports": [
+        "Kbd",
+        "kbdVariants"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/kbd",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/kbd.md",
+      "type": "ui",
+      "title": "Kbd",
+      "description": "Keyboard key or shortcut label.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "label",
+      "useFor": "Use the default form label above an input. Use variant=control for the larger label beside a checkbox, switch or radio. Connect htmlFor to the control id, or use Field to connect it automatically.",
+      "constraints": [
+        "Bold labels",
+        "Caps labels",
+        "Labels without a control to point at"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (table head labels)",
+      "exports": [
+        "Label"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/label",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/label.md",
+      "type": "ui",
+      "title": "Label",
+      "description": "Accessible label for a form control.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-label"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "logo-strip",
+      "useFor": "Pass the brands with an image src (drawn as a mask, so any color works), a mark node in currentColor, or just a name. Use once, in the hero.",
+      "constraints": [
+        "Logos in their own colors",
+        "Tiles or borders around the marks",
+        "A fast drift",
+        "Two strips on a page"
+      ],
+      "source": "opencommerce-agentcard-web src/components/logo-strip.tsx, src/components/merchant-logo.tsx, src/app/globals.css (THE LOGO STRIP, .logo-mask)",
+      "exports": [
+        "LogoStrip",
+        "Brand"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/logo-strip",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/logo-strip.md",
+      "type": "site",
+      "title": "Logo strip",
+      "description": "The stores or customers as bare grey marks drifting left in one row under the hero's keys.",
+      "surface": "site",
+      "kinds": [
+        "logo-strip"
+      ],
+      "requires": [
+        "theme",
+        "marquee",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "logo",
+      "useFor": "Use Lockup in headers and footers (compact once the header scrolls), and LogoMark in tight spots: an app icon, an avatar, a favicon-sized slot. Set label={null} when the containing link already has an accessible name.",
+      "constraints": [
+        "The name set in another face or weight",
+        "The name capitalized",
+        "The byline larger than the name",
+        "The mark stretched or outlined",
+        "A drop shadow or glow behind the logo"
+      ],
+      "source": "opencommerce-agentcard-web src/components/logo.tsx, src/app/icon2.svg; brand/logo (lockup.svg, mark.svg)",
+      "exports": [
+        "Lockup",
+        "LogoMark",
+        "LogoProps",
+        "LockupProps"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/logo",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/logo.md",
+      "type": "ui",
+      "title": "Logo",
+      "description": "The typeset opencommerce lockup with its byline, and the [*] mark.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "marker",
+      "useFor": "Use to mark time or state in a conversation or a log: separator for a day (Today), unread for where new messages start, border for a heading over a group. Put a lucide glyph in MarkerIcon and the words in MarkerContent.",
+      "constraints": [
+        "Caps or bold labels",
+        "Colors other than muted ink and the blue",
+        "Markers between every message"
+      ],
+      "source": "Extrapolated from opencommerce (window bar and chart labels in the platform mono)",
+      "exports": [
+        "Marker",
+        "MarkerContent",
+        "MarkerIcon",
+        "markerVariants"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/marker",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/marker.md",
+      "type": "ui",
+      "title": "Marker",
+      "description": "A small mono label in a conversation or list: plain, centered between rules, ruled underneath, or the blue unread rule.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "marquee",
+      "useFor": "Use under the hero's actions for the stores, customers or partners a product reaches; LogoStrip wraps it for marks. Use at most one per page.",
+      "constraints": [
+        "Logos in color on the strip",
+        "A fast loop (under 60s a lap)",
+        "Two running strips on one page",
+        "Text a reader must read to act"
+      ],
+      "source": "opencommerce-agentcard-web src/components/logo-strip.tsx, src/app/globals.css (THE LOGO STRIP)",
+      "exports": [
+        "Marquee",
+        "MarqueeProps"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/marquee",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/marquee.md",
+      "type": "visual",
+      "title": "Marquee",
+      "description": "A slow strip of grey marks or names drifting left, fading at both ends, paused under the pointer.",
+      "surface": "site",
+      "kinds": [
+        "logo-strip"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "menubar",
+      "useFor": "Use in a tool where people work for a long time and expect desktop menus (an order console). Keep to a few menus with short names. Arrow keys move between menus and through their items.",
+      "constraints": [
+        "A menubar as site navigation (use navigation menu)",
+        "More than five menus",
+        "Menus with a single item"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-secondary, .nav-tray) and dropdown-menu.tsx",
+      "exports": [
+        "Menubar",
+        "MenubarCheckboxItem",
+        "MenubarContent",
+        "MenubarGroup",
+        "MenubarItem",
+        "MenubarLabel",
+        "MenubarMenu",
+        "MenubarPortal",
+        "MenubarRadioGroup",
+        "MenubarRadioItem",
+        "MenubarSeparator",
+        "MenubarShortcut",
+        "MenubarSub",
+        "MenubarSubContent",
+        "MenubarSubTrigger",
+        "MenubarTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/menubar",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/menubar.md",
+      "type": "ui",
+      "title": "Menubar",
+      "description": "A white bar of menus (Orders, View, Help) like a desktop app's, each opening the brand's menu.",
+      "surface": "site",
+      "kinds": [
+        "menu-panel",
+        "menu-item"
+      ],
+      "requires": [
+        "theme",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-menubar",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "message-scroller",
+      "useFor": "Use to hold a conversation that grows: MessageScroller with MessageScrollerViewport, MessageScrollerContent and one MessageScrollerItem per message, plus MessageScrollerButton. Set scrollAnchor on the message just sent. Wrap the composer in MessageScrollerProvider when its send key needs useMessageScroller.",
+      "constraints": [
+        "Scrolling the page instead of the conversation",
+        "Sliding the jump key in",
+        "Auto-scrolling while the reader is reading older messages"
+      ],
+      "source": "Extrapolated from opencommerce (the secondary key and floating drop)",
+      "exports": [
+        "MessageScroller",
+        "MessageScrollerButton",
+        "MessageScrollerContent",
+        "MessageScrollerItem",
+        "MessageScrollerProvider",
+        "MessageScrollerViewport",
+        "useMessageScroller",
+        "useMessageScrollerScrollable",
+        "useMessageScrollerVisibility"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/message-scroller",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/message-scroller.md",
+      "type": "ui",
+      "title": "Message Scroller",
+      "description": "A conversation's scroll area that stays on the newest message and offers the white Jump to latest key when the reader scrolls up.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "button",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "message",
+      "useFor": "Use for each turn of an agent conversation: MessageAvatar, then MessageContent holding MessageHeader (the name, then a time element), the Bubble parts and an optional MessageFooter (Delivered). Set align end for the agent's own messages. Stack turns in MessageGroup or MessageScroller.",
+      "constraints": [
+        "Round avatars",
+        "Bold sender names",
+        "Timestamps in Inter"
+      ],
+      "source": "Extrapolated from opencommerce (avatar.tsx, mono figures)",
+      "exports": [
+        "Message",
+        "MessageAvatar",
+        "MessageContent",
+        "MessageFooter",
+        "MessageGroup",
+        "MessageHeader"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/message",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/message.md",
+      "type": "ui",
+      "title": "Message",
+      "description": "One message: a 32px square avatar, the sender with the time in mono, the bubbles and a mono footer, mirrored for the agent's own.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "native-select",
+      "useFor": "Use where the platform picker serves better than a custom list: long lists on phones, forms that must work without script. Pair it with a Field or Label and give it a name. Use Select for a styled list.",
+      "constraints": [
+        "A custom arrow on top of the browser's own",
+        "Empty-string values for real options",
+        "A pill-shaped field"
+      ],
+      "source": "Extrapolated from opencommerce (the input and select field)",
+      "exports": [
+        "NativeSelect",
+        "NativeSelectOptGroup",
+        "NativeSelectOption"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/native-select",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/native-select.md",
+      "type": "ui",
+      "title": "Native Select",
+      "description": "The browser's own select in the brand's field: 36px, 8px corners, the hairline and the drawn chevron.",
+      "surface": "site",
+      "kinds": [
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "nav-dock",
+      "useFor": "SiteHeader renders it from its links; use it alone only for a custom header. Link on-page sections by #id so the pill follows the reader, or set spy={false} and mark the current page.",
+      "constraints": [
+        "More than six links",
+        "Icons instead of labels",
+        "A colored tray",
+        "A dark glass tray on the white page",
+        "Moving the pill with a spring"
+      ],
+      "source": "opencommerce-agentcard-web src/components/nav-pills.tsx, src/app/globals.css (.nav-tray, .nav-link, .nav-lit)",
+      "exports": [
+        "NavDock",
+        "TRAY",
+        "DockLink",
+        "NavDockProps"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/nav-dock",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/nav-dock.md",
+      "type": "site",
+      "title": "Nav dock",
+      "description": "The header's tray of links in frosted glass, with a lit pill that slides to the current section.",
+      "surface": "site",
+      "kinds": [
+        "nav-dock",
+        "nav-link"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "navigation-menu",
+      "useFor": "Use for a site's main navigation when some entries open a panel of related links (Product, Developers). Give each link in a panel a title and a NavigationMenuLinkDescription. Set tray for the header's glass tray, and active on the current page's link.",
+      "constraints": [
+        "Actions in the menu (use a dropdown menu)",
+        "Panels with more than eight links",
+        "Nesting panels"
+      ],
+      "source": "opencommerce-agentcard-web src/app/globals.css (.nav-tray, .nav-link)",
+      "exports": [
+        "NavigationMenu",
+        "NavigationMenuContent",
+        "NavigationMenuIndicator",
+        "NavigationMenuItem",
+        "NavigationMenuLink",
+        "NavigationMenuLinkDescription",
+        "NavigationMenuList",
+        "NavigationMenuTrigger",
+        "NavigationMenuViewport",
+        "navigationMenuTriggerStyle"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/navigation-menu",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/navigation-menu.md",
+      "type": "ui",
+      "title": "Navigation Menu",
+      "description": "Site links with panels, drawn as the header's links, optionally in its frosted tray.",
+      "surface": "site",
+      "kinds": [
+        "nav-link"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-navigation-menu",
+        "class-variance-authority",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "outline-wordmark",
+      "useFor": "Use once, along the bottom edge of the site footer, with the product's name in its own case.",
+      "constraints": [
+        "A filled wordmark",
+        "The wordmark anywhere but the footer",
+        "A tagline in place of the name",
+        "A colored outline at rest"
+      ],
+      "source": "opencommerce-agentcard-web src/components/footer-wordmark.tsx, src/app/globals.css (THE FOOTER WORDMARK)",
+      "exports": [
+        "OutlineWordmark"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/outline-wordmark",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/outline-wordmark.md",
+      "type": "visual",
+      "title": "Outline wordmark",
+      "description": "The name set as wide as the page in a faint outline, lit in blue under the pointer.",
+      "surface": "site",
+      "kinds": [
+        "footer"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "page-header",
+      "useFor": "Place below SiteHeader on company, form, legal or update pages. Put supporting title content in children.",
+      "constraints": [
+        "A tinted ground behind it",
+        "Centered",
+        "A second title under it",
+        "More than one per page"
+      ],
+      "source": "Extension in the opencommerce site's voice (.h-hero type, mono labels and hairlines; opencommerce-agentcard-web src/app/globals.css)",
+      "exports": [
+        "PageHeader"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/page-header",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/page-header.md",
+      "type": "site",
+      "title": "Page header",
+      "description": "Title, optional label and introduction for an inner page.",
+      "surface": "site",
+      "kinds": [
+        "eyebrow"
+      ],
+      "requires": [
+        "theme",
+        "section",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "pagination",
+      "useFor": "Use under a table or list that is split into pages. Show the first and last pages, the current one and its neighbors, with PaginationEllipsis between. Mark the current page with isActive and an unavailable Previous or Next with aria-disabled.",
+      "constraints": [
+        "Pagination for fewer than two pages",
+        "Numbered pages for a live feed (load more instead)",
+        "Blue page keys"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-secondary) and monitoring.tsx",
+      "exports": [
+        "Pagination",
+        "PaginationContent",
+        "PaginationEllipsis",
+        "PaginationItem",
+        "PaginationLink",
+        "PaginationNext",
+        "PaginationPrevious"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/pagination",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/pagination.md",
+      "type": "ui",
+      "title": "Pagination",
+      "description": "Page keys under a table: the current page a white key, the others bare, Previous and Next with chevrons.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "popover",
+      "useFor": "Use for explanations, filters or small controls. Use variant=\"glass\" over imagery or the header. Keep longer tasks in Dialog or Sheet.",
+      "constraints": [
+        "Forms longer than a few fields (use a dialog)",
+        "Popovers that open on hover (use a tooltip)",
+        "Gray panels"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-tray, .win)",
+      "exports": [
+        "Popover",
+        "PopoverAnchor",
+        "PopoverContent",
+        "PopoverTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/popover",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/popover.md",
+      "type": "ui",
+      "title": "Popover",
+      "description": "Anchored panel for contextual details or controls.",
+      "surface": "site",
+      "kinds": [
+        "popover-panel"
+      ],
+      "requires": [
+        "theme",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-popover"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "pricing-page",
+      "useFor": "Use as a starting point for a pricing page. Set the current plans, values and action URLs.",
+      "constraints": [
+        "More than one featured plan",
+        "Prices in bold"
+      ],
+      "source": "opencommerce-agentcard-web src/components/pricing.tsx, faq.tsx (as a page of its own)",
+      "exports": [
+        "PricingPage"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/pricing-page",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/pricing-page.md",
+      "type": "block",
+      "title": "Pricing page",
+      "description": "Pricing page template with the plans, billing questions and the footer.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "faq",
+        "pricing",
+        "section",
+        "site-footer",
+        "site-header"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "pricing",
+      "useFor": "Pass title, description, the compared rows and two plans with one value per row. Feature at most one plan.",
+      "constraints": [
+        "More than one featured plan",
+        "More than three plans",
+        "Strikethrough prices without a reason",
+        "Check lists in place of compared rows",
+        "A blue window"
+      ],
+      "source": "opencommerce-agentcard-web src/components/pricing.tsx, src/lib/content.ts (PRICING)",
+      "exports": [
+        "Pricing",
+        "Plan",
+        "PlanAction"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/pricing",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/pricing.md",
+      "type": "site",
+      "title": "Pricing",
+      "description": "Plans side by side in windows, with the figure, compared rows and a full-width key; one plan featured.",
+      "surface": "site",
+      "kinds": [
+        "window",
+        "window-bar",
+        "stat",
+        "chip",
+        "button-primary",
+        "button-secondary"
+      ],
+      "requires": [
+        "theme",
+        "section",
+        "button",
+        "window",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "product-grid",
+      "useFor": "Pass products with title, description, action and media. Use layout=\"lead\" for a full-width card and layout=\"half\" for paired cards.",
+      "constraints": [
+        "An odd number of half cards",
+        "A card without media",
+        "Two keys in one card",
+        "A blue stage"
+      ],
+      "source": "Extension in the opencommerce site's voice (its windows, mist insets and keys; opencommerce-agentcard-web src/app/globals.css .win); the layout from agentcard.sh / (.v7-sol)",
+      "exports": [
+        "ProductGrid",
+        "ProductItem",
+        "ProductAction"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/product-grid",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/product-grid.md",
+      "type": "site",
+      "title": "Product grid",
+      "description": "Product overview cards with text, actions and media.",
+      "surface": "site",
+      "kinds": [
+        "card",
+        "media-frame",
+        "button-primary"
+      ],
+      "requires": [
+        "theme",
+        "button",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "progress",
+      "useFor": "Use for spending limits, uploads or setup progress. Update value as progress changes and set max when the scale is not 100. Give the bar an accessible label.",
+      "constraints": [
+        "Gradients in the fill",
+        "Pill-shaped or thick tracks",
+        "Progress without a label saying what it measures"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components/features.tsx (the speed race bars)",
+      "exports": [
+        "Progress"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/progress",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/progress.md",
+      "type": "ui",
+      "title": "Progress",
+      "description": "Progress bar with a value, maximum and accessible progress state.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-progress"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "prose",
+      "useFor": "Use for documentation, guides, legal content and release notes. Pass semantic HTML or rendered Markdown. Use wide for a wider content column.",
+      "constraints": [
+        "Bold headings or table headers",
+        "Body text wider than 576px",
+        "Links without the underline",
+        "Centered long text"
+      ],
+      "source": "Extension in the opencommerce site's voice (its type, hairlines, code and mono labels; opencommerce-agentcard-web src/app/globals.css); the structure from agentcard.sh/terms",
+      "exports": [
+        "Prose",
+        "ProseProps"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/prose",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/prose.md",
+      "type": "site",
+      "title": "Prose",
+      "description": "Typography and layout for long-form content.",
+      "surface": "site",
+      "kinds": [
+        "page",
+        "column",
+        "eyebrow",
+        "hero-title",
+        "body-text",
+        "link",
+        "table",
+        "code-window"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "questionnaire",
+      "useFor": "Use for a short set of questions with set answers (onboarding an agent, a checkout preference survey). Pass items with name, required and multiple; for each, a QuestionnaireItem with a title, choices (QuestionnaireChoice), an optional QuestionnaireInput and QuestionnaireError; finish with QuestionnaireActions (Previous, Skip, Next, Submit). Read the answers from FormData on submit.",
+      "constraints": [
+        "More than one question on screen",
+        "Animating between questions",
+        "Hiding the progress"
+      ],
+      "source": "Extrapolated from opencommerce (in-action.tsx step list, checkbox.tsx, the keys)",
+      "exports": [
+        "Questionnaire",
+        "QuestionnaireActions",
+        "QuestionnaireChoice",
+        "QuestionnaireChoiceDescription",
+        "QuestionnaireChoices",
+        "QuestionnaireDescription",
+        "QuestionnaireError",
+        "QuestionnaireInput",
+        "QuestionnaireItem",
+        "QuestionnaireNext",
+        "QuestionnairePrevious",
+        "QuestionnaireProgress",
+        "QuestionnaireSkip",
+        "QuestionnaireSubmit",
+        "QuestionnaireTitle"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/questionnaire",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/questionnaire.md",
+      "type": "ui",
+      "title": "Questionnaire",
+      "description": "Questions asked one at a time: choice keys on the hairline that take the pale blue when chosen, a mono progress count and the blue Next key.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "button",
+        "input",
+        "kbd",
+        "progress",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "radio-group",
+      "useFor": "Use for one choice among two to five options that should stay visible (a checkout mode, a shipping speed). Label every option with a Label (variant control) beside its circle, and give the group a name for FormData. For more options use Select; for a compact row of choices use Toggle Group.",
+      "constraints": [
+        "A radio for a yes or no setting (use Switch)",
+        "Options without a visible label",
+        "A filled blue circle with no white ring"
+      ],
+      "source": "Extrapolated from opencommerce (the checkbox and the blue key)",
+      "exports": [
+        "RadioGroup",
+        "RadioGroupItem"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/radio-group",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/radio-group.md",
+      "type": "ui",
+      "title": "Radio Group",
+      "description": "18px white circles on the hairline; the chosen one takes the blue edge and a blue dot.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "field",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-radio-group"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "resizable",
+      "useFor": "Use for a split view people adjust (a request and its response, an order list and its detail). Give each ResizablePanel a defaultSize and limits in percent; add withHandle to the ResizableHandle when the rule alone is too easy to miss.",
+      "constraints": [
+        "Resizable panels on phones",
+        "Panels that can shrink to nothing without a way back",
+        "More than three panels in a row"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, the 9 percent ink rules)",
+      "exports": [
+        "ResizableHandle",
+        "ResizablePanel",
+        "ResizablePanelGroup"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/resizable",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/resizable.md",
+      "type": "ui",
+      "title": "Resizable",
+      "description": "Panels split by a 9 percent ink rule that can be dragged or moved with the arrow keys.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "scroll-area",
+      "useFor": "Use for a list or log inside a fixed-height window or panel.",
+      "constraints": [
+        "Scroll areas inside scroll areas",
+        "Hiding the main content in one",
+        "Scrolling the whole page in one"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.key-white)",
+      "exports": [
+        "ScrollArea"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/scroll-area",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/scroll-area.md",
+      "type": "ui",
+      "title": "Scroll area",
+      "description": "Scrollable container with overflow indicators and a scroll control.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "secret-field",
+      "useFor": "Use for API keys or card details. Provide a descriptive label. Use defaultRevealed only when the value should initially be visible.",
+      "constraints": [
+        "Showing a secret in full by default",
+        "Editable secrets (use an input)",
+        "Secrets without a copy key"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter), copy-button.tsx",
+      "exports": [
+        "maskSecret",
+        "SecretText",
+        "SecretField"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/secret-field",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/secret-field.md",
+      "type": "ui",
+      "title": "Secret field",
+      "description": "Masked value with reveal and copy controls.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "copy-button",
+        "tooltip",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "section",
+      "useFor": "Use SiteSection for each band of the page and SectionHeading to open it. Pick width medium (800px) for features, pricing and questions, wide (1200px) for a table, the steps or the closing card. Add bottom padding only to the section that closes the page.",
+      "constraints": [
+        "A blue section",
+        "Rules between sections",
+        "Left-aligned section titles over centered content",
+        "Bold titles",
+        "Eyebrows in caps",
+        "Two tinted sections in a row"
+      ],
+      "source": "opencommerce-agentcard-web src/components/band.tsx, src/components/section-head.tsx, src/app/globals.css (.sec, .h-section, .lead)",
+      "exports": [
+        "SiteSection",
+        "SectionHeading",
+        "Eyebrow",
+        "SectionGround"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/section",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/section.md",
+      "type": "site",
+      "title": "Section",
+      "description": "Page section with generous air above, the centered section heading and an optional label.",
+      "surface": "site",
+      "kinds": [
+        "section",
+        "column",
+        "section-heading",
+        "section-description",
+        "eyebrow"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "segmented-control",
+      "useFor": "Use for a small set of options such as a billing period or a package manager. Connect value and onValueChange. Use size=\"sm\" in compact layouts and variant=\"plain\" in toolbars.",
+      "constraints": [
+        "Switching between pages or panels (use tabs)",
+        "More than four options",
+        "Pill-shaped tracks"
+      ],
+      "source": "opencommerce-agentcard-web src/components/nav-pills.tsx; src/app/globals.css (.nav-tray, .nav-link, .nav-lit)",
+      "exports": [
+        "SegmentedControl"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/segmented-control",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/segmented-control.md",
+      "type": "ui",
+      "title": "Segmented control",
+      "description": "Single-value selector with radio semantics and arrow-key navigation.",
+      "surface": "site",
+      "kinds": [
+        "tabs"
+      ],
+      "requires": [
+        "theme",
+        "use-tab-glide",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "select",
+      "useFor": "Use the field appearance inside Field for forms. Use compact in dense rows and ghost or chip for filters. Field required is inherited by Select. Give Select a name for FormData; keep value and onValueChange on the root. Use compact on SelectContent for compact fields and toolbar menus.",
+      "constraints": [
+        "Pill-shaped triggers",
+        "Empty string item values",
+        "Long lists without a search (use a command)"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter)",
+      "exports": [
+        "Select",
+        "SelectContent",
+        "SelectGroup",
+        "SelectItem",
+        "SelectLabel",
+        "SelectSeparator",
+        "SelectTrigger",
+        "SelectValue"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/select",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/select.md",
+      "type": "ui",
+      "title": "Select",
+      "description": "Single-choice select with field, compact, ghost and chip treatments.",
+      "surface": "site",
+      "kinds": [
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "surface",
+        "field",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-select",
+        "lucide-react",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "separator",
+      "useFor": "Use between related content groups or inline controls.",
+      "constraints": [
+        "Thick or colored rules",
+        "Rules between every row of a card",
+        "Dotted or dashed rules"
+      ],
+      "source": "opencommerce-agentcard-web src/app/globals.css (--line)",
+      "exports": [
+        "Separator"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/separator",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/separator.md",
+      "type": "ui",
+      "title": "Separator",
+      "description": "Horizontal or vertical divider.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-separator"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "sheet",
+      "useFor": "Use for item details, activity logs or longer forms. Choose right, left or bottom with side. Set modal={false} when the rest of the page must remain interactive.",
+      "constraints": [
+        "Sheets for a quick confirmation (use a dialog)",
+        "Full-screen sheets on desktop",
+        "Two sheets at once"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar)",
+      "exports": [
+        "Sheet",
+        "SheetBody",
+        "SheetClose",
+        "SheetContent",
+        "SheetDescription",
+        "SheetHeader",
+        "SheetTitle",
+        "SheetTrigger"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/sheet",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/sheet.md",
+      "type": "ui",
+      "title": "Sheet",
+      "description": "Side panel with a title, close control and focus management.",
+      "surface": "site",
+      "kinds": [
+        "window",
+        "window-bar"
+      ],
+      "requires": [
+        "theme",
+        "window",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-dialog",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "sidebar",
+      "useFor": "Use for an app's main navigation (an order console, a developer dashboard). Wrap the page in SidebarProvider with the Sidebar and a SidebarInset beside it; put the wordmark or a switcher in SidebarHeader, groups of SidebarMenu rows in SidebarContent and the account in SidebarFooter. Mark the current row with isActive. Set collapsible=\"icon\" to let it narrow to glyphs (give rows a tooltip), floating or inset for the window looks. On phones it opens in the sheet; Cmd or Ctrl and B toggles it.",
+      "constraints": [
+        "More than seven top-level rows",
+        "Nested rows two levels deep",
+        "A sidebar on a marketing page",
+        "Icons without labels when expanded"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-link, .win)",
+      "exports": [
+        "Sidebar",
+        "SidebarContent",
+        "SidebarFooter",
+        "SidebarGroup",
+        "SidebarGroupAction",
+        "SidebarGroupContent",
+        "SidebarGroupLabel",
+        "SidebarHeader",
+        "SidebarInput",
+        "SidebarInset",
+        "SidebarMenu",
+        "SidebarMenuAction",
+        "SidebarMenuBadge",
+        "SidebarMenuButton",
+        "SidebarMenuItem",
+        "SidebarMenuSkeleton",
+        "SidebarMenuSub",
+        "SidebarMenuSubButton",
+        "SidebarMenuSubItem",
+        "SidebarProvider",
+        "SidebarRail",
+        "SidebarSeparator",
+        "SidebarTrigger",
+        "useSidebar"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/sidebar",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/sidebar.md",
+      "type": "ui",
+      "title": "Sidebar",
+      "description": "An app's rail: a white column with a rule at its edge, quiet rows, mono group labels and the pale blue current row.",
+      "surface": "site",
+      "kinds": [
+        "nav-link"
+      ],
+      "requires": [
+        "theme",
+        "button",
+        "input",
+        "separator",
+        "sheet",
+        "skeleton",
+        "tooltip",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slot",
+        "class-variance-authority",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "site-footer",
+      "useFor": "Use once at the foot of every page. Provide link groups (three reads best), the description and the small print; check that every link resolves.",
+      "constraints": [
+        "A blue or dark footer",
+        "Icons beside every link",
+        "More than four columns",
+        "Bold headings",
+        "A filled wordmark"
+      ],
+      "source": "opencommerce-agentcard-web src/components/site-footer.tsx, src/components/footer-wordmark.tsx",
+      "exports": [
+        "SiteFooter",
+        "FooterGroup",
+        "FooterLink",
+        "SiteFooterProps"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/site-footer",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/site-footer.md",
+      "type": "site",
+      "title": "Site footer",
+      "description": "White footer under a hairline: the name and a line, three link columns, the small print and the outlined wordmark.",
+      "surface": "site",
+      "kinds": [
+        "footer",
+        "link"
+      ],
+      "requires": [
+        "theme",
+        "outline-wordmark",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "site-header",
+      "useFor": "Use once at the top of every page with the page's sections as links (#features) and the main action. Set fixed={false} inside a frame or preview.",
+      "constraints": [
+        "A filled header bar",
+        "More than one key",
+        "A white key in the header",
+        "A sticky header (fixed with a spacer instead)",
+        "Many links in the header"
+      ],
+      "source": "opencommerce-agentcard-web src/components/site-header.tsx, src/components/logo.tsx, src/components/mobile-nav.tsx, src/app/globals.css (.nav-tray, .nav-cta, .mobile-sheet)",
+      "exports": [
+        "SiteHeader",
+        "HeaderLink"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/site-header",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/site-header.md",
+      "type": "site",
+      "title": "Site header",
+      "description": "Fixed header of three glass trays: the wordmark, the links with their pill, and one blue key.",
+      "surface": "site",
+      "kinds": [
+        "header",
+        "header-action",
+        "nav-link",
+        "nav-dock"
+      ],
+      "requires": [
+        "theme",
+        "nav-dock",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "skeleton",
+      "useFor": "Match the expected content dimensions and replace it when loading completes.",
+      "constraints": [
+        "Skeletons for content that loads at once",
+        "Gray blocks that do not match the final layout",
+        "Colored sheens"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (--mist)",
+      "exports": [
+        "Skeleton"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/skeleton",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/skeleton.md",
+      "type": "ui",
+      "title": "Skeleton",
+      "description": "Placeholder that reserves space while content loads.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "slider",
+      "useFor": "Use to set a number in a known range where the rough value matters more than the exact one (a per-order budget, a retry count). Show the current value beside it in the platform mono. Pass two values for a range, and set step for whole units.",
+      "constraints": [
+        "A slider for an exact amount the user must type",
+        "A round blue knob",
+        "Animating the key between values"
+      ],
+      "source": "Extrapolated from opencommerce (the switch key and the speed bars in speed.feature)",
+      "exports": [
+        "Slider"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/slider",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/slider.md",
+      "type": "ui",
+      "title": "Slider",
+      "description": "A 4px rule filled with the blue up to the value, with a small white key you drag or step with the arrow keys.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-slider"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "sonner",
+      "useFor": "Mount one Toaster near the application root. Show a toast after an action succeeds or fails. Connect any toast action to its intended behavior.",
+      "constraints": [
+        "Toasts for errors that need an answer (use a dialog or a banner)",
+        "More than one action",
+        "Dark toasts",
+        "Long sentences in a toast"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.feat-order, .feat-node)",
+      "exports": [
+        "Toaster"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/sonner",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/sonner.md",
+      "type": "ui",
+      "title": "Toast",
+      "description": "Toast notifications with optional actions.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "sonner"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "spinner",
+      "useFor": "Use during a pending operation. Pair it with a label, prevent duplicate submissions when needed and restore the control when the operation finishes.",
+      "constraints": [
+        "Spinners for whole pages (use skeletons)",
+        "Colored spinners that ignore their text"
+      ],
+      "source": "Extension using the site text colors and reduced-motion behavior; no standalone spinner found on the current public site",
+      "exports": [
+        "Spinner"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/spinner",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/spinner.md",
+      "type": "ui",
+      "title": "Spinner",
+      "description": "Loading indicator that inherits the surrounding text color.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "status-table",
+      "useFor": "Use for live health of the things a product depends on (stores, routes, providers), in a wide SiteSection. Pass the columns, one value per column per row, and the day history.",
+      "constraints": [
+        "Red and green bars (the brand's blue only)",
+        "More than six columns",
+        "Live data faked as live",
+        "A dark table"
+      ],
+      "source": "opencommerce-agentcard-web src/components/monitoring.tsx",
+      "exports": [
+        "StatusTable",
+        "DayStatus",
+        "StatusColumn",
+        "StatusRow"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/status-table",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/status-table.md",
+      "type": "site",
+      "title": "Status table",
+      "description": "A live table in a window: a live dot and filter, rows with marks, mono figures and day bars, a legend.",
+      "surface": "site",
+      "kinds": [
+        "table",
+        "window",
+        "window-bar",
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "window",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "steps",
+      "useFor": "Use once on the home page, in a wide SiteSection, for three to six steps from first call to result. Each step carries the code that does it.",
+      "constraints": [
+        "More than six steps",
+        "Steps without code",
+        "A timer faster than 4 seconds a step",
+        "Auto-advancing under reduced motion",
+        "Light code windows here"
+      ],
+      "source": "opencommerce-agentcard-web src/components/in-action.tsx, src/app/globals.css (.swap-in, step-timer)",
+      "exports": [
+        "Steps",
+        "Step"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/steps",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/steps.md",
+      "type": "site",
+      "title": "Steps",
+      "description": "How it works: steps listed down the left, each with its code in a dark window, playing through on a timer.",
+      "surface": "site",
+      "kinds": [
+        "tabs",
+        "code-window",
+        "window-bar"
+      ],
+      "requires": [
+        "theme",
+        "code-window",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "surface",
+      "useFor": "Wrap an area with the white or mist ground (the closing card, an inset) so content and overlays use matching colors.",
+      "constraints": [
+        "A blue ground for a section (the page is white throughout)",
+        "Mist behind long text"
+      ],
+      "source": "opencommerce-agentcard-web src/app/globals.css (--ground, --mist); src/components/cta.tsx (the mist card)",
+      "exports": [
+        "Surface",
+        "usePortalContainer"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/r/surface.md",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/surface.md",
+      "type": "lib",
+      "title": "Surface",
+      "description": "Background and text context shared by a section and its overlays.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "switch",
+      "useFor": "Pair with Label. Connect checked and onCheckedChange when the application owns the setting.",
+      "constraints": [
+        "Pill-shaped switches",
+        "Colors other than blue for on",
+        "A switch inside a form that needs a submit (use a checkbox)"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-primary, .feat-tile)",
+      "exports": [
+        "Switch"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/switch",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/switch.md",
+      "type": "ui",
+      "title": "Switch",
+      "description": "Toggle for a setting that takes effect immediately.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-switch"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "table",
+      "useFor": "Use for live records (merchants, routes, orders) or a plan comparison. Set figures in the mono (font-mono text-snippet). Give each TableCell after the first a label for the mobile layout. Use Badge for statuses.",
+      "constraints": [
+        "Zebra stripes",
+        "Bold or caps headers",
+        "Rules between columns",
+        "Tables nested in a card (the table is its own frame; inside a Window drop its frame with your own classes)"
+      ],
+      "source": "opencommerce-agentcard-web src/components/monitoring.tsx (the merchant table)",
+      "exports": [
+        "Table",
+        "TableBody",
+        "TableCaption",
+        "TableCell",
+        "TableFooter",
+        "TableHead",
+        "TableHeader",
+        "TableRow"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/table",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/table.md",
+      "type": "ui",
+      "title": "Table",
+      "description": "Responsive table that stacks row content on phones.",
+      "surface": "site",
+      "kinds": [
+        "table"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "tabs",
+      "useFor": "Use for related views such as plans, FAQ topics or item details. Give each TabsTrigger a matching TabsContent. Use glide={false} when supplying a custom selected state.",
+      "constraints": [
+        "Tabs for actions",
+        "Underlined tabs (except the install box)",
+        "Pill-shaped tabs",
+        "A blue key as the selected tab"
+      ],
+      "source": "opencommerce-agentcard-web src/components/nav-pills.tsx; src/app/globals.css (.nav-tray, .nav-link, .nav-lit, .nav-lit-shadow)",
+      "exports": [
+        "Tabs",
+        "TabsList",
+        "TabsTrigger",
+        "TabsContent",
+        "tabsTriggerVariants"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/tabs",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/tabs.md",
+      "type": "ui",
+      "title": "Tabs",
+      "description": "Tabbed views in the header's glass tray: a white pill glides to the selected tab.",
+      "surface": "site",
+      "kinds": [
+        "tabs"
+      ],
+      "requires": [
+        "theme",
+        "use-tab-glide",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-tabs",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "tag-filter",
+      "useFor": "Connect onAddTag and onRemoveTag to the filter state, then apply those filters to the results.",
+      "constraints": [
+        "Filters that hide which tags are on",
+        "Colored tags per category"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components/pricing.tsx (the plan chip), monitoring.tsx (#merchant-filter)",
+      "exports": [
+        "TagFilter"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/tag-filter",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/tag-filter.md",
+      "type": "ui",
+      "title": "Tag filter",
+      "description": "Searchable tag picker with removable selected filters.",
+      "surface": "site",
+      "kinds": [
+        "chip"
+      ],
+      "requires": [
+        "theme",
+        "popover",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "tags-input",
+      "useFor": "Use inside Field for domains, emails or similar values. Enter or comma adds a value; Backspace removes the last value when the input is empty. Provide isTagInvalid for validation.",
+      "constraints": [
+        "Pill-shaped fields or tags",
+        "Tags without a way to remove them",
+        "Free text that should be a textarea"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter), pricing.tsx (the plan chip)",
+      "exports": [
+        "TagsInput"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/tags-input",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/tags-input.md",
+      "type": "ui",
+      "title": "Tags input",
+      "description": "Editable list of values with add, remove and validation states.",
+      "surface": "site",
+      "kinds": [
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "field",
+        "utils"
+      ],
+      "packages": [
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "team-directory",
+      "useFor": "Use for teams, advisors, investors or partners. Provide current names and links.",
+      "constraints": [
+        "Color photos",
+        "Round avatars",
+        "Bold names",
+        "A colored window bar",
+        "Cards with gaps between people instead of the ruled grid"
+      ],
+      "source": "Extension in the opencommerce site's voice (its windows, hairlines and mono labels; opencommerce-agentcard-web src/components/window.tsx); the grid from agentcard.sh/about",
+      "exports": [
+        "TeamDirectory",
+        "TeamPerson",
+        "TeamFooterCell",
+        "TeamDirectoryProps"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/team-directory",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/team-directory.md",
+      "type": "site",
+      "title": "Team directory",
+      "description": "Responsive directory of people with photos, roles and optional links.",
+      "surface": "site",
+      "kinds": [
+        "window",
+        "window-bar",
+        "card",
+        "link"
+      ],
+      "requires": [
+        "theme",
+        "window",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "testimonials",
+      "useFor": "Pass cases with name, logo, quote, context and tag. Use approved customer quotes and attribution.",
+      "constraints": [
+        "More than one quote per window",
+        "Bold or italic quotes",
+        "Tilted or hung windows",
+        "Photos in place of the company's mark"
+      ],
+      "source": "Extension in the opencommerce site's voice (its windows and mono tags; opencommerce-agentcard-web src/components/window.tsx, pricing.tsx)",
+      "exports": [
+        "Testimonials",
+        "Case"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/testimonials",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/testimonials.md",
+      "type": "site",
+      "title": "Testimonials",
+      "description": "Customer quotes with names, logos and optional context.",
+      "surface": "site",
+      "kinds": [
+        "window",
+        "window-bar",
+        "card"
+      ],
+      "requires": [
+        "theme",
+        "window",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "textarea",
+      "useFor": "Use inside Field for messages, notes and other longer input. Connect value and onChange when the form owns the state.",
+      "constraints": [
+        "Corners other than 8px",
+        "Gray fills",
+        "Resizing sideways"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter)",
+      "exports": [
+        "Textarea"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/textarea",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/textarea.md",
+      "type": "ui",
+      "title": "Textarea",
+      "description": "Resizable multi-line text field.",
+      "surface": "site",
+      "kinds": [
+        "input"
+      ],
+      "requires": [
+        "theme",
+        "field",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "toast",
+      "useFor": "Prefer Sonner for new work. Use this when an app already uses the toast() and useToast() API: mount one Toaster near the root, call toast({ title, description, action }) and use variant=\"destructive\" for a failure. Give an action an altText that says what it does.",
+      "constraints": [
+        "A toast for an error that needs a decision (use an alert dialog)",
+        "More than one action",
+        "Long descriptions"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/components (the order card's done step) and sonner.tsx",
+      "exports": [
+        "Toast",
+        "ToastAction",
+        "ToastClose",
+        "ToastDescription",
+        "Toaster",
+        "ToastProvider",
+        "ToastTitle",
+        "ToastViewport",
+        "toast",
+        "useToast",
+        "ToastActionElement",
+        "ToastProps"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/toast",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/toast.md",
+      "type": "ui",
+      "title": "Toast",
+      "description": "The older Radix toast in the look of the brand's Sonner toasts: a white card at the bottom left with a blue action.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-toast",
+        "class-variance-authority",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "toggle-group",
+      "useFor": "Use type=\"single\" for one view or filter among a few (Live, Failed, All) and type=\"multiple\" for filters that combine. Use variant outline with spacing 0 for a joined bar of white keys. Prefer Tabs when each option shows its own panel.",
+      "constraints": [
+        "A gliding key (choices change instantly)",
+        "More than six options in the tray",
+        "Blue filled keys for the chosen option"
+      ],
+      "source": "Extrapolated from opencommerce (the header's trays and the segmented control)",
+      "exports": [
+        "ToggleGroup",
+        "ToggleGroupItem"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/toggle-group",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/toggle-group.md",
+      "type": "ui",
+      "title": "Toggle Group",
+      "description": "The header's frosted tray of options with the chosen one a white key and a blue label, or separate white keys.",
+      "surface": "site",
+      "kinds": [
+        "tabs"
+      ],
+      "requires": [
+        "theme",
+        "toggle",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-toggle-group",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "toggle",
+      "useFor": "Use for an on or off option that acts at once in a toolbar (show live routes only, pin a merchant). Give an icon-only toggle an aria-label. Use outline when the toggle sits among white keys.",
+      "constraints": [
+        "A toggle for a setting saved later (use Switch or Checkbox)",
+        "Blue fill for the pressed state",
+        "An icon that moves when pressed"
+      ],
+      "source": "Extrapolated from opencommerce (the keys and the header's trays)",
+      "exports": [
+        "Toggle",
+        "toggleVariants"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/toggle",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/toggle.md",
+      "type": "ui",
+      "title": "Toggle",
+      "description": "A 34px key that stays pressed: a quiet label on the wash, or a white key that lights blue.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-toggle",
+        "class-variance-authority"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "tooltip",
+      "useFor": "Use to explain an icon control or add brief context. Keep a separate accessible name on the control; do not put essential instructions only in the tooltip.",
+      "constraints": [
+        "Tooltips for anything needed to finish a task",
+        "Long text (use a popover)",
+        "Dark tooltips"
+      ],
+      "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .feat-tile)",
+      "exports": [
+        "Tooltip",
+        "TooltipTrigger",
+        "TooltipContent",
+        "TooltipProvider"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/tooltip",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/tooltip.md",
+      "type": "ui",
+      "title": "Tooltip",
+      "description": "Short contextual label shown on hover or keyboard focus.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "surface",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-tooltip"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "trace",
+      "useFor": "Use to show what an agent did or is doing: one TraceLine per step with a TraceIcon, TraceTitle and TraceDescription (a duration). Set status running, pending or error. Wrap a step in TraceCollapsible with a trigger and content to reveal its detail (the request, the response).",
+      "constraints": [
+        "Spinners on every line",
+        "Colored backgrounds for steps",
+        "Details open by default for every step"
+      ],
+      "source": "Extrapolated from opencommerce (in-action.tsx steps, monitoring.tsx log, the rule)",
+      "exports": [
+        "Trace",
+        "TraceCollapsible",
+        "TraceCollapsibleContent",
+        "TraceCollapsibleTrigger",
+        "TraceDescription",
+        "TraceIcon",
+        "TraceLine",
+        "TraceTitle"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/trace",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/trace.md",
+      "type": "ui",
+      "title": "Trace",
+      "description": "An agent's steps as lines of muted 14px text with glyphs, mono durations, a breathing running step and details that open from a hairline.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "@radix-ui/react-collapsible",
+        "lucide-react"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "typography",
+      "useFor": "Use for text a page writes by hand, outside Prose: headings with TypographyH1 to H4, body with TypographyP, the line under a heading with TypographyLead, inline code with TypographyInlineCode. For a whole article from markdown, use Prose.",
+      "constraints": [
+        "Bold or caps headings",
+        "Tracking body text",
+        "Headings in Inter"
+      ],
+      "source": "opencommerce-agentcard-web src/app/globals.css (h1 to h3, .lead, .mono); prose.tsx",
+      "exports": [
+        "TypographyBlockquote",
+        "TypographyH1",
+        "TypographyH2",
+        "TypographyH3",
+        "TypographyH4",
+        "TypographyInlineCode",
+        "TypographyLarge",
+        "TypographyLead",
+        "TypographyList",
+        "TypographyMuted",
+        "TypographyP",
+        "TypographySmall",
+        "TypographyTable"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/typography",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/typography.md",
+      "type": "ui",
+      "title": "Typography",
+      "description": "The brand type as parts: display-face headings at 500 tracked tight, 16px Inter body, muted leads, blue-marked lists, mono inline code.",
+      "surface": "site",
+      "kinds": [
+        "section-heading",
+        "body-text"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "updates-feed",
+      "useFor": "Use for changelogs or activity updates. Provide dates, change groups and optional media. Place in a Prose column or another readable content width.",
+      "constraints": [
+        "Tags in caps",
+        "Colors other than blue ink and red for tags",
+        "Cards around each day",
+        "Long paragraphs instead of bullets"
+      ],
+      "source": "Extension in the opencommerce site's voice (mono tags, hairlines; opencommerce-agentcard-web src/components/pricing.tsx chip); the structure from agentcard.sh/updates",
+      "exports": [
+        "UpdatesFeed",
+        "UpdateTag",
+        "UpdateDay",
+        "UpdateEntry",
+        "UpdatesFeedProps"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/updates-feed",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/updates-feed.md",
+      "type": "site",
+      "title": "Updates feed",
+      "description": "Dated release notes grouped by change type.",
+      "surface": "site",
+      "kinds": [
+        "table",
+        "chip",
+        "body-text",
+        "caption",
+        "media-frame"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "use-hold",
+      "useFor": "Use for hold-to-confirm controls. Spread handlers on the control and use isHolding for its visual state. Pass disabled to prevent confirmation.",
+      "constraints": [
+        "Hold for actions that can be undone"
+      ],
+      "exports": [
+        "useHold"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/r/use-hold.md",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/use-hold.md",
+      "type": "hook",
+      "title": "useHold",
+      "description": "Confirms after a continuous pointer or keyboard hold and cancels when interrupted.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "use-tab-glide",
+      "useFor": "Use for a shared selection indicator in a row of options. The indicator is measured from the parent’s outer edge; account for the border when positioning it.",
+      "constraints": [
+        "Animating the key with a timed transition that restarts when interrupted"
+      ],
+      "exports": [
+        "useTabGlide"
+      ],
+      "client": true,
+      "docsUrl": "https://opencommerce-ds.vercel.app/r/use-tab-glide.md",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/use-tab-glide.md",
+      "type": "hook",
+      "title": "useTabGlide",
+      "description": "Moves a selection indicator between tabs, respecting reduced motion.",
+      "surface": "site",
+      "kinds": [],
+      "requires": [
+        "theme"
+      ],
+      "packages": []
+    },
+    {
+      "schemaVersion": 1,
+      "name": "utils",
+      "useFor": "Use cn to combine component classes and caller overrides.",
+      "constraints": [],
+      "source": "src/lib/utils.ts",
+      "exports": [
+        "cn"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/r/utils.md",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/utils.md",
+      "type": "lib",
+      "title": "cn",
+      "description": "Class-name utilities that understand the design token scales.",
+      "surface": "both",
+      "kinds": [],
+      "requires": [],
+      "packages": [
+        "clsx",
+        "tailwind-merge"
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "name": "window",
+      "useFor": "Use for the things a page shows off: code (agent.ts), plans (free.plan), a live table (monitoring.live), a feature's picture. Name the bar like a file. Use dark for code that runs.",
+      "constraints": [
+        "A window bar on every card of a page",
+        "Colored or blue bars on the page's main windows",
+        "Rounded corners other than 12px",
+        "A heavy or offset shadow"
+      ],
+      "source": "opencommerce-agentcard-web src/app/globals.css (.win, .win-bar, .win-mark), src/components/window.tsx",
+      "exports": [
+        "Window",
+        "WindowBar",
+        "WindowMark",
+        "windowBarVariants"
+      ],
+      "client": false,
+      "docsUrl": "https://opencommerce-ds.vercel.app/components/window",
+      "markdownUrl": "https://opencommerce-ds.vercel.app/r/window.md",
+      "type": "ui",
+      "title": "Window",
+      "description": "A white card with a quiet title bar: file name centered, the [*] mark or an action at the right.",
+      "surface": "site",
+      "kinds": [
+        "window",
+        "window-bar",
+        "card"
+      ],
+      "requires": [
+        "theme",
+        "utils"
+      ],
+      "packages": [
+        "class-variance-authority"
+      ]
+    }
+  ]
+}

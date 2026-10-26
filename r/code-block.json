@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "name": "code-block",
+  "useFor": "Use when you need shadcn's composable code block: a header with CodeBlockTitle and CodeBlockActions (CodeBlockCopyButton), CodeBlockContent with code as a string, and an optional CodeBlockFooter. Pass dark on CodeBlock for code that runs, lineNumbers and highlight on the content. For a single snippet, CodeWindow does the same in one part.",
+  "constraints": [
+    "A full syntax theme with many colors",
+    "Code in a proportional face",
+    "A dark bar over light code",
+    "Corners other than 12px"
+  ],
+  "documentation": "",
+  "source": "opencommerce-agentcard-web src/components/code-block.tsx; code-window.tsx (the same window, bar, tokenizer and colors)",
+  "exports": [
+    "CodeBlock",
+    "CodeBlockActions",
+    "CodeBlockContent",
+    "CodeBlockCopyButton",
+    "CodeBlockFooter",
+    "CodeBlockHeader",
+    "CodeBlockLine",
+    "CodeBlockTitle"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/code-block",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/code-block.md",
+  "examples": [
+    {
+      "path": "examples/code-block.tsx",
+      "content": "import { FileCode2 } from \"lucide-react\";\n\nimport { CodeBlock, CodeBlockActions, CodeBlockContent, CodeBlockCopyButton, CodeBlockFooter, CodeBlockHeader, CodeBlockLine, CodeBlockTitle } from \"@/components/ui/code-block\";\n\nconst AGENT = `import { Agentcard } from \"@agentcard/sdk\";\n\nconst agentcard = new Agentcard({\n  clientSecret: process.env.AGENTCARD_SECRET,\n  clientId: process.env.AGENTCARD_ID,\n});\n\n// Buy from any online store from a single endpoint.\nconst order = await agentcard.purchase({ thing: \"USB-C hub\", maxPrice: 40 });\nconsole.log(order.status);`;\n\nconst INSTALL = `npm install @agentcard/sdk\nexport AGENTCARD_SECRET=\"sk_live_...\"`;\n\nexport function Site() {\n  return (\n    <CodeBlock className=\"mx-auto w-full max-w-2xl\">\n      <CodeBlockHeader>\n        <CodeBlockTitle>agent.ts</CodeBlockTitle>\n        <CodeBlockActions>\n          <CodeBlockCopyButton value={AGENT} />\n        </CodeBlockActions>\n      </CodeBlockHeader>\n      <CodeBlockContent code={AGENT} language=\"ts\" highlight={[8]} />\n    </CodeBlock>\n  );\n}\n\nexport function Dark() {\n  return (\n    <CodeBlock dark className=\"mx-auto w-full max-w-2xl\">\n      <CodeBlockHeader>\n        <CodeBlockTitle>install.sh</CodeBlockTitle>\n        <CodeBlockActions>\n          <CodeBlockCopyButton value={INSTALL} />\n        </CodeBlockActions>\n      </CodeBlockHeader>\n      <CodeBlockContent code={INSTALL} language=\"sh\" />\n    </CodeBlock>\n  );\n}\n\nexport function LineNumbers() {\n  return (\n    <CodeBlock size=\"sm\" className=\"mx-auto w-full max-w-2xl\">\n      <CodeBlockHeader>\n        <CodeBlockTitle>\n          <FileCode2 aria-hidden strokeWidth={1.5} />\n          order.ts\n        </CodeBlockTitle>\n      </CodeBlockHeader>\n      <CodeBlockContent code={AGENT} language=\"ts\" lineNumbers />\n      <CodeBlockFooter>TypeScript, 10 lines</CodeBlockFooter>\n    </CodeBlock>\n  );\n}\n\nexport function Diff() {\n  return (\n    <CodeBlock className=\"mx-auto w-full max-w-2xl\">\n      <CodeBlockHeader>\n        <CodeBlockTitle>route.diff</CodeBlockTitle>\n      </CodeBlockHeader>\n      <CodeBlockContent>\n        <CodeBlockLine>{\"const route = await router.find(store);\"}</CodeBlockLine>\n        <CodeBlockLine variant=\"removed\">{\"const cart = await route.coldStart();\"}</CodeBlockLine>\n        <CodeBlockLine variant=\"added\">{\"const cart = await route.warmed();\"}</CodeBlockLine>\n        <CodeBlockLine />\n        <CodeBlockLine variant=\"highlighted\">{\"return cart.checkout();\"}</CodeBlockLine>\n      </CodeBlockContent>\n    </CodeBlock>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Dark",
+        "LineNumbers",
+        "Diff"
+      ],
+      "requires": [
+        "code-block"
+      ],
+      "packages": [
+        "lucide-react",
+        "@agentcard/sdk"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/code-block/Site"
+        },
+        {
+          "name": "Dark",
+          "url": "https://opencommerce-ds.vercel.app/preview/code-block/Dark"
+        },
+        {
+          "name": "LineNumbers",
+          "url": "https://opencommerce-ds.vercel.app/preview/code-block/LineNumbers"
+        },
+        {
+          "name": "Diff",
+          "url": "https://opencommerce-ds.vercel.app/preview/code-block/Diff"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Code Block",
+  "description": "shadcn's code block as the brand's code window: the mist bar with the file name and Copy, the 13px mono body, light or on ink, with line numbers and banded lines.",
+  "surface": "site",
+  "kinds": [
+    "code-window",
+    "window-bar"
+  ],
+  "requires": [
+    "theme",
+    "code-window",
+    "copy-button",
+    "window",
+    "utils"
+  ],
+  "packages": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/code-block.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { tokenize } from \"@/components/ui/code-window\";\nimport { CopyButton } from \"@/components/ui/copy-button\";\nimport { WindowMark } from \"@/components/ui/window\";\nimport { cn } from \"@/lib/utils\";\n\n// shadcn's code block as the brand's code window (code-window.tsx, globals.css .win, .code; computed): the white window\n// on the 16 percent ink edge with 12px corners and the soft drop; a 36px mist bar over a 9 percent rule set in the 11.5px\n// platform mono at 64 percent ink, a dimmed arrow at the left, the file name centered and the [*] in blue at the right,\n// which an action (Copy) replaces. The code is the 13px platform mono at 1.75 leading, light by default (ink, keywords\n// blue, strings deep blue, comments faint) or `dark` on ink for code that runs. Long lines wrap and hang two columns\n// past their indent (or scroll with wrap={false}); line numbers sit in a faint gutter; a highlighted line is the pale\n// blue band (5 percent white on ink). Nothing animates except the copy key's own swap.\nconst codeBlockVariants = cva(\"group/code-block m-0 flex w-full min-w-0 flex-col overflow-hidden rounded-panel border border-line-window bg-surface text-fg shadow-card\", {\n  variants: {\n    size: { default: \"\", sm: \"\" },\n  },\n  defaultVariants: { size: \"default\" },\n});\n\nconst CodeBlockTheme = React.createContext<{ dark: boolean }>({ dark: false });\n\nfunction CodeBlock({ className, size = \"default\", dark = false, ...props }: React.ComponentProps<\"figure\"> & VariantProps<typeof codeBlockVariants> & { dark?: boolean }) {\n  return (\n    <CodeBlockTheme.Provider value={{ dark }}>\n      <figure data-slot=\"code-block\" data-size={size} data-dark={dark || undefined} className={cn(codeBlockVariants({ size }), className)} {...props} />\n    </CodeBlockTheme.Provider>\n  );\n}\n\n/** The mist bar: the arrow, the title centered, the [*] or the actions at the right. */\nfunction CodeBlockHeader({ className, children, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"code-block-header\"\n      className={cn(\n        \"grid min-h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-line bg-window-bar pr-3 pl-3.5 font-mono text-bar leading-body text-fg-muted has-[[data-slot=code-block-actions]]:[&>[data-slot=code-block-mark]]:hidden\",\n        className,\n      )}\n      {...props}\n    >\n      <span aria-hidden className=\"justify-self-start opacity-60\">\n        ↳\n      </span>\n      {children}\n      <span data-slot=\"code-block-mark\" className=\"col-start-3 flex justify-self-end\">\n        <WindowMark />\n      </span>\n    </div>\n  );\n}\n\nfunction CodeBlockTitle({ className, ...props }: React.ComponentProps<\"figcaption\">) {\n  return <figcaption data-slot=\"code-block-title\" className={cn(\"col-start-2 min-w-0 truncate text-center font-mono text-bar text-fg-muted [&_svg]:mr-1.5 [&_svg]:inline-block [&_svg]:size-3 [&_svg]:align-[-0.125em]\", className)} {...props} />;\n}\n\nfunction CodeBlockActions({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"code-block-actions\" className={cn(\"col-start-3 flex min-w-0 items-center gap-1.5 justify-self-end\", className)} {...props} />;\n}\n\n/** The brand's copy key (copy-button.tsx), compact in a small block. */\nfunction CodeBlockCopyButton({ value, label = \"Copy code\", compact, className }: { value: string; label?: string; compact?: boolean; className?: string }) {\n  return <CopyButton value={value} label={label} compact={compact} className={className} />;\n}\n\nconst codeBlockLineVariants = cva(\n  \"relative block min-h-[1lh] px-3 group-data-[size=sm]/code-block:px-2.5 in-data-numbered:col-span-2 in-data-numbered:grid in-data-numbered:grid-cols-subgrid in-data-numbered:gap-x-3 in-data-numbered:[counter-increment:line] in-data-numbered:before:min-w-6 in-data-numbered:before:text-right in-data-numbered:before:text-fg-faint in-data-numbered:before:content-[counter(line)] in-data-numbered:before:select-none after:absolute after:top-0 after:left-0.5 after:select-none\",\n  {\n    variants: {\n      variant: {\n        default: \"\",\n        highlighted: \"bg-blue-5 in-data-dark:bg-code-soft\",\n        added: \"bg-blue-5 after:text-fg-brand after:content-['+'] in-data-dark:bg-code-soft in-data-dark:after:text-fg-code-string\",\n        removed: \"bg-subtle after:text-danger after:content-['-'] in-data-dark:bg-code-soft\",\n      },\n    },\n    defaultVariants: { variant: \"default\" },\n  },\n);\n\n/** One line. `hang` is its indent in columns: when the block wraps, the line's continuation hangs two columns past it. */\nfunction CodeBlockLine({ className, variant = \"default\", hang = 0, style, children, ...props }: React.ComponentProps<\"span\"> & VariantProps<typeof codeBlockLineVariants> & { hang?: number }) {\n  const empty = children === undefined || children === null || children === \"\" || (Array.isArray(children) && children.length === 0);\n  return (\n    <span data-slot=\"code-block-line\" data-variant={variant} style={{ \"--hang\": `${hang + 2}ch`, ...style } as React.CSSProperties} className={cn(codeBlockLineVariants({ variant }), className)} {...props}>\n      <span data-slot=\"code-block-line-content\" className=\"min-w-0 in-data-wrap:pl-(--hang) in-data-wrap:[text-indent:calc(-1*var(--hang))]\">\n        {empty ? \"\\n\" : children}\n      </span>\n    </span>\n  );\n}\n\nconst VOICE = {\n  light: { plain: \"\", keyword: \"text-fg-brand\", string: \"text-fg-string\", comment: \"text-fg-faint\" },\n  dark: { plain: \"\", keyword: \"text-fg-code-key\", string: \"text-fg-code-string\", comment: \"text-fg-code-dim\" },\n} as const;\n\n/** The code, split into lines with the code window's three voices. */\nfunction highlightLines(code: string, language: string | undefined, dark: boolean) {\n  const voice = VOICE[dark ? \"dark\" : \"light\"];\n  const lines: React.ReactNode[][] = [[]];\n  tokenize(code.replace(/\\n$/, \"\"), language).forEach((t, i) => {\n    t.text.split(\"\\n\").forEach((part, n) => {\n      if (n > 0) lines.push([]);\n      if (part) lines[lines.length - 1].push(t.kind === \"plain\" ? <React.Fragment key={`${i}-${n}`}>{part}</React.Fragment> : <span key={`${i}-${n}`} className={voice[t.kind]}>{part}</span>);\n    });\n  });\n  return lines;\n}\n\n/**\n * The code. Pass the text as `code` (highlighted lightly; `language` only picks the comment marker) or your own\n * CodeBlockLine children. `lineNumbers` adds the gutter from `startLine`; `highlight` bands lines by zero-based index;\n * long lines wrap and hang past their indent, as in the code window; `wrap={false}` scrolls them instead.\n */\nfunction CodeBlockContent({ className, children, style, code, language, wrap = true, lineNumbers = false, startLine = 1, highlight = [], ...props }: React.ComponentProps<\"pre\"> & { code?: string; language?: string; wrap?: boolean; lineNumbers?: boolean; startLine?: number; highlight?: number[] }) {\n  const { dark } = React.useContext(CodeBlockTheme);\n  const lines = React.useMemo(() => (code !== undefined ? highlightLines(code, language, dark) : null), [code, language, dark]);\n  const banded = new Set(highlight);\n  const indents = React.useMemo(() => (code ?? \"\").split(\"\\n\").map((l) => l.length - l.trimStart().length), [code]);\n  return (\n    <pre\n      data-slot=\"code-block-content\"\n      data-wrap={wrap || undefined}\n      data-numbered={lineNumbers || undefined}\n      data-dark={dark || undefined}\n      dir=\"ltr\"\n      tabIndex={0}\n      style={{ counterReset: `line ${startLine - 1}`, ...style }}\n      className={cn(\n        \"m-0 min-h-0 min-w-0 flex-1 overflow-auto py-4 font-mono text-snippet leading-code outline-none [scrollbar-width:thin] [tab-size:2] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring group-data-[size=sm]/code-block:py-3\",\n        dark ? \"bg-code text-fg-code\" : \"bg-surface text-fg\",\n        wrap ? \"whitespace-pre-wrap [overflow-wrap:anywhere]\" : \"whitespace-pre\",\n        className,\n      )}\n      {...props}\n    >\n      <code data-slot=\"code-block-code\" className={cn(\"grid content-start font-[inherit] in-data-numbered:grid-cols-[auto_1fr]\", wrap ? \"min-w-0\" : \"min-w-max\")}>\n        {lines\n          ? lines.map((line, i) => (\n              <CodeBlockLine key={i} variant={banded.has(i) ? \"highlighted\" : \"default\"} hang={indents[i] ?? 0}>\n                {line.length ? line : undefined}\n              </CodeBlockLine>\n            ))\n          : children}\n      </code>\n    </pre>\n  );\n}\n\n/** A quiet line under the code: the mist on a 9 percent rule, in the 11.5px mono at 64 percent ink. */\nfunction CodeBlockFooter({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"code-block-footer\" className={cn(\"flex min-w-0 shrink-0 items-center gap-2 border-t border-line bg-window-bar px-3.5 py-2 font-mono text-bar leading-body text-fg-muted\", className)} {...props} />;\n}\n\nexport { CodeBlock, CodeBlockActions, CodeBlockContent, CodeBlockCopyButton, CodeBlockFooter, CodeBlockHeader, CodeBlockLine, CodeBlockTitle };\n"
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "name": "steps",
+  "useFor": "Use once on the home page, in a wide SiteSection, for three to six steps from first call to result. Each step carries the code that does it.",
+  "constraints": [
+    "More than six steps",
+    "Steps without code",
+    "A timer faster than 4 seconds a step",
+    "Auto-advancing under reduced motion",
+    "Light code windows here"
+  ],
+  "documentation": "`Steps` props: `steps` ({ title, code, file, language }[]), `interval` (ms a step stays open, default 6000), `label`\n(the tab list's name, default \"Steps\"), plus div props. Arrow keys, Home and End move between steps.\n\nMotion: the timer bar fills linearly (it is a clock) and holds while the pointer or focus is inside or the steps are off\nscreen; the new code fades in through a breath of blur (200ms ease-out). Reduced motion: no timer, and only the fade.",
+  "source": "opencommerce-agentcard-web src/components/in-action.tsx, src/app/globals.css (.swap-in, step-timer)",
+  "exports": [
+    "Steps",
+    "Step"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/steps",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/steps.md",
+  "examples": [
+    {
+      "path": "examples/steps.tsx",
+      "content": "import { Steps } from \"@/components/site/steps\";\n\nconst STEPS = [\n  { title: \"Add the commerce tool to your agent\", code: `npm install @agentcard/sdk\\n\\nimport { Agentcard } from \"@agentcard/sdk\";\\n\\nconst agentcard = new Agentcard({\\n  clientSecret: process.env.AGENTCARD_SECRET,\\n});\\n\\nconst tools = [agentcard.tools.commerce()];` },\n  { title: \"Search catalogues and place orders conversationally\", code: `const results = await agentcard.commerce.search({\\n  query: \"running shoes, size 10\",\\n  maxPrice: 120,\\n});` },\n  { title: \"Pay with your customer’s stored card\", code: `const order = await agentcard.commerce.checkout({\\n  item: results[0].id,\\n  card: customer.cardId,\\n});` },\n  { title: \"Follow orders and report back\", code: `const status = await agentcard.commerce.track(order.id);\\n// \"shipped\", with the carrier and tracking number` },\n];\n\nexport function Site() {\n  return (\n    <div className=\"mx-auto w-(--ds-frame-column) py-16\">\n      <Steps steps={STEPS} />\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "steps"
+      ],
+      "packages": [
+        "@agentcard/sdk"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/steps/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Steps",
+  "description": "How it works: steps listed down the left, each with its code in a dark window, playing through on a timer.",
+  "surface": "site",
+  "kinds": [
+    "tabs",
+    "code-window",
+    "window-bar"
+  ],
+  "requires": [
+    "theme",
+    "code-window",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/steps.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { CodeWindow } from \"@/components/ui/code-window\";\nimport { cn } from \"@/lib/utils\";\n\n// How it works (the opencommerce site, in-action.tsx): the steps listed down the left, the open step's code on the\n// right in a dark code window. A step is a row with its number in a small square (blue and filled when open, a hairline\n// otherwise) and its title; the open one sits on the pale blue with a faint blue ring. The steps play through on a\n// timer: a 2px bar fills along the foot of the open step (linear, it is a clock), and when it is full the next opens,\n// back to the first after the last. The bar's own CSS animation is the clock, so pausing it (pointer or focus inside,\n// or the steps off screen) holds the time exactly. A click jumps to that step and starts its bar over. Reduced motion\n// gets no timer at all. Each step's code comes in through a breath of blur, so the swap reads as one change.\n\ntype Step = {\n  title: React.ReactNode;\n  code: string;\n  /** The code window's name; defaults to step-1.ts. */\n  file?: string;\n  language?: string;\n};\n\nconst REDUCE = \"(prefers-reduced-motion: reduce)\";\nconst subscribeMotion = (cb: () => void) => {\n  const mq = window.matchMedia(REDUCE);\n  mq.addEventListener(\"change\", cb);\n  return () => mq.removeEventListener(\"change\", cb);\n};\n\n/** The open step's clock: a 2px bar along the row's foot, over its border, filling left to right. */\nfunction TimerBar({ duration, running, onDone }: { duration: number; running: boolean; onDone: () => void }) {\n  const ref = React.useRef<HTMLSpanElement>(null);\n  const anim = React.useRef<Animation | null>(null);\n  const done = React.useRef(onDone);\n  done.current = onDone;\n  React.useEffect(() => {\n    const el = ref.current;\n    if (!el || typeof el.animate !== \"function\") return;\n    const a = el.animate([{ transform: \"scaleX(0)\" }, { transform: \"scaleX(1)\" }], { duration, easing: \"linear\", fill: \"forwards\" });\n    a.onfinish = () => done.current();\n    anim.current = a;\n    return () => a.cancel();\n  }, [duration]);\n  React.useEffect(() => {\n    if (running) anim.current?.play();\n    else anim.current?.pause();\n  }, [running]);\n  return (\n    <span aria-hidden className=\"absolute inset-x-0 bottom-0 h-0.5\">\n      <span ref={ref} className=\"block h-full origin-left scale-x-0 bg-brand\" />\n    </span>\n  );\n}\n\nfunction Steps({ steps, interval = 6000, label = \"Steps\", className, ...props }: Omit<React.ComponentProps<\"div\">, \"children\"> & { steps: Step[]; /** ms each step stays open. */ interval?: number; label?: string }) {\n  const [active, setActive] = React.useState(0);\n  const [held, setHeld] = React.useState(false);\n  const [onScreen, setOnScreen] = React.useState(false);\n  // The server assumes reduced motion, so no bar renders before the browser says otherwise.\n  const still = React.useSyncExternalStore(subscribeMotion, () => window.matchMedia(REDUCE).matches, () => true);\n  const root = React.useRef<HTMLDivElement>(null);\n  const id = React.useId();\n  const step = steps[active];\n\n  React.useEffect(() => {\n    const el = root.current;\n    if (!el) return;\n    const io = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), { threshold: 0.35 });\n    io.observe(el);\n    return () => io.disconnect();\n  }, []);\n\n  const next = () => setActive((i) => (i + 1) % steps.length);\n  const running = !held && onScreen;\n\n  // Arrow keys move between the steps, as in any tab list.\n  const onKeyDown = (e: React.KeyboardEvent) => {\n    const keys: Record<string, number> = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };\n    let to: number | undefined;\n    if (e.key in keys) to = (active + keys[e.key] + steps.length) % steps.length;\n    if (e.key === \"Home\") to = 0;\n    if (e.key === \"End\") to = steps.length - 1;\n    if (to === undefined) return;\n    e.preventDefault();\n    setActive(to);\n    root.current?.querySelector<HTMLElement>(`#${CSS.escape(`${id}-tab-${to}`)}`)?.focus();\n  };\n\n  return (\n    <div\n      ref={root}\n      data-slot=\"steps\"\n      onPointerEnter={() => setHeld(true)}\n      onPointerLeave={() => setHeld(false)}\n      onFocus={() => setHeld(true)}\n      onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setHeld(false)}\n      className={cn(\"grid items-start gap-8 lg:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)] lg:gap-12\", className)}\n      {...props}\n    >\n      <div role=\"tablist\" aria-label={label} aria-orientation=\"vertical\" onKeyDown={onKeyDown} className=\"flex flex-col gap-1\">\n        {steps.map((s, i) => {\n          const on = i === active;\n          return (\n            <button\n              key={i}\n              type=\"button\"\n              role=\"tab\"\n              id={`${id}-tab-${i}`}\n              aria-selected={on}\n              aria-controls={`${id}-panel`}\n              tabIndex={on ? 0 : -1}\n              onClick={() => setActive(i)}\n              className={cn(\n                \"relative flex items-center gap-4 overflow-hidden rounded-card px-4 py-4 text-left outline-none transition-colors duration-(--ds-duration-fast) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring motion-reduce:transition-none\",\n                on ? \"bg-tint ring-1 ring-brand/20 ring-inset\" : \"hover:bg-subtle\",\n              )}\n            >\n              <span\n                className={cn(\n                  \"grid size-6 shrink-0 place-items-center rounded-chip font-mono text-caption transition-colors duration-(--ds-duration-fast) ease-out motion-reduce:transition-none\",\n                  on ? \"bg-brand text-on-brand\" : \"border border-line-strong text-fg-muted\",\n                )}\n              >\n                {i + 1}\n              </span>\n              <span className={cn(\"text-button leading-snug transition-colors duration-(--ds-duration-fast) ease-out motion-reduce:transition-none\", on ? \"text-fg\" : \"text-fg-muted\")}>{s.title}</span>\n              {on && !still && (\n                <TimerBar key={active} duration={interval} running={running} onDone={next} />\n              )}\n            </button>\n          );\n        })}\n      </div>\n      <div role=\"tabpanel\" id={`${id}-panel`} aria-labelledby={`${id}-tab-${active}`}>\n        <CodeWindow\n          key={active}\n          title={step.file ?? `step-${active + 1}.ts`}\n          code={step.code}\n          language={step.language}\n          copy\n          dark\n          className=\"transition-[opacity,filter] duration-(--ds-duration-base) ease-out starting:opacity-0 starting:blur-xs motion-reduce:transition-opacity motion-reduce:starting:blur-none\"\n          preClassName=\"min-h-75\"\n        />\n      </div>\n    </div>\n  );\n}\n\nexport { Steps };\nexport type { Step };\n"
+    }
+  ]
+}

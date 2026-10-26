@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "copy-button",
+  "useFor": "Place beside a command, key or file and pass its value: in a window bar's corner, at the top right of a code card or in an install box. Use dark on ink. Use compact only where there is no room for the word.",
+  "constraints": [
+    "A copy button without a label for screen readers",
+    "Green or red copy states",
+    "Copying without visible feedback",
+    "A key that changes width when it says Copied"
+  ],
+  "documentation": "`CopyButton` takes `value`, `label` (the accessible name, default \"Copy\"), `dark` (on ink), `compact` (the icon only,\nnamed by a tooltip) and `className`. It also exports `useCopy()`, which returns `{ hasCopied, error, copy }` for a\ncontrol of your own.",
+  "source": "opencommerce-agentcard-web src/components/copy-button.tsx; src/app/globals.css (.copy-layer, .key-white, .key-dark)",
+  "exports": [
+    "useCopy",
+    "CopyButton"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/copy-button",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/copy-button.md",
+  "examples": [
+    {
+      "path": "examples/copy-button.tsx",
+      "content": "import { CopyButton } from \"@/components/ui/copy-button\";\n\nexport function Site() {\n  return (\n    <div className=\"grid w-full max-w-md gap-4\">\n      <div className=\"flex items-center gap-3 rounded-control border border-hairline bg-surface py-2 pr-2 pl-4\">\n        <code className=\"min-w-0 flex-1 truncate font-mono text-snippet text-fg\">npm install @agentcard/sdk</code>\n        <CopyButton value=\"npm install @agentcard/sdk\" label=\"Copy command\" />\n      </div>\n      <div className=\"flex items-center gap-3 rounded-panel bg-code py-2 pr-2 pl-4\">\n        <code className=\"min-w-0 flex-1 truncate font-mono text-snippet text-fg-code\">pnpm add @agentcard/sdk</code>\n        <CopyButton value=\"pnpm add @agentcard/sdk\" label=\"Copy command\" dark />\n        <CopyButton value=\"pnpm add @agentcard/sdk\" label=\"Copy command\" dark compact />\n      </div>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "copy-button"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/copy-button/Site"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Copy button",
+  "description": "A small Copy key that swaps to Copied in place, on white or on ink.",
+  "surface": "site",
+  "kinds": [
+    "button-secondary"
+  ],
+  "requires": [
+    "theme",
+    "tooltip",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/ui/copy-button.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { Tooltip, TooltipContent, TooltipTrigger } from \"@/components/ui/tooltip\";\nimport { cn } from \"@/lib/utils\";\n\nconst COPIED_MS = 2000;\n\n/** Copies text and reports it for a moment, so the button can say so. */\nexport function useCopy() {\n  const [hasCopied, setHasCopied] = React.useState(false);\n  const [error, setError] = React.useState<string | null>(null);\n  const timeout = React.useRef<ReturnType<typeof setTimeout>>(undefined);\n  React.useEffect(() => () => clearTimeout(timeout.current), []);\n  const copy = React.useCallback(async (text: string) => {\n    clearTimeout(timeout.current);\n    setError(null);\n    setHasCopied(false);\n    try {\n      const policy = (document as Document & { permissionsPolicy?: { allowsFeature: (name: string) => boolean }; featurePolicy?: { allowsFeature: (name: string) => boolean } });\n      if (navigator.clipboard && (policy.permissionsPolicy ?? policy.featurePolicy)?.allowsFeature(\"clipboard-write\") !== false) {\n        await navigator.clipboard.writeText(text);\n      } else {\n        // Sandboxed previews and older browsers can still copy a user-selected string synchronously.\n        const previous = document.activeElement;\n        const selection = document.getSelection();\n        const ranges = selection ? Array.from({ length: selection.rangeCount }, (_, index) => selection.getRangeAt(index)) : [];\n        const field = document.createElement(\"textarea\");\n        field.value = text;\n        field.style.cssText = \"position:fixed;opacity:0;pointer-events:none\";\n        document.body.append(field);\n        try {\n          field.focus({ preventScroll: true });\n          field.select();\n          if (!document.execCommand(\"copy\")) throw new Error(\"Copy unavailable\");\n        } finally {\n          field.remove();\n          if (previous instanceof HTMLElement) previous.focus({ preventScroll: true });\n          selection?.removeAllRanges();\n          for (const range of ranges) selection?.addRange(range);\n        }\n      }\n    } catch {\n      setError(\"Copy failed. Try again.\");\n      return false;\n    }\n    setHasCopied(true);\n    clearTimeout(timeout.current);\n    timeout.current = setTimeout(() => setHasCopied(false), COPIED_MS);\n    return true;\n  }, []);\n  return { hasCopied, error, copy };\n}\n\n// The brand's copy key (copy-button.tsx, globals.css .copy-layer, .key-white, .key-dark; computed): a 28px key with 6px\n// corners and the 12px platform mono, \"Copy\" beside a drawn clipboard. White with blue text on white; on ink (`dark`)\n// an outline at 15 percent white that brightens with its label under the pointer. Copied, the two states swap in one\n// cell, so the key never changes width: the leaving one lifts away, shrinking a touch and blurring as it fades (160ms),\n// the arriving one rises from below (250ms ease-out) and its tick draws once the label has landed. A press shrinks the\n// key to 0.97. Reduced motion only crossfades. `compact` drops the words for a tight bar (the tooltip names it).\nconst LAYER =\n  \"col-start-1 row-start-1 flex items-center justify-center gap-1.5 transition-[opacity,translate,scale,filter] duration-250 ease-out motion-reduce:transition-[opacity] motion-reduce:duration-150\";\nconst OUT = \"pointer-events-none -translate-y-1.75 scale-94 opacity-0 blur-xs duration-160 motion-reduce:translate-y-0 motion-reduce:scale-100 motion-reduce:blur-none\";\n\nfunction CopyIcon() {\n  return (\n    <svg aria-hidden viewBox=\"0 0 12 12\" className=\"size-3 fill-none stroke-current\">\n      <rect x=\"3.5\" y=\"3.5\" width=\"7\" height=\"7\" rx=\"1.5\" />\n      <path d=\"M8.5 1.5h-5.5a1.5 1.5 0 0 0-1.5 1.5v5.5\" strokeLinecap=\"round\" />\n    </svg>\n  );\n}\n\nfunction TickIcon({ drawn }: { drawn: boolean }) {\n  return (\n    <svg aria-hidden viewBox=\"0 0 12 12\" className=\"size-3 fill-none stroke-current\">\n      <path\n        d=\"M2 6.4l2.6 2.6L10 3.4\"\n        strokeWidth={1.5}\n        strokeLinecap=\"round\"\n        strokeLinejoin=\"round\"\n        pathLength={1}\n        strokeDasharray={1}\n        strokeDashoffset={drawn ? 0 : 1}\n        className=\"transition-[stroke-dashoffset] delay-100 duration-200 ease-out motion-reduce:transition-none\"\n      />\n    </svg>\n  );\n}\n\nfunction CopyButton({ value, label = \"Copy\", dark = false, compact = false, className }: { value: string; label?: string; dark?: boolean; compact?: boolean; className?: string }) {\n  const { hasCopied, error, copy } = useCopy();\n  const button = (\n    <button\n      type=\"button\"\n      data-slot=\"copy-button\"\n      data-copied={hasCopied || undefined}\n      onClick={() => copy(value)}\n      aria-label={hasCopied ? \"Copied\" : error ?? label}\n      className={cn(\n        \"relative grid h-7 shrink-0 place-items-center overflow-hidden rounded-sm border font-mono text-caption leading-none outline-none transition-[background-color,border-color,color,scale] duration-160 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring active:scale-97 motion-reduce:transition-[background-color,border-color,color] motion-reduce:active:scale-100\",\n        compact ? \"w-7\" : \"px-2.5\",\n        dark ? \"border-line-on-code text-white/70 hover:border-line-on-code-hover hover:text-white\" : \"border-hairline bg-surface text-fg-brand hover:bg-subtle\",\n        className,\n      )}\n    >\n      <span aria-hidden className={cn(LAYER, hasCopied && OUT)}>\n        <CopyIcon />\n        {!compact && \"Copy\"}\n      </span>\n      <span aria-hidden className={cn(LAYER, !hasCopied && OUT, !hasCopied && \"translate-y-1.75\", dark && \"text-sky\")}>\n        <TickIcon drawn={hasCopied} />\n        {!compact && \"Copied\"}\n      </span>\n    </button>\n  );\n  return (\n    <>\n      {compact ? (\n        <Tooltip>\n          <TooltipTrigger asChild>{button}</TooltipTrigger>\n          <TooltipContent side=\"top\">{hasCopied ? \"Copied\" : error ?? label}</TooltipContent>\n        </Tooltip>\n      ) : (\n        button\n      )}\n      <span role=\"status\" className=\"sr-only\">{hasCopied ? \"Copied\" : error}</span>\n    </>\n  );\n}\n\nexport { CopyButton };\n"
+    }
+  ]
+}

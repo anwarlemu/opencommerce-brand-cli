@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "banner",
+  "useFor": "Use info for general notices, brand for announcements and alert for problems. Set name for the title bar and provide an action when one is needed.",
+  "constraints": [
+    "More than one banner at a time",
+    "Banners for marketing copy that belongs in a section",
+    "Bold titles",
+    "Gradients"
+  ],
+  "documentation": "",
+  "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar)",
+  "exports": [
+    "Banner"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/banner",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/banner.md",
+  "examples": [
+    {
+      "path": "examples/banner.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Banner } from \"@/components/ui/banner\";\nimport { Button } from \"@/components/ui/button\";\n\nexport function Site() {\n  const [reviewing, setReviewing] = useState(false);\n  return <div className=\"grid max-w-3xl gap-4\">\n    <Banner name=\"tracking.beta\" title=\"Order tracking is in beta\" actions={<Button size=\"sm\" asChild><a href=\"#docs\">Read the guide</a></Button>}>Your agent can now follow an order from checkout to the door.</Banner>\n    <Banner tone=\"brand\" name=\"merchants.news\" title=\"Fifty new stores this month\" actions={<Button size=\"sm\" variant=\"secondary\" asChild><a href=\"#monitoring\">See the list</a></Button>}>Every one is monitored around the clock from day one.</Banner>\n    <Banner tone=\"alert\" name=\"agent.paused\" title=\"Travel agent was paused\" actions={<Button variant=\"secondary\" size=\"sm\" aria-expanded={reviewing} onClick={() => setReviewing(!reviewing)}>{reviewing ? \"Hide details\" : \"Review\"}</Button>}>It hit its monthly limit on Oct 14.</Banner>\n    {reviewing && <p className=\"text-body-sm text-fg-muted\">Travel agent has spent $2,000 of its $2,000 monthly limit. Purchases are paused until its limit resets.</p>}\n  </div>;\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "banner",
+        "button"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/banner/Site"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Banner",
+  "description": "Notice with a title, message and optional actions.",
+  "surface": "site",
+  "kinds": [
+    "window-bar"
+  ],
+  "requires": [
+    "theme",
+    "window",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/ui/banner.tsx",
+      "content": "import * as React from \"react\";\n\nimport { WindowBar } from \"@/components/ui/window\";\nimport { cn } from \"@/lib/utils\";\n\n// A notice as one of the brand's windows: the 16 percent ink edge, 12px corners and the window's soft drop, its mist\n// bar labeled like a file (`name`), over a sheet with 14px of padding on top, 18px at the sides and 16px below. `info`\n// is a note: the sheet on the pale blue. `brand` is the notice that matters: white, its title in blue. `alert` is\n// trouble: white, its title in red. The title is 16px display at 500, tracked tight, the detail 14px Inter at 64\n// percent ink, and actions sit at the end.\n\nconst TONES = {\n  info: { bar: \"mist\", sheet: \"bg-note\", title: \"text-fg\", name: \"note\" },\n  brand: { bar: \"mist\", sheet: \"bg-surface\", title: \"text-fg-brand\", name: \"news\" },\n  alert: { bar: \"mist\", sheet: \"bg-surface\", title: \"text-danger\", name: \"alert\" },\n} as const;\n\nfunction Banner({\n  tone = \"info\",\n  title,\n  name,\n  actions,\n  role,\n  className,\n  children,\n  ...props\n}: Omit<React.ComponentProps<\"div\">, \"title\"> & {\n  tone?: keyof typeof TONES;\n  title: React.ReactNode;\n  /** The bar's label, file-like: `voice.beta`, `card.paused`. Defaults to note, news or alert. */\n  name?: React.ReactNode;\n  actions?: React.ReactNode;\n  role?: \"status\" | \"alert\";\n}) {\n  const t = TONES[tone];\n  return (\n    <div\n      role={role ?? (tone === \"alert\" ? \"alert\" : \"status\")}\n      data-slot=\"banner\"\n      data-tone={tone}\n      className={cn(\"flex flex-col overflow-hidden rounded-panel border border-line-window text-fg shadow-card\", t.sheet, className)}\n      {...props}\n    >\n      <WindowBar aria-hidden name={name ?? t.name} tone={t.bar} className=\"[&>span:nth-child(2)]:text-left\" />\n      <div className=\"flex flex-col gap-3 px-4.5 pt-3.5 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6\">\n        <div className=\"min-w-0\">\n          <p className={cn(\"font-display text-body leading-snug font-medium tracking-tight\", t.title)}>{title}</p>\n          {children && (\n            <div data-slot=\"banner-detail\" className=\"mt-1 text-body-sm leading-relaxed text-fg-muted\">\n              {children}\n            </div>\n          )}\n        </div>\n        {actions && <div className=\"flex shrink-0 flex-wrap gap-2\">{actions}</div>}\n      </div>\n    </div>\n  );\n}\n\nexport { Banner };\n"
+    }
+  ]
+}

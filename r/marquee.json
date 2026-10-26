@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "name": "marquee",
+  "useFor": "Use under the hero's actions for the stores, customers or partners a product reaches; LogoStrip wraps it for marks. Use at most one per page.",
+  "constraints": [
+    "Logos in color on the strip",
+    "A fast loop (under 60s a lap)",
+    "Two running strips on one page",
+    "Text a reader must read to act"
+  ],
+  "documentation": "`Marquee` props: `items` (ReactNode[]), `label` (the list's accessible name), `duration` (seconds a lap, default 100),\nplus div props. The items take the strip's grey through currentColor.",
+  "source": "opencommerce-agentcard-web src/components/logo-strip.tsx, src/app/globals.css (THE LOGO STRIP)",
+  "exports": [
+    "Marquee",
+    "MarqueeProps"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/marquee",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/marquee.md",
+  "examples": [
+    {
+      "path": "examples/marquee.tsx",
+      "content": "import { Marquee } from \"@/components/visuals/marquee\";\n\nconst NAMES = [\"Northwind\", \"Acme Supply\", \"Globex\", \"Initech\", \"Umbrella\", \"Hooli\", \"Stark Goods\", \"Wayne Retail\", \"Soylent\", \"Vandelay\", \"Pied Piper\", \"Gringotts\"];\n\nexport function Site() {\n  return (\n    <div className=\"mx-auto w-full max-w-200 py-10\">\n      <Marquee label=\"Stores\" items={NAMES.map((name) => <span key={name} className=\"font-display text-h5 font-medium tracking-tight\">{name}</span>)} />\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "marquee"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/marquee/Site"
+        }
+      ]
+    }
+  ],
+  "type": "visual",
+  "title": "Marquee",
+  "description": "A slow strip of grey marks or names drifting left, fading at both ends, paused under the pointer.",
+  "surface": "site",
+  "kinds": [
+    "logo-strip"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/visuals/marquee.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The running strip (the opencommerce hero's stores): bare marks or names in grey (ink at 45 percent), in one row,\n// drifting left at a slow, steady pace (linear, 100s a lap) and fading out at both ends. Two copies sit end to end and\n// the track moves by one copy's width, so the loop has no seam. A mouse resting on it holds it so a mark can be read.\n// With reduced motion it stands still and scrolls by hand. The second copy is hidden from screen readers; the first is\n// a list, and `label` names it.\n\nfunction useReducedMotion() {\n  const [reduce, setReduce] = React.useState(false);\n  React.useEffect(() => {\n    const query = window.matchMedia(\"(prefers-reduced-motion: reduce)\");\n    const update = () => setReduce(query.matches);\n    update();\n    query.addEventListener(\"change\", update);\n    return () => query.removeEventListener(\"change\", update);\n  }, []);\n  return reduce;\n}\n\ntype MarqueeProps = Omit<React.ComponentProps<\"div\">, \"children\"> & {\n  /** The marks or names, in order. Give an image its alt here; the repeated copy is hidden from readers. */\n  items: React.ReactNode[];\n  /** The list's accessible name (\"Stores\"). */\n  label?: string;\n  /** Seconds for one lap (one copy of the row). */\n  duration?: number;\n};\n\nfunction Marquee({ items, label, duration = 100, className, ...props }: MarqueeProps) {\n  const trackRef = React.useRef<HTMLUListElement>(null);\n  const animationRef = React.useRef<Animation | null>(null);\n  const reduce = useReducedMotion();\n\n  React.useEffect(() => {\n    const el = trackRef.current;\n    if (!el || reduce || typeof el.animate !== \"function\") return;\n    const animation = el.animate([{ transform: \"translateX(0)\" }, { transform: \"translateX(-50%)\" }], { duration: duration * 1000, iterations: Infinity, easing: \"linear\" });\n    animationRef.current = animation;\n    return () => {\n      animation.cancel();\n      animationRef.current = null;\n    };\n  }, [reduce, duration]);\n\n  const pause = (e: React.PointerEvent) => {\n    if (e.pointerType === \"mouse\") animationRef.current?.pause();\n  };\n  const play = () => animationRef.current?.play();\n\n  const row = (copy: boolean) =>\n    items.map((item, i) => (\n      <li key={`${i}${copy ? \"-copy\" : \"\"}`} aria-hidden={copy || undefined} className=\"flex flex-none items-center pr-11\">\n        {item}\n      </li>\n    ));\n\n  return (\n    <div\n      data-slot=\"marquee\"\n      onPointerEnter={pause}\n      onPointerLeave={play}\n      className={cn(\n        \"w-full text-[color-mix(in_srgb,var(--ds-color-ink)_45%,transparent)] [mask-image:linear-gradient(to_right,transparent,var(--ds-color-ink)_14%,var(--ds-color-ink)_86%,transparent)]\",\n        reduce ? \"overflow-x-auto\" : \"overflow-hidden\",\n        className,\n      )}\n      {...props}\n    >\n      <ul ref={trackRef} aria-label={label} className=\"flex h-7 w-max list-none items-center p-0 text-body-sm whitespace-nowrap will-change-transform\">\n        {row(false)}\n        {!reduce && row(true)}\n      </ul>\n    </div>\n  );\n}\n\nexport { Marquee };\nexport type { MarqueeProps };\n"
+    }
+  ]
+}

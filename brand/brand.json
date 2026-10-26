@@ -1,0 +1,38 @@
+{
+	"name": "opencommerce",
+	"bin": "opencommerce-ds",
+	"source": "github:anwarlemu/opencommerce-brand-cli#release",
+	"reviewModel": "claude-opus-5-5",
+	"reviewThreshold": 7,
+	"registryUrl": "https://opencommerce-ds.vercel.app",
+	"site": "https://opencommerce-agentcard-web.vercel.app",
+	"surfaces": [
+		"site"
+	],
+	"fonts": {
+		"css": "https://fonts.googleapis.com/css2?family=Inter:wght@400..600&display=swap",
+		"next": [
+			{
+				"import": "Inter",
+				"variable": "--font-inter",
+				"options": {
+					"display": "swap"
+				}
+			}
+		],
+		"native": "Add Inter (text, buttons and links) to the app as a font and set it on its text styles; headings use Helvetica Neue (the system's on Apple platforms) and code, tags and figures use the system monospace"
+	},
+	"touches": {},
+	"type": {
+		"caps": false
+	},
+	"variants": {
+		"site": {
+			"filled": "primary",
+			"outlined": "secondary",
+			"quiet": "ghost",
+			"onBrand": "on-brand",
+			"card": "default"
+		}
+	}
+}

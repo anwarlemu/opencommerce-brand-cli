@@ -1,0 +1,1316 @@
+{
+	"site": {
+		"page": {
+			"name": "Page",
+			"match": {
+				"tags": [
+					"html",
+					"body"
+				]
+			},
+			"css": {
+				"background-color": "var(--ds-color-bg-default)",
+				"color": "var(--ds-color-text-default)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body)",
+				"line-height": "var(--ds-leading-body)"
+			},
+			"tailwind": "bg-surface text-fg font-sans text-body leading-body",
+			"rules": [
+				"One white page throughout; ink text in Inter at 16px, leading 1.6.",
+				"Blue is the color of actions, labels and accents, never a ground behind a section or a gradient behind text."
+			],
+			"source": "src/app/globals.css:143 (html, body)"
+		},
+		"column": {
+			"name": "Content column",
+			"match": {
+				"words": [
+					"container",
+					"wrapper",
+					"wrap",
+					"inner",
+					"content",
+					"max"
+				]
+			},
+			"css": {
+				"width": "100%",
+				"max-width": "var(--ds-frame-column)",
+				"margin-inline": "auto"
+			},
+			"tailwind": "w-full max-w-(--ds-frame-column) mx-auto",
+			"rules": [
+				"A 1200px frame with 40px of gutter (20px on phones); wide sections (a live table, a step-by-step, the closing card) take all of it.",
+				"Most sections sit in the 800px medium column (--ds-layout-medium): the hero, feature cards, pricing and the FAQ."
+			],
+			"source": "src/app/globals.css:66 (--frame-max, --w-medium, --pad)"
+		},
+		"section": {
+			"name": "Section",
+			"match": {
+				"tags": [
+					"section"
+				],
+				"words": [
+					"section",
+					"block",
+					"band"
+				]
+			},
+			"css": {
+				"padding-top": "var(--ds-space-30)",
+				"background-color": "var(--ds-color-bg-default)"
+			},
+			"states": {
+				"@media (max-width: 47.9375rem)": {
+					"padding-top": "calc(var(--ds-space-16) + var(--ds-space-2))"
+				}
+			},
+			"tailwind": "pt-30 max-md:pt-18 bg-surface",
+			"rules": [
+				"Generous air above each section (120px, 72px on phones) and nothing ruled between them; the last section before the footer keeps the same air below.",
+				"Sections are white; none sits on a colored ground."
+			],
+			"source": "src/app/globals.css:209 (.sec)"
+		},
+		"section-heading": {
+			"name": "Section heading",
+			"match": {
+				"tags": [
+					"h2"
+				],
+				"words": [
+					"title",
+					"heading",
+					"headline"
+				],
+				"context": [
+					"section"
+				]
+			},
+			"css": {
+				"font-family": "var(--ds-font-display)",
+				"font-size": "var(--ds-text-h2)",
+				"font-weight": "var(--ds-font-weight-medium)",
+				"letter-spacing": "var(--ds-tracking-tighter)",
+				"line-height": "var(--ds-leading-display)",
+				"color": "var(--ds-color-text-default)",
+				"text-align": "center",
+				"text-wrap": "balance"
+			},
+			"tailwind": "font-display text-h2 font-medium tracking-tighter leading-display text-fg text-center text-balance",
+			"rules": [
+				"Centered, display face at 500, 44px (32px on phones), tracked to -0.025em, leading 1.06.",
+				"Its description sits 16px under it, centered, 16px Inter at 64 percent ink; 48 to 56px of air before the content.",
+				"The closing card heading is the 48px step (h1)."
+			],
+			"source": "src/app/globals.css:223 (.h-section), src/components/section-head.tsx"
+		},
+		"section-description": {
+			"name": "Section description",
+			"match": {
+				"tags": [
+					"p"
+				],
+				"words": [
+					"subtitle",
+					"sub",
+					"lead",
+					"description",
+					"intro",
+					"desc",
+					"lede"
+				],
+				"context": [
+					"section"
+				]
+			},
+			"css": {
+				"max-width": "var(--ds-layout-text)",
+				"margin-inline": "auto",
+				"font-size": "var(--ds-text-body)",
+				"line-height": "var(--ds-leading-lead)",
+				"color": "var(--ds-color-text-muted)",
+				"text-align": "center"
+			},
+			"tailwind": "max-w-(--ds-layout-text) mx-auto text-body leading-lead text-fg-muted text-center",
+			"rules": [
+				"16px Inter at 64 percent ink, leading 1.55, centered under the heading, no wider than 576px.",
+				"One to three lines; it says what the section shows, plainly."
+			],
+			"source": "src/app/globals.css:232 (.lead)"
+		},
+		"hero": {
+			"name": "Hero",
+			"match": {
+				"words": [
+					"hero",
+					"masthead",
+					"jumbotron",
+					"banner-hero",
+					"splash"
+				]
+			},
+			"css": {
+				"padding-block": "var(--ds-space-12) var(--ds-space-20)",
+				"background-color": "var(--ds-color-bg-default)",
+				"color": "var(--ds-color-text-default)",
+				"text-align": "center"
+			},
+			"tailwind": "pt-12 pb-20 bg-surface text-fg text-center",
+			"rules": [
+				"White and centered: a small squarish pill link, the headline, one line of lead, the blue key beside the white key, then the proof (a logo strip) and the product (a code window).",
+				"No colored ground and nothing behind the headline; any texture (the field of *s and @s) sits behind the code window and feathers out."
+			],
+			"source": "src/components/hero.tsx"
+		},
+		"hero-title": {
+			"name": "Hero title",
+			"match": {
+				"tags": [
+					"h1"
+				],
+				"words": [
+					"hero-title",
+					"headline",
+					"display"
+				]
+			},
+			"css": {
+				"font-family": "var(--ds-font-display)",
+				"font-size": "var(--ds-text-hero)",
+				"font-weight": "var(--ds-font-weight-medium)",
+				"letter-spacing": "var(--ds-tracking-hero)",
+				"line-height": "var(--ds-leading-heading)",
+				"text-wrap": "balance"
+			},
+			"tailwind": "font-display text-hero font-medium tracking-hero leading-heading text-balance",
+			"rules": [
+				"54px display at 500, tracked to -0.03em, leading 1.02; 40px on phones.",
+				"Ink on white, two lines at most."
+			],
+			"source": "src/app/globals.css:218 (.h-hero)"
+		},
+		"hero-subtitle": {
+			"name": "Hero subtitle",
+			"match": {
+				"tags": [
+					"p"
+				],
+				"words": [
+					"hero-sub",
+					"subtitle",
+					"tagline",
+					"lead"
+				],
+				"context": [
+					"hero"
+				]
+			},
+			"css": {
+				"max-width": "var(--ds-layout-text)",
+				"margin-inline": "auto",
+				"font-size": "var(--ds-text-body)",
+				"line-height": "var(--ds-leading-lead)",
+				"color": "var(--ds-color-text-muted)"
+			},
+			"tailwind": "max-w-(--ds-layout-text) mx-auto text-body leading-lead text-fg-muted",
+			"rules": [
+				"16px Inter at 64 percent ink, 12px under the headline.",
+				"One line where it fits; the actions follow 40px below."
+			],
+			"source": "src/app/globals.css:232 (.lead), src/components/hero.tsx"
+		},
+		"eyebrow": {
+			"name": "Eyebrow",
+			"match": {
+				"words": [
+					"eyebrow",
+					"kicker",
+					"overline",
+					"label",
+					"tag",
+					"pretitle",
+					"badge"
+				]
+			},
+			"css": {
+				"display": "inline-flex",
+				"align-items": "center",
+				"padding": "var(--ds-space-1-5) var(--ds-space-3-5)",
+				"border": "1px solid var(--ds-color-border-strong)",
+				"border-radius": "var(--ds-radius-card)",
+				"background-color": "var(--ds-color-bg-default)",
+				"color": "var(--ds-color-text-muted)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)",
+				"font-weight": "var(--ds-font-weight-medium)",
+				"letter-spacing": "var(--ds-tracking-snug)",
+				"text-transform": "none",
+				"transition": "color var(--ds-duration-fast) var(--ds-easing-out)"
+			},
+			"tailwind": "inline-flex items-center px-3.5 py-1.5 border border-line-strong rounded-card bg-surface text-fg-muted font-sans text-body-sm font-medium tracking-snug normal-case transition-colors duration-150 ease-out hover:text-fg",
+			"rules": [
+				"A squarish pill above the headline: 14px Inter at 500, 64 percent ink, a 16 percent ink border, 6px corners; it links somewhere real.",
+				"Sentence case, never caps; one short claim (\"Buy from 4000+ stores\")."
+			],
+			"source": "src/components/hero.tsx (the stores pill)",
+			"states": {
+				":hover": {
+					"color": "var(--ds-color-text-default)"
+				}
+			}
+		},
+		"card": {
+			"name": "Card",
+			"match": {
+				"tags": [
+					"article"
+				],
+				"words": [
+					"card",
+					"tile",
+					"panel",
+					"box",
+					"feature",
+					"item",
+					"plan"
+				]
+			},
+			"css": {
+				"display": "flex",
+				"flex-direction": "column",
+				"gap": "var(--ds-space-3)",
+				"padding": "var(--ds-space-6)",
+				"border": "1px solid var(--ds-color-border-default)",
+				"border-radius": "var(--ds-radius-card)",
+				"background-color": "var(--ds-color-bg-default)"
+			},
+			"tailwind": "flex flex-col gap-3 p-6 border border-line rounded-card bg-surface",
+			"rules": [
+				"White, a 9 percent ink hairline, 6px corners and no drop.",
+				"A card that shows a product, a plan or a file is a window instead (window): 12px corners, a quiet bar and a soft drop."
+			],
+			"source": "src/app/globals.css:87 (--r-card)"
+		},
+		"card-raised": {
+			"name": "Raised card",
+			"match": {
+				"words": [
+					"feature",
+					"product",
+					"plan",
+					"offer",
+					"tile-lg",
+					"showcase"
+				]
+			},
+			"css": {
+				"padding": "var(--ds-space-3) var(--ds-space-3-5) var(--ds-space-3-5)",
+				"border": "1px solid var(--ds-color-border-default)",
+				"border-radius": "var(--ds-radius-control)",
+				"background-color": "var(--ds-color-bg-default)",
+				"box-shadow": "var(--ds-shadow-raised)"
+			},
+			"tailwind": "px-3.5 pt-3 pb-3.5 border border-line rounded-control bg-surface shadow-raised",
+			"rules": [
+				"A small card set on a picture (an order, a receipt): 8px corners, a hairline and a firmer drop.",
+				"Its header row is mono 11px at 64 percent ink with a status pill at the right."
+			],
+			"source": "src/app/globals.css:896 (.feat-order)"
+		},
+		"window": {
+			"name": "Window",
+			"match": {
+				"words": [
+					"window",
+					"terminal",
+					"dir",
+					"case",
+					"file"
+				]
+			},
+			"css": {
+				"display": "flex",
+				"flex-direction": "column",
+				"overflow": "hidden",
+				"border": "1px solid var(--ds-color-border-strong)",
+				"border-radius": "var(--ds-radius-panel)",
+				"background-color": "var(--ds-color-bg-default)",
+				"box-shadow": "var(--ds-shadow-card)"
+			},
+			"tailwind": "flex flex-col overflow-hidden border border-line-strong rounded-panel bg-surface shadow-card",
+			"rules": [
+				"The brand's card: white, a 16 percent ink edge, 12px corners and a soft long drop, with a 36px bar on top.",
+				"Features, plans, live tables and code all sit in windows; the bar names them like files (pricing.plan, monitoring.live)."
+			],
+			"source": "src/app/globals.css:442 (.win)"
+		},
+		"window-bar": {
+			"name": "Window bar",
+			"match": {
+				"words": [
+					"windowbar",
+					"titlebar",
+					"window-bar",
+					"title-bar",
+					"chrome"
+				]
+			},
+			"css": {
+				"display": "grid",
+				"grid-template-columns": "1fr auto 1fr",
+				"align-items": "center",
+				"gap": "var(--ds-space-3)",
+				"min-height": "var(--ds-space-9)",
+				"padding-inline": "var(--ds-space-3-5) var(--ds-space-3)",
+				"border-bottom": "1px solid var(--ds-color-border-default)",
+				"background-color": "var(--ds-color-window-bar)",
+				"color": "var(--ds-color-text-muted)",
+				"font-family": "var(--ds-font-mono)",
+				"font-size": "var(--ds-text-bar)"
+			},
+			"tailwind": "grid grid-cols-[1fr_auto_1fr] items-center gap-3 min-h-9 pl-3.5 pr-3 border-b border-line bg-window-bar text-fg-muted font-mono text-bar",
+			"rules": [
+				"36px, mist ground, 11.5px mono at 64 percent ink, a 9 percent ink rule under it.",
+				"Left: a dimmed arrow; center: the window's name; right: the drawn [*] in blue, or the window's one action (Copy)."
+			],
+			"source": "src/app/globals.css:453 (.win-bar), src/components/window.tsx"
+		},
+		"card-title": {
+			"name": "Card title",
+			"match": {
+				"tags": [
+					"h3",
+					"h4"
+				],
+				"words": [
+					"card-title",
+					"title",
+					"name",
+					"heading"
+				],
+				"context": [
+					"card"
+				]
+			},
+			"css": {
+				"font-family": "var(--ds-font-display)",
+				"font-size": "var(--ds-text-h4)",
+				"font-weight": "var(--ds-font-weight-medium)",
+				"letter-spacing": "var(--ds-tracking-tight)",
+				"line-height": "var(--ds-leading-snug)",
+				"color": "var(--ds-color-text-default)"
+			},
+			"tailwind": "font-display text-h4 font-medium tracking-tight leading-snug text-fg",
+			"rules": [
+				"20px display at 500, tracked tight, leading 1.2.",
+				"Its description is 16px Inter at 64 percent ink, 8px below."
+			],
+			"source": "src/app/globals.css:228 (.h-card)"
+		},
+		"body-text": {
+			"name": "Body text",
+			"match": {
+				"tags": [
+					"p",
+					"li"
+				],
+				"words": [
+					"text",
+					"body",
+					"copy",
+					"desc",
+					"description",
+					"summary",
+					"excerpt"
+				]
+			},
+			"css": {
+				"font-size": "var(--ds-text-body)",
+				"line-height": "var(--ds-leading-body)",
+				"color": "var(--ds-color-text-default)"
+			},
+			"tailwind": "text-body leading-body text-fg",
+			"rules": [
+				"16px Inter, leading 1.6, ink; secondary copy at 64 percent ink.",
+				"Lines no wider than about 70 characters."
+			],
+			"source": "src/app/globals.css:155 (body)"
+		},
+		"caption": {
+			"name": "Caption",
+			"match": {
+				"tags": [
+					"small",
+					"figcaption",
+					"time"
+				],
+				"words": [
+					"caption",
+					"meta",
+					"note",
+					"date",
+					"small",
+					"fine",
+					"hint"
+				]
+			},
+			"css": {
+				"font-size": "var(--ds-text-body-sm)",
+				"line-height": "var(--ds-leading-lead)",
+				"color": "var(--ds-color-text-muted)"
+			},
+			"tailwind": "text-body-sm leading-lead text-fg-muted",
+			"rules": [
+				"14px Inter at 64 percent ink: list details, footer links, small print (12px).",
+				"Hints and timestamps go fainter, 42 percent ink."
+			],
+			"source": "src/components/site-footer.tsx"
+		},
+		"link": {
+			"name": "Link",
+			"match": {
+				"tags": [
+					"a"
+				],
+				"words": [
+					"link",
+					"more",
+					"arrow",
+					"readmore"
+				]
+			},
+			"css": {
+				"color": "var(--ds-color-text-brand)",
+				"text-decoration-line": "none",
+				"transition": "color var(--ds-duration-fast) var(--ds-easing-out)"
+			},
+			"states": {
+				":hover": {
+					"color": "var(--ds-color-text-default)"
+				}
+			},
+			"tailwind": "text-fg-brand no-underline transition-colors duration-150 ease-out hover:text-fg",
+			"rules": [
+				"Inline links are blue with no underline; hover settles to ink.",
+				"Navigation and footer links are muted ink and turn ink on hover."
+			],
+			"source": "src/app/globals.css:52 (--accent)"
+		},
+		"button-primary": {
+			"name": "Primary button",
+			"match": {
+				"tags": [
+					"button",
+					"a"
+				],
+				"words": [
+					"btn-primary",
+					"primary",
+					"cta",
+					"get-started",
+					"signup",
+					"start",
+					"solid",
+					"filled",
+					"main"
+				]
+			},
+			"css": {
+				"display": "inline-flex",
+				"align-items": "center",
+				"justify-content": "center",
+				"gap": "var(--ds-space-2)",
+				"height": "var(--ds-space-10)",
+				"padding-inline": "var(--ds-space-4-5)",
+				"border-radius": "var(--ds-radius-control)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-button)",
+				"font-weight": "var(--ds-font-weight-medium)",
+				"line-height": "var(--ds-leading-body)",
+				"white-space": "nowrap",
+				"text-decoration": "none",
+				"transition": "background-color var(--ds-duration-fast) var(--ds-easing-out), border-color var(--ds-duration-fast) var(--ds-easing-out), color var(--ds-duration-fast) var(--ds-easing-out), transform var(--ds-duration-fast) var(--ds-easing-out)",
+				"border": "1px solid var(--ds-color-border-brand-edge)",
+				"background-color": "var(--ds-color-action-primary)",
+				"color": "var(--ds-color-action-primary-fg)"
+			},
+			"states": {
+				":hover": {
+					"background-color": "var(--ds-color-action-primary-hover)"
+				},
+				":active": {
+					"transform": "scale(0.97)"
+				}
+			},
+			"tailwind": "inline-flex items-center justify-center gap-2 h-10 px-4.5 rounded-control font-sans text-button font-medium leading-body whitespace-nowrap transition-[background-color,border-color,color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none border border-line-brand-edge bg-primary text-on-primary hover:bg-primary-hover",
+			"rules": [
+				"The blue key: 40px tall, 18px of padding, 8px corners, 15px Inter at 500, a border a shade darker than the fill, flat (no shadow).",
+				"Hover lifts the blue toward white a shade; a press shrinks it to 97 percent.",
+				"One per view; the white key sits beside it for the second action."
+			],
+			"source": "src/app/globals.css:241 (.btn), src/app/globals.css:389 (.btn-primary)"
+		},
+		"button-secondary": {
+			"name": "Secondary button",
+			"match": {
+				"tags": [
+					"button",
+					"a"
+				],
+				"words": [
+					"btn-secondary",
+					"secondary",
+					"outline",
+					"ghost",
+					"btn-ghost",
+					"learn",
+					"demo",
+					"explore",
+					"btn"
+				]
+			},
+			"css": {
+				"display": "inline-flex",
+				"align-items": "center",
+				"justify-content": "center",
+				"gap": "var(--ds-space-2)",
+				"height": "var(--ds-space-10)",
+				"padding-inline": "var(--ds-space-4-5)",
+				"border-radius": "var(--ds-radius-control)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-button)",
+				"font-weight": "var(--ds-font-weight-medium)",
+				"line-height": "var(--ds-leading-body)",
+				"white-space": "nowrap",
+				"text-decoration": "none",
+				"transition": "background-color var(--ds-duration-fast) var(--ds-easing-out), border-color var(--ds-duration-fast) var(--ds-easing-out), color var(--ds-duration-fast) var(--ds-easing-out), transform var(--ds-duration-fast) var(--ds-easing-out)",
+				"border": "1px solid var(--ds-color-border-key)",
+				"background-color": "var(--ds-color-bg-default)",
+				"color": "var(--ds-color-text-default)"
+			},
+			"states": {
+				":hover": {
+					"background-color": "var(--ds-color-bg-subtle)"
+				},
+				":active": {
+					"transform": "scale(0.97)"
+				}
+			},
+			"tailwind": "inline-flex items-center justify-center gap-2 h-10 px-4.5 rounded-control font-sans text-button font-medium leading-body whitespace-nowrap transition-[background-color,border-color,color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none border border-line-key bg-surface text-fg hover:bg-subtle",
+			"rules": [
+				"The white key: ink text, a 16 percent ink border, flat.",
+				"Hover turns it mist; a press shrinks it."
+			],
+			"source": "src/app/globals.css:399 (.btn-secondary)"
+		},
+		"button-on-brand": {
+			"name": "Button on the blue",
+			"match": {
+				"tags": [
+					"button",
+					"a"
+				],
+				"words": [
+					"btn"
+				],
+				"context": [
+					"section-blue",
+					"on-brand"
+				]
+			},
+			"css": {
+				"display": "inline-flex",
+				"align-items": "center",
+				"justify-content": "center",
+				"gap": "var(--ds-space-2)",
+				"height": "var(--ds-space-10)",
+				"padding-inline": "var(--ds-space-4-5)",
+				"border-radius": "var(--ds-radius-control)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-button)",
+				"font-weight": "var(--ds-font-weight-medium)",
+				"line-height": "var(--ds-leading-body)",
+				"white-space": "nowrap",
+				"text-decoration": "none",
+				"transition": "background-color var(--ds-duration-fast) var(--ds-easing-out), border-color var(--ds-duration-fast) var(--ds-easing-out), color var(--ds-duration-fast) var(--ds-easing-out), transform var(--ds-duration-fast) var(--ds-easing-out)",
+				"border": "1px solid var(--ds-color-border-key)",
+				"background-color": "var(--ds-color-white)",
+				"color": "var(--ds-color-text-brand)"
+			},
+			"states": {
+				":hover": {
+					"background-color": "var(--ds-color-bg-subtle)"
+				},
+				":active": {
+					"transform": "scale(0.97)"
+				}
+			},
+			"tailwind": "inline-flex items-center justify-center gap-2 h-10 px-4.5 rounded-control font-sans text-button font-medium leading-body whitespace-nowrap transition-[background-color,border-color,color,transform] duration-150 ease-out active:scale-[0.97] motion-reduce:transition-none border border-line-key bg-white text-fg-brand hover:bg-subtle",
+			"rules": [
+				"A white key with blue text, for the rare action that sits on a blue fill or on ink.",
+				"The page itself never has a blue ground; on white use the blue key."
+			],
+			"source": "src/app/globals.css:408 (.key-white)"
+		},
+		"header": {
+			"name": "Header",
+			"match": {
+				"tags": [
+					"header"
+				],
+				"words": [
+					"header",
+					"nav",
+					"navbar",
+					"topbar",
+					"site-header",
+					"masthead"
+				],
+				"roles": [
+					"banner"
+				]
+			},
+			"css": {
+				"background-color": "transparent",
+				"color": "inherit",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)",
+				"border": "0"
+			},
+			"tailwind": "bg-transparent text-inherit font-sans text-body-sm border-0",
+			"rules": [
+				"No bar: three glass trays fixed over the page (the wordmark, the links, the Get started key), each its own pane, 64px tall.",
+				"At the top the links sit dead center; once the page scrolls the trays drop 12px and slide together (250ms, in-out), and the byline folds away."
+			],
+			"source": "src/components/site-header.tsx"
+		},
+		"header-action": {
+			"name": "Header action",
+			"match": {
+				"tags": [
+					"a",
+					"button"
+				],
+				"words": [
+					"btn",
+					"cta",
+					"login",
+					"signin",
+					"sign-in",
+					"demo",
+					"get-started",
+					"signup"
+				],
+				"context": [
+					"header"
+				]
+			},
+			"css": {
+				"display": "inline-flex",
+				"align-items": "center",
+				"gap": "var(--ds-space-3-5)",
+				"padding": "var(--ds-space-2) var(--ds-space-3-5)",
+				"border": "1px solid var(--ds-color-border-brand-edge)",
+				"border-radius": "var(--ds-radius-sm)",
+				"background-color": "var(--ds-color-action-primary)",
+				"color": "var(--ds-color-action-primary-fg)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)",
+				"line-height": "var(--ds-leading-tight)",
+				"white-space": "nowrap",
+				"text-decoration": "none",
+				"transition": "background-color var(--ds-duration-fast) var(--ds-easing-out), transform var(--ds-duration-fast) var(--ds-easing-out)"
+			},
+			"states": {
+				":hover": {
+					"background-color": "var(--ds-color-action-primary-hover)"
+				},
+				":active": {
+					"transform": "scale(0.97)"
+				}
+			},
+			"tailwind": "inline-flex items-center gap-3.5 px-3.5 py-2 border border-line-brand-edge rounded-sm bg-primary text-on-primary font-sans text-body-sm leading-tight whitespace-nowrap transition-[background-color,transform] duration-150 ease-out hover:bg-primary-hover active:scale-[0.97]",
+			"rules": [
+				"The header's one action is a small blue key (14px Inter, 6px corners) in its own glass tray.",
+				"Other header links are nav links in the middle tray."
+			],
+			"source": "src/app/globals.css:366 (.nav-cta)"
+		},
+		"nav-link": {
+			"name": "Nav link",
+			"match": {
+				"tags": [
+					"a",
+					"button"
+				],
+				"words": [
+					"nav-link",
+					"menu-link",
+					"nav-item",
+					"link",
+					"menu-item"
+				],
+				"context": [
+					"header",
+					"nav"
+				]
+			},
+			"css": {
+				"display": "flex",
+				"align-items": "center",
+				"padding": "var(--ds-space-2) var(--ds-space-3-5)",
+				"border-radius": "var(--ds-radius-menu)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)",
+				"line-height": "var(--ds-leading-tight)",
+				"color": "var(--ds-color-text-nav)",
+				"text-decoration": "none",
+				"transition": "background-color var(--ds-duration-fast) var(--ds-easing-out), color var(--ds-duration-fast) var(--ds-easing-out)"
+			},
+			"states": {
+				":hover": {
+					"background-color": "var(--ds-color-wash-hover)",
+					"color": "var(--ds-color-text-default)"
+				},
+				"[aria-current]": {
+					"background-color": "var(--ds-color-bg-default)",
+					"color": "var(--ds-color-text-brand)",
+					"box-shadow": "var(--ds-shadow-lit)"
+				}
+			},
+			"tailwind": "flex items-center px-3.5 py-2 rounded-menu font-sans text-body-sm leading-tight text-fg-nav transition-colors duration-150 ease-out hover:bg-wash-hover hover:text-fg aria-[current]:bg-surface aria-[current]:text-fg-brand aria-[current]:shadow-lit",
+			"rules": [
+				"14px Inter at 64 percent ink, 5px corners; hover is a 5 percent ink wash and ink text.",
+				"The current section is a white pill with blue text and a hairline lift, and it slides between links as the page scrolls (250ms, in-out)."
+			],
+			"source": "src/app/globals.css:307 (.nav-link), src/app/globals.css:347 (.nav-lit)"
+		},
+		"nav-dock": {
+			"name": "Glass nav",
+			"match": {
+				"words": [
+					"dock",
+					"nav-pill",
+					"pill-nav",
+					"floating-nav",
+					"navpill",
+					"bottom-nav"
+				]
+			},
+			"css": {
+				"padding": "calc(var(--ds-space-1) - 1px)",
+				"border": "1px solid var(--ds-color-border-glass)",
+				"border-radius": "var(--ds-radius-control)",
+				"background-color": "var(--ds-color-bg-glass)",
+				"background-image": "var(--ds-glass-sheen)",
+				"box-shadow": "var(--ds-shadow-glass)",
+				"backdrop-filter": "var(--ds-glass-blur)",
+				"color": "var(--ds-color-text-default)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)"
+			},
+			"tailwind": "p-[3px] border border-line-glass rounded-control bg-glass bg-(image:--ds-glass-sheen) shadow-glass [backdrop-filter:var(--ds-glass-blur)] text-fg font-sans text-body-sm",
+			"rules": [
+				"A tray of frosted glass: mostly white over a heavy blur, a 10 percent ink edge, a lit top edge, 8px corners and no drop.",
+				"Its links are nav links; the current one is the white pill."
+			],
+			"source": "src/app/globals.css:285 (.nav-tray)"
+		},
+		"chip": {
+			"name": "Tag",
+			"match": {
+				"words": [
+					"chip",
+					"pill",
+					"tag",
+					"badge",
+					"token",
+					"label"
+				]
+			},
+			"css": {
+				"display": "inline-flex",
+				"align-items": "center",
+				"padding": "var(--ds-space-1) var(--ds-space-2)",
+				"border": "0",
+				"border-radius": "var(--ds-radius-chip)",
+				"background-color": "var(--ds-color-blue-5)",
+				"color": "var(--ds-color-text-brand)",
+				"font-family": "var(--ds-font-mono)",
+				"font-size": "var(--ds-text-caption)",
+				"letter-spacing": "var(--ds-tracking-normal)",
+				"text-transform": "none",
+				"line-height": "var(--ds-leading-body)"
+			},
+			"tailwind": "inline-flex items-center px-2 py-1 border-0 rounded-chip bg-blue-5 text-fg-brand font-mono text-caption tracking-normal normal-case leading-body",
+			"rules": [
+				"A small tag: mono 11 to 12px, blue on the pale blue, 2px corners, sentence case (\"Every merchant\").",
+				"A status pill (Processing, Confirmed) is fully round, 10px at 600: mist and muted while waiting, sky and blue when done."
+			],
+			"source": "src/components/pricing.tsx (the featured tag), globals.css:905 (.feat-pill)"
+		},
+		"stat": {
+			"name": "Stat",
+			"match": {
+				"words": [
+					"stat",
+					"metric",
+					"number",
+					"figure",
+					"kpi",
+					"count",
+					"value"
+				]
+			},
+			"css": {
+				"font-family": "var(--ds-font-display)",
+				"font-size": "var(--ds-text-h2)",
+				"font-weight": "var(--ds-font-weight-medium)",
+				"letter-spacing": "var(--ds-tracking-hero)",
+				"line-height": "var(--ds-leading-tight)",
+				"font-variant-numeric": "tabular-nums"
+			},
+			"tailwind": "font-display text-h2 font-medium tracking-hero leading-tight tabular-nums",
+			"rules": [
+				"A figure in the 44px display step at 500 (a price), its unit beside it in 14px Inter at 64 percent ink.",
+				"Figures inside tables and pictures are mono 13px."
+			],
+			"source": "src/components/pricing.tsx (plan price)"
+		},
+		"code-window": {
+			"name": "Code window",
+			"match": {
+				"tags": [
+					"pre"
+				],
+				"words": [
+					"code",
+					"terminal",
+					"snippet",
+					"codeblock",
+					"console",
+					"editor",
+					"window"
+				]
+			},
+			"css": {
+				"overflow": "hidden",
+				"border": "1px solid var(--ds-color-border-strong)",
+				"border-radius": "var(--ds-radius-panel)",
+				"background-color": "var(--ds-color-bg-default)",
+				"color": "var(--ds-color-text-default)",
+				"font-family": "var(--ds-font-mono)",
+				"font-size": "var(--ds-text-snippet)",
+				"line-height": "var(--ds-leading-code)",
+				"box-shadow": "var(--ds-shadow-card)"
+			},
+			"tailwind": "overflow-hidden border border-line-strong rounded-panel bg-surface text-fg font-mono text-snippet leading-code shadow-card",
+			"rules": [
+				"Code sits in a window: mono 13px, leading 1.75, keywords blue, strings deep blue, comments faint; a banded line is the pale blue.",
+				"Code that runs (a step, an install line) is the dark body: ink, text at 88 percent white, keywords pale blue, strings sky.",
+				"Long lines wrap and hang under their own indent instead of scrolling."
+			],
+			"source": "src/app/globals.css:589 (.code), src/app/globals.css:490 (.win-body-dark)"
+		},
+		"media-frame": {
+			"name": "Media panel",
+			"match": {
+				"tags": [
+					"img",
+					"video",
+					"picture",
+					"figure",
+					"iframe"
+				],
+				"words": [
+					"screenshot",
+					"image",
+					"media",
+					"preview",
+					"shot",
+					"visual",
+					"frame",
+					"mockup"
+				]
+			},
+			"css": {
+				"overflow": "hidden",
+				"border": "1px solid var(--ds-color-border-strong)",
+				"border-radius": "var(--ds-radius-panel)",
+				"background-color": "var(--ds-color-bg-default)",
+				"box-shadow": "var(--ds-shadow-card)"
+			},
+			"tailwind": "overflow-hidden border border-line-strong rounded-panel bg-surface shadow-card",
+			"rules": [
+				"Screens, pictures and demos sit in a window (the same edge, corners and drop), never on a colored panel.",
+				"Pictures are small and flat, drawn from the page's own parts: hairlines on white with blue as the only voice."
+			],
+			"source": "src/app/globals.css:442 (.win), src/components/features.tsx"
+		},
+		"table": {
+			"name": "Table",
+			"match": {
+				"tags": [
+					"table"
+				],
+				"words": [
+					"table",
+					"comparison",
+					"compare",
+					"pricing-table",
+					"grid"
+				]
+			},
+			"css": {
+				"width": "100%",
+				"border-collapse": "collapse",
+				"font-size": "var(--ds-text-body-sm)",
+				"color": "var(--ds-color-text-default)"
+			},
+			"tailwind": "w-full border-collapse text-body-sm text-fg [&_th]:text-caption [&_th]:text-fg-muted [&_th]:font-normal [&_th]:text-left [&_tr]:border-b [&_tr]:border-line [&_tbody_tr:hover]:bg-subtle",
+			"rules": [
+				"14px Inter rows at 16px of padding with a 9 percent ink rule under each; heads 12px Inter at 64 percent ink, normal weight.",
+				"Figures (rates, durations) are mono 13px; hovered rows turn mist. No zebra stripes, no vertical rules."
+			],
+			"source": "src/components/monitoring.tsx"
+		},
+		"faq": {
+			"name": "FAQ",
+			"match": {
+				"tags": [
+					"details"
+				],
+				"words": [
+					"faq",
+					"accordion",
+					"question",
+					"qa"
+				]
+			},
+			"css": {
+				"border-bottom": "1px solid var(--ds-color-border-default)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body)",
+				"font-weight": "var(--ds-font-weight-regular)"
+			},
+			"tailwind": "border-b border-line font-sans text-body font-normal",
+			"rules": [
+				"Questions in an 800px list: 16px Inter, 20px of padding, a 9 percent ink rule between; a drawn plus at the right turns 45 degrees and blue when open.",
+				"Hovered and open rows take the pale blue on a card inset 3px, and hide the rules on both edges.",
+				"The answer is 15px Inter at 64 percent ink, fading up 4px in 200ms; one open at a time."
+			],
+			"source": "src/components/faq.tsx, globals.css:1107"
+		},
+		"tabs": {
+			"name": "Tabs",
+			"match": {
+				"roles": [
+					"tab",
+					"tablist"
+				],
+				"words": [
+					"tab",
+					"tabs",
+					"segment",
+					"toggle",
+					"switcher"
+				]
+			},
+			"css": {
+				"display": "flex",
+				"gap": "2px",
+				"padding": "calc(var(--ds-space-1) - 1px)",
+				"border": "1px solid var(--ds-color-border-glass)",
+				"border-radius": "var(--ds-radius-control)",
+				"background-color": "var(--ds-color-bg-glass)",
+				"box-shadow": "var(--ds-shadow-glass)"
+			},
+			"states": {
+				"[aria-selected=true]": {
+					"background-color": "var(--ds-color-bg-default)",
+					"color": "var(--ds-color-text-brand)",
+					"box-shadow": "var(--ds-shadow-lit)"
+				}
+			},
+			"tailwind": "flex gap-[2px] p-[3px] border border-line-glass rounded-control bg-glass shadow-glass",
+			"rules": [
+				"A tray like the header's: 3px inset, 8px corners; tabs are 14px Inter at 64 percent ink with 5px corners.",
+				"The selected tab is a white pill with blue text and a hairline lift that slides between tabs (250ms, in-out).",
+				"Tabs on ink (an install box) are an underline: white 2px under the selected, the rest white at 50 percent."
+			],
+			"source": "src/app/globals.css:285 (.nav-tray), src/components/install-tabs.tsx"
+		},
+		"input": {
+			"name": "Input",
+			"match": {
+				"tags": [
+					"input",
+					"textarea",
+					"select"
+				],
+				"words": [
+					"input",
+					"field",
+					"search",
+					"email"
+				]
+			},
+			"css": {
+				"height": "var(--ds-space-9)",
+				"padding-inline": "var(--ds-space-3)",
+				"border": "1px solid var(--ds-color-border-field)",
+				"border-radius": "var(--ds-radius-control)",
+				"background-color": "var(--ds-color-bg-default)",
+				"color": "var(--ds-color-text-default)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)",
+				"transition": "border-color var(--ds-duration-fast) var(--ds-easing-out)"
+			},
+			"states": {
+				":focus-visible": {
+					"border-color": "var(--ds-color-border-brand)",
+					"outline": "none"
+				},
+				"[aria-invalid=true]": {
+					"border-color": "var(--ds-color-status-danger)"
+				}
+			},
+			"tailwind": "h-9 px-3 border border-line-field rounded-control bg-surface text-fg font-sans text-body-sm placeholder:text-fg-faint outline-none transition-[border-color] duration-150 ease-out focus-visible:border-brand aria-invalid:border-danger",
+			"rules": [
+				"36px fields: a 16 percent ink border, 8px corners, 14px Inter, placeholder at 42 percent ink.",
+				"Focus turns the border blue (no glow); invalid fields use the danger border. Labels are 14px Inter above the control."
+			],
+			"source": "src/components/monitoring.tsx (#merchant-filter)"
+		},
+		"logo-strip": {
+			"name": "Merchant line",
+			"match": {
+				"words": [
+					"logos",
+					"logo-strip",
+					"clients",
+					"customers",
+					"trusted",
+					"marquee",
+					"partners",
+					"brands"
+				]
+			},
+			"css": {
+				"overflow": "hidden",
+				"color": "var(--ds-color-text-faint)",
+				"mask-image": "linear-gradient(to right, transparent, var(--ds-color-black) 14%, var(--ds-color-black) 86%, transparent)"
+			},
+			"tailwind": "overflow-hidden text-fg-faint [mask-image:linear-gradient(to_right,transparent,black_14%,black_86%,transparent)]",
+			"rules": [
+				"Bare marks in gray, one row, no tiles: square marks 20px tall, long wordmarks held to 84px wide, 44px apart.",
+				"The row drifts left slowly (linear, about 100s a loop), fades out at both ends and holds while the pointer rests on it; under reduced motion it stays put and scrolls by hand."
+			],
+			"source": "src/app/globals.css:1186 (.strip), src/components/logo-strip.tsx"
+		},
+		"footer": {
+			"name": "Footer",
+			"match": {
+				"tags": [
+					"footer"
+				],
+				"words": [
+					"footer",
+					"site-footer"
+				],
+				"roles": [
+					"contentinfo"
+				]
+			},
+			"css": {
+				"border-top": "1px solid var(--ds-color-border-default)",
+				"background-color": "var(--ds-color-bg-default)",
+				"color": "var(--ds-color-text-default)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)"
+			},
+			"tailwind": "border-t border-line bg-surface text-fg font-sans text-body-sm",
+			"rules": [
+				"On the page's own white under a hairline: the wordmark and a line about the product at the left, three link columns at the right (heads 13px display at 500, links 14px at 64 percent ink).",
+				"Small print in 12px under a second hairline, then the name set as large as the page allows, as a faint outline that lights blue under the pointer."
+			],
+			"source": "src/components/site-footer.tsx, src/components/footer-wordmark.tsx"
+		},
+		"menu-panel": {
+			"name": "Menu panel",
+			"match": {
+				"words": [
+					"dropdown-menu",
+					"dropdown-content",
+					"dropdown-menu-content",
+					"menu-panel",
+					"menu-content",
+					"select-content"
+				],
+				"roles": [
+					"menu",
+					"listbox"
+				]
+			},
+			"css": {
+				"padding": "var(--ds-space-1)",
+				"border": "1px solid var(--ds-color-border-default)",
+				"border-radius": "var(--ds-radius-control)",
+				"background-color": "var(--ds-color-bg-default)",
+				"color": "var(--ds-color-text-default)",
+				"box-shadow": "var(--ds-shadow-floating)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)"
+			},
+			"tailwind": "rounded-control border border-line bg-surface p-1 font-sans text-body-sm text-fg shadow-floating outline-none",
+			"states": {},
+			"rules": [
+				"A white panel: a 9 percent ink hairline, 8px corners and a soft drop; rows of 14px Inter.",
+				"Keep the existing interaction, placement, keyboard focus, disabled states and selection."
+			],
+			"source": "src/components/mobile-nav.tsx (#mobile-nav)"
+		},
+		"menu-item": {
+			"name": "Menu item",
+			"match": {
+				"words": [
+					"dropdown-item",
+					"dropdown-menu-item",
+					"menu-item",
+					"select-item"
+				],
+				"roles": [
+					"menuitem",
+					"menuitemcheckbox",
+					"menuitemradio",
+					"option"
+				]
+			},
+			"css": {
+				"padding": "var(--ds-space-2) var(--ds-space-3)",
+				"border-radius": "var(--ds-radius-menu)",
+				"background-color": "transparent",
+				"color": "var(--ds-color-text-default)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)",
+				"line-height": "var(--ds-leading-snug)",
+				"outline": "none"
+			},
+			"tailwind": "rounded-menu px-3 py-2 font-sans text-body-sm leading-snug text-fg outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-40 data-[highlighted]:bg-wash-hover data-[highlighted]:text-fg",
+			"states": {
+				":hover": {
+					"background-color": "var(--ds-color-wash-hover)",
+					"color": "var(--ds-color-text-default)"
+				},
+				"[data-highlighted]": {
+					"background-color": "var(--ds-color-wash-hover)",
+					"color": "var(--ds-color-text-default)"
+				},
+				"[data-disabled]": {
+					"opacity": "0.4",
+					"pointer-events": "none"
+				}
+			},
+			"rules": [
+				"Rows of 14px Inter in ink, 5px corners; the highlighted row takes a 5 percent ink wash, as a nav link does.",
+				"Keep the existing interaction, placement, keyboard focus, disabled states and selection."
+			],
+			"source": "src/components/mobile-nav.tsx (sheet links)"
+		},
+		"glass-menu": {
+			"name": "Glass menu",
+			"match": {
+				"words": [
+					"glass-menu",
+					"glass-dropdown",
+					"dock-card"
+				]
+			},
+			"css": {
+				"padding": "var(--ds-space-1)",
+				"border": "1px solid var(--ds-color-border-default)",
+				"border-radius": "var(--ds-radius-control)",
+				"background-color": "var(--ds-color-bg-glass)",
+				"color": "var(--ds-color-text-default)",
+				"box-shadow": "var(--ds-shadow-floating)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)",
+				"border-color": "var(--ds-color-border-glass)",
+				"background-image": "var(--ds-glass-sheen)",
+				"backdrop-filter": "var(--ds-glass-blur)"
+			},
+			"tailwind": "rounded-control border border-line-glass bg-glass bg-(image:--ds-glass-sheen) p-1 font-sans text-body-sm text-fg shadow-floating [backdrop-filter:var(--ds-glass-blur)] outline-none",
+			"states": {},
+			"rules": [
+				"A menu that drops from a glass tray is glass too: mostly white over a heavy blur, a 10 percent ink edge.",
+				"Keep the existing interaction, placement, keyboard focus, disabled states and selection."
+			],
+			"source": "src/app/globals.css:285 (.nav-tray)"
+		},
+		"glass-menu-item": {
+			"name": "Glass menu item",
+			"match": {
+				"words": [
+					"glass-menu-item",
+					"glass-dropdown-item",
+					"dock-card-item"
+				]
+			},
+			"css": {
+				"padding": "var(--ds-space-2) var(--ds-space-3-5)",
+				"border-radius": "var(--ds-radius-menu)",
+				"background-color": "transparent",
+				"color": "var(--ds-color-text-nav)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)",
+				"line-height": "var(--ds-leading-tight)",
+				"outline": "none"
+			},
+			"tailwind": "rounded-menu px-3.5 py-2 font-sans text-body-sm leading-tight text-fg-nav outline-none data-[highlighted]:bg-wash-glass-hover data-[highlighted]:text-fg",
+			"states": {
+				":hover": {
+					"background-color": "var(--ds-color-wash-glass-hover)",
+					"color": "var(--ds-color-text-default)"
+				},
+				"[data-highlighted]": {
+					"background-color": "var(--ds-color-wash-glass-hover)",
+					"color": "var(--ds-color-text-default)"
+				}
+			},
+			"rules": [
+				"Rows like nav links: 14px Inter at 64 percent ink; hover is a 5 percent ink wash and ink text.",
+				"Keep the existing interaction, placement, keyboard focus, disabled states and selection."
+			],
+			"source": "src/app/globals.css:307 (.nav-link)"
+		},
+		"popover-panel": {
+			"name": "Popover panel",
+			"match": {
+				"words": [
+					"popover-content",
+					"popover-panel"
+				]
+			},
+			"css": {
+				"padding": "var(--ds-space-4)",
+				"border": "1px solid var(--ds-color-border-default)",
+				"border-radius": "var(--ds-radius-control)",
+				"background-color": "var(--ds-color-bg-default)",
+				"color": "var(--ds-color-text-default)",
+				"box-shadow": "var(--ds-shadow-floating)",
+				"font-family": "var(--ds-font-sans)",
+				"font-size": "var(--ds-text-body-sm)"
+			},
+			"tailwind": "rounded-control border border-line bg-surface p-4 font-sans text-body-sm text-fg shadow-floating outline-none",
+			"states": {},
+			"rules": [
+				"A white panel: a 9 percent ink hairline, 8px corners and a soft drop; rows of 14px Inter.",
+				"Keep the existing interaction, placement, keyboard focus, disabled states and selection."
+			],
+			"source": "src/app/globals.css:442 (.win)"
+		}
+	}
+}

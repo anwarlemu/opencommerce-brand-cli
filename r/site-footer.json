@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "name": "site-footer",
+  "useFor": "Use once at the foot of every page. Provide link groups (three reads best), the description and the small print; check that every link resolves.",
+  "constraints": [
+    "A blue or dark footer",
+    "Icons beside every link",
+    "More than four columns",
+    "Bold headings",
+    "A filled wordmark"
+  ],
+  "documentation": "`SiteFooter` props: `groups` ({ title, links: { label, href, external }[] }[]), `name` (default \"opencommerce\"),\n`byline` (default \"by Agentcard\"), `logo`, `description`, `legal`, `wordmark` (string or null, default\n\"opencommerce\"), plus footer props.",
+  "source": "opencommerce-agentcard-web src/components/site-footer.tsx, src/components/footer-wordmark.tsx",
+  "exports": [
+    "SiteFooter",
+    "FooterGroup",
+    "FooterLink",
+    "SiteFooterProps"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/site-footer",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/site-footer.md",
+  "examples": [
+    {
+      "path": "examples/site-footer.tsx",
+      "content": "import { SiteFooter } from \"@/components/site/site-footer\";\n\nexport function Site() {\n  return (\n    <SiteFooter\n      description=\"The open router for commerce. Buy from any online store from a single endpoint.\"\n      legal={<span>© 2026 Agentcard, Inc.</span>}\n      groups={[\n        { title: \"Product\", links: [{ label: \"Features\", href: \"#features\" }, { label: \"Monitoring\", href: \"#monitoring\" }, { label: \"Pricing\", href: \"#pricing\" }, { label: \"FAQ\", href: \"#faq\" }] },\n        { title: \"Developers\", links: [{ label: \"Docs\", href: \"https://docs.agentcard.sh\" }, { label: \"SDK\", href: \"https://www.npmjs.com/package/@agentcard/sdk\" }, { label: \"Status\", href: \"https://status.agentcard.sh\" }] },\n        { title: \"Company\", links: [{ label: \"Agentcard\", href: \"https://agentcard.sh\" }, { label: \"Privacy\", href: \"https://agentcard.sh/privacy\" }, { label: \"Terms\", href: \"https://agentcard.sh/terms\" }] },\n      ]}\n    />\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "site-footer"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/site-footer/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Site footer",
+  "description": "White footer under a hairline: the name and a line, three link columns, the small print and the outlined wordmark.",
+  "surface": "site",
+  "kinds": [
+    "footer",
+    "link"
+  ],
+  "requires": [
+    "theme",
+    "outline-wordmark",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/site-footer.tsx",
+      "content": "import * as React from \"react\";\n\nimport { OutlineWordmark } from \"@/components/visuals/outline-wordmark\";\nimport { cn } from \"@/lib/utils\";\n\n// The footer (the opencommerce site, site-footer.tsx): on the page's own white under a hairline. At the left the name\n// (17px display) with its byline (12px muted) and a short line about the product in 14px muted; at the right the link\n// columns travel together, each a 13px display heading over 14px muted links that darken on hover. Under them, on\n// another hairline, the small print in 12px muted. Along the bottom edge the name is set as wide as the page as a faint\n// outline that lights up under the pointer (OutlineWordmark). On a phone the brand block sits over the columns.\ntype FooterLink = { label: React.ReactNode; href: string; external?: boolean };\ntype FooterGroup = { title: React.ReactNode; links: FooterLink[] };\n\ntype SiteFooterProps = Omit<React.ComponentProps<\"footer\">, \"children\"> & {\n  /** The link columns (three reads best). */\n  groups: FooterGroup[];\n  name?: React.ReactNode;\n  byline?: React.ReactNode;\n  /** Your own logo in place of the name and byline. */\n  logo?: React.ReactNode;\n  /** The line under the name. */\n  description?: React.ReactNode;\n  /** The small print (\"© 2026 Agentcard, Inc.\"). */\n  legal?: React.ReactNode;\n  /** The outlined word along the foot. null for none. */\n  wordmark?: string | null;\n};\n\nfunction SiteFooter({ groups, name = \"opencommerce\", byline = \"by Agentcard\", logo, description, legal, wordmark = \"opencommerce\", className, ...props }: SiteFooterProps) {\n  return (\n    <footer data-slot=\"site-footer\" className={cn(\"border-t border-line bg-surface text-fg\", className)} {...props}>\n      <div className=\"mx-auto w-(--ds-frame-column)\">\n        <div className=\"flex flex-col gap-10 py-14 md:flex-row md:justify-between\">\n          <div>\n            {logo ?? (\n              <p className=\"flex items-baseline font-display leading-none\">\n                <span className=\"text-h5 font-medium tracking-tight\">{name}</span>\n                {byline && <span className=\"ml-1.5 text-caption text-fg-muted\">{byline}</span>}\n              </p>\n            )}\n            {description && <p className=\"mt-4 max-w-xs text-body-sm leading-relaxed text-fg-muted\">{description}</p>}\n          </div>\n          <div className=\"grid grid-cols-3 gap-x-6 md:gap-x-16 lg:gap-x-24\">\n            {groups.map((group, i) => (\n              <nav key={i} aria-label={typeof group.title === \"string\" ? group.title : undefined}>\n                <h2 className=\"font-display text-snippet leading-body font-medium tracking-normal\">{group.title}</h2>\n                <ul className=\"mt-4 flex list-none flex-col gap-2.5 p-0\">\n                  {group.links.map((link) => {\n                    const external = link.external ?? /^https?:/.test(link.href);\n                    return (\n                      <li key={link.href + String(link.label)}>\n                        <a\n                          href={link.href}\n                          {...(external ? { target: \"_blank\", rel: \"noreferrer\" } : {})}\n                          className=\"rounded-chip text-body-sm text-fg-muted outline-none transition-colors duration-(--ds-duration-fast) ease-out hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring motion-reduce:transition-none\"\n                        >\n                          {link.label}\n                        </a>\n                      </li>\n                    );\n                  })}\n                </ul>\n              </nav>\n            ))}\n          </div>\n        </div>\n        {legal && <div className=\"relative z-10 flex flex-wrap items-center justify-between gap-3 border-t border-line py-5 text-caption text-fg-muted\">{legal}</div>}\n      </div>\n      {wordmark && <OutlineWordmark text={wordmark} />}\n    </footer>\n  );\n}\n\nexport { SiteFooter };\nexport type { FooterGroup, FooterLink, SiteFooterProps };\n"
+    }
+  ]
+}

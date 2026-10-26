@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "name": "surface",
+  "useFor": "Wrap an area with the white or mist ground (the closing card, an inset) so content and overlays use matching colors.",
+  "constraints": [
+    "A blue ground for a section (the page is white throughout)",
+    "Mist behind long text"
+  ],
+  "documentation": "",
+  "source": "opencommerce-agentcard-web src/app/globals.css (--ground, --mist); src/components/cta.tsx (the mist card)",
+  "exports": [
+    "Surface",
+    "usePortalContainer"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/r/surface.md",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/surface.md",
+  "examples": [],
+  "type": "lib",
+  "title": "Surface",
+  "description": "Background and text context shared by a section and its overlays.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "lib/surface.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// A ground: white (the page, every card and window), mist (ink at 2.5 percent: the closing card, a window bar, an\n// inset; `paper` is the same tint under its older name) or blue (a rare deliberate band; the page itself\n// never sits on blue). Blue sets white text and sky labels for everything inside. Dialogs, menus and tooltips opened\n// inside a Surface render inside it too, so they keep its ground.\nconst PortalContainer = React.createContext<HTMLElement | null>(null);\n\nconst GROUNDS = {\n  white: \"bg-surface text-fg\",\n  mist: \"bg-subtle text-fg\",\n  paper: \"bg-paper text-fg\",\n  blue: \"bg-brand text-on-brand\",\n} as const;\n\nexport function Surface({ ground = \"white\", className, children, ...props }: React.ComponentProps<\"div\"> & { ground?: keyof typeof GROUNDS }) {\n  const [element, setElement] = React.useState<HTMLDivElement | null>(null);\n  return (\n    <div ref={setElement} data-ground={ground} className={cn(GROUNDS[ground], className)} {...props}>\n      <PortalContainer.Provider value={element}>{children}</PortalContainer.Provider>\n    </div>\n  );\n}\n\n/** Where overlays render: the nearest Surface, else the page body. */\nexport function usePortalContainer() {\n  return React.useContext(PortalContainer) ?? undefined;\n}\n"
+    }
+  ]
+}

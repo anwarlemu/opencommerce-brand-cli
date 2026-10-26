@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "name": "code-window",
+  "useFor": "Use for the code a page shows: the hero's setup file, a step's code, an API request. Pass code as a string for highlighting and copying, or pass rendered children. Light by default; dark for code that runs.",
+  "constraints": [
+    "A full syntax theme with many colors",
+    "Code in a proportional face",
+    "Rounded corners other than 12px",
+    "Horizontal scrolling for long lines (they wrap and hang)"
+  ],
+  "documentation": "`CodeWindow` props: `title` (the file name in the bar), `code` (string) or `children`, `language` (picks the comment\nmarker and turns keywords off for `text` and `http`), `copy` (puts the Copy key in the bar; needs `code`), `dark` (the\nbody on ink), `highlight` (zero-based line numbers to band; a run reads as one inset block) and `preClassName` (a fixed\nheight, or `text-caption leading-snug` for a tighter hero card). It also exports `tokenize(code, language)`.\n\nThree voices only: keywords in the blue, strings in the deep blue (sky on ink), comments faint. Long lines wrap and hang\ntwo columns past their own indent, so the structure still reads on a phone.",
+  "source": "opencommerce-agentcard-web src/components/code-block.tsx, hero.tsx, in-action.tsx; src/app/globals.css (.code, .code-dark, .tok-*, .code-line)",
+  "exports": [
+    "CodeWindow",
+    "tokenize",
+    "CodeWindowProps"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/code-window",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/code-window.md",
+  "examples": [
+    {
+      "path": "examples/code-window.tsx",
+      "content": "import { CodeWindow } from \"@/components/ui/code-window\";\n\nconst AGENT = `import { Agentcard } from \"@agentcard/sdk\";\n\nconst agentcard = new Agentcard({\n  clientSecret: process.env.AGENTCARD_SECRET,\n  clientId: process.env.AGENTCARD_ID,\n});\n\n// One tool for every store: search, checkout and tracking.\nconst tools = [agentcard.tools.commerce()];`;\n\nconst STEP = `npm install @agentcard/sdk\n\nimport { Agentcard } from \"@agentcard/sdk\";\n\nconst order = await agentcard.purchase({\n  merchant: \"target.com\",\n  thing: \"Two notebooks and a pack of pens\",\n});`;\n\n// Light, as the hero's code card: the setup lines banded.\nexport function Site() {\n  return <CodeWindow title=\"agent.ts\" language=\"ts\" code={AGENT} copy highlight={[2, 3, 4, 5]} className=\"mx-auto w-full max-w-200\" />;\n}\n\n// On ink, for code that runs (the step-by-step's window).\nexport function Dark() {\n  return <CodeWindow title=\"step-2.ts\" language=\"ts\" code={STEP} copy dark className=\"mx-auto w-full max-w-160\" preClassName=\"min-h-60\" />;\n}\n",
+      "exports": [
+        "Site",
+        "Dark"
+      ],
+      "requires": [
+        "code-window"
+      ],
+      "packages": [
+        "@agentcard/sdk"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/code-window/Site"
+        },
+        {
+          "name": "Dark",
+          "url": "https://opencommerce-ds.vercel.app/preview/code-window/Dark"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Code window",
+  "description": "Code in a window: the file name in the bar, Copy at the right, light or on ink, with banded lines.",
+  "surface": "site",
+  "kinds": [
+    "code-window"
+  ],
+  "requires": [
+    "theme",
+    "copy-button",
+    "window",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/ui/code-window.tsx",
+      "content": "import * as React from \"react\";\n\nimport { CopyButton } from \"@/components/ui/copy-button\";\nimport { WindowBar } from \"@/components/ui/window\";\nimport { cn } from \"@/lib/utils\";\n\n// Code in one of the brand's windows (hero.tsx, in-action.tsx, code-block.tsx, globals.css .code; computed): the white\n// window with its quiet mist bar (the file name centered, Copy at the right), the code in the 13px platform mono at 1.75\n// leading. Light by default, as the hero's card: ink, keywords in the blue, strings in the deep blue, comments faint.\n// `dark` puts the body on ink for code that runs: 88 percent white, keywords the blue lifted toward white, strings sky,\n// comments dim. Highlighting is small on purpose: keywords, strings and comments are the only three voices. Long lines\n// wrap and hang two columns past their own indent; `highlight` bands lines (a run reads as one inset block).\n\ntype Token = { text: string; kind: \"plain\" | \"comment\" | \"string\" | \"keyword\" };\n\nconst COMMENT: Record<string, RegExp> = {\n  hash: /#[^\\n]*/y,\n  slash: /\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\//y,\n  dash: /--[^\\n]*/y,\n};\nconst KEYWORD = /\\b(?:import|from|export|default|const|let|var|new|await|async|return|function|type|interface|if|else|for|of|in|true|false|null|npm|pnpm|yarn|bun|npx|install|add)\\b/y;\nconst STRING = /\"(?:[^\"\\\\\\n]|\\\\.)*\"|'(?:[^'\\\\\\n]|\\\\.)*'|`(?:[^`\\\\]|\\\\.)*`/y;\n\nfunction commentStyle(language?: string) {\n  const lang = (language ?? \"\").toLowerCase();\n  if ([\"sh\", \"bash\", \"shell\", \"zsh\", \"py\", \"python\", \"rb\", \"ruby\", \"yaml\", \"yml\", \"toml\"].includes(lang)) return COMMENT.hash;\n  if ([\"sql\", \"lua\"].includes(lang)) return COMMENT.dash;\n  if ([\"text\", \"txt\", \"plain\", \"http\"].includes(lang)) return undefined;\n  return COMMENT.slash;\n}\n\n/** Splits code into plain runs, keywords, comments and strings. Language only picks the comment marker. */\nfunction tokenize(code: string, language?: string): Token[] {\n  const comment = commentStyle(language);\n  // Plain text and HTTP have no keywords: \"in\" and \"for\" there are words.\n  const keywords = ![\"text\", \"txt\", \"plain\", \"http\"].includes((language ?? \"\").toLowerCase());\n  const tokens: Token[] = [];\n  let plain = \"\";\n  let i = 0;\n  const flush = () => {\n    if (plain) tokens.push({ text: plain, kind: \"plain\" });\n    plain = \"\";\n  };\n  while (i < code.length) {\n    let match: RegExpExecArray | null = null;\n    let kind: Token[\"kind\"] = \"plain\";\n    if (comment) {\n      comment.lastIndex = i;\n      match = comment.exec(code);\n      kind = \"comment\";\n    }\n    if (!match) {\n      STRING.lastIndex = i;\n      match = STRING.exec(code);\n      kind = \"string\";\n    }\n    // A keyword only where a word starts: not inside another identifier.\n    if (!match && keywords && !/[\\w$]/.test(code[i - 1] ?? \"\")) {\n      KEYWORD.lastIndex = i;\n      match = KEYWORD.exec(code);\n      kind = \"keyword\";\n    }\n    if (match && match[0].length > 0) {\n      flush();\n      tokens.push({ text: match[0], kind });\n      i += match[0].length;\n    } else {\n      plain += code[i];\n      i += 1;\n    }\n  }\n  flush();\n  return tokens;\n}\n\nconst VOICE = {\n  light: { plain: \"\", keyword: \"text-fg-brand\", string: \"text-fg-string\", comment: \"text-fg-faint\" },\n  dark: { plain: \"\", keyword: \"text-fg-code-key\", string: \"text-fg-code-string\", comment: \"text-fg-code-dim\" },\n} as const;\n\n/** The tokens cut at each newline, so every line can be its own block (wrapping, hanging indent, a band). */\nfunction toLines(tokens: Token[]) {\n  const lines: Token[][] = [[]];\n  for (const t of tokens) {\n    t.text.split(\"\\n\").forEach((part, n) => {\n      if (n > 0) lines.push([]);\n      if (part) lines[lines.length - 1].push({ text: part, kind: t.kind });\n    });\n  }\n  return lines;\n}\n\nfunction Lines({ code, language, dark, highlight = [] }: { code: string; language?: string; dark: boolean; highlight?: number[] }) {\n  const lines = React.useMemo(() => toLines(tokenize(code, language)), [code, language]);\n  const banded = new Set(highlight);\n  const voice = VOICE[dark ? \"dark\" : \"light\"];\n  return (\n    <>\n      {lines.map((line, i) => {\n        const text = line.map((t) => t.text).join(\"\");\n        const indent = text.length - text.trimStart().length;\n        const inBand = banded.has(i);\n        return (\n          <span\n            key={i}\n            style={{ \"--hang\": `${indent + 2}ch` } as React.CSSProperties}\n            className={cn(\n              \"block pr-3 pl-[calc(var(--ds-space-3)+var(--hang))] [text-indent:calc(-1*var(--hang))] whitespace-pre-wrap [overflow-wrap:anywhere]\",\n              inBand && (dark ? \"bg-code-soft\" : \"bg-blue-5\"),\n              inBand && !banded.has(i - 1) && \"rounded-t-sm\",\n              inBand && !banded.has(i + 1) && \"rounded-b-sm\",\n            )}\n          >\n            {line.length ? line.map((t, j) => (t.kind === \"plain\" ? <React.Fragment key={j}>{t.text}</React.Fragment> : <span key={j} className={voice[t.kind]}>{t.text}</span>)) : \" \"}\n          </span>\n        );\n      })}\n    </>\n  );\n}\n\ntype CodeWindowProps = Omit<React.ComponentProps<\"figure\">, \"children\" | \"title\"> & {\n  /** The file name in the bar (agent.ts). */\n  title?: React.ReactNode;\n  /** The code as a string; highlighted lightly and copyable. */\n  code?: string;\n  /** Pre-rendered code instead of `code` (shown as is, not highlighted). */\n  children?: React.ReactNode;\n  /** Only picks the comment marker for highlighting (ts, sh, py, sql, text...). */\n  language?: string;\n  /** Puts Copy at the right of the bar (needs `code`). */\n  copy?: boolean;\n  /** The body on ink, for code that runs. */\n  dark?: boolean;\n  /** Zero-based line numbers to band. */\n  highlight?: number[];\n  /** Classes for the pre (a fixed height, tighter type for a hero card). */\n  preClassName?: string;\n};\n\nfunction CodeWindow({ title, code, children, language, copy = false, dark = false, highlight, className, preClassName, ...props }: CodeWindowProps) {\n  return (\n    <figure data-slot=\"code-window\" className={cn(\"m-0 flex min-w-0 flex-col overflow-hidden rounded-panel border border-line-window bg-surface text-fg shadow-card\", className)} {...props}>\n      <WindowBar name={title ?? \"\"} actions={copy && code ? <CopyButton value={code} label=\"Copy code\" /> : undefined} />\n      <pre\n        tabIndex={0}\n        className={cn(\n          \"m-0 min-h-0 flex-1 overflow-auto px-3 py-4 font-mono text-snippet leading-code outline-none [tab-size:2] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring\",\n          dark ? \"bg-code text-fg-code\" : \"bg-surface text-fg\",\n          preClassName,\n        )}\n      >\n        <code className=\"font-[inherit]\">{code !== undefined ? <Lines code={code} language={language} dark={dark} highlight={highlight} /> : children}</code>\n      </pre>\n    </figure>\n  );\n}\n\nexport { CodeWindow, tokenize };\nexport type { CodeWindowProps };\n"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "name": "product-grid",
+  "useFor": "Pass products with title, description, action and media. Use layout=\"lead\" for a full-width card and layout=\"half\" for paired cards.",
+  "constraints": [
+    "An odd number of half cards",
+    "A card without media",
+    "Two keys in one card",
+    "A blue stage"
+  ],
+  "documentation": "",
+  "source": "Extension in the opencommerce site's voice (its windows, mist insets and keys; opencommerce-agentcard-web src/app/globals.css .win); the layout from agentcard.sh / (.v7-sol)",
+  "exports": [
+    "ProductGrid",
+    "ProductItem",
+    "ProductAction"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/product-grid",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/product-grid.md",
+  "examples": [
+    {
+      "path": "examples/product-grid.tsx",
+      "content": "import { ArrowUpRight } from \"lucide-react\";\n\nimport { ProductGrid } from \"@/components/site/product-grid\";\nimport { CodeWindow } from \"@/components/ui/code-window\";\nimport { Window } from \"@/components/ui/window\";\n\n// Stand-ins for a product's pictures, drawn from the page's own parts: windows, hairlines and the one blue.\nfunction Screen({ name, rows }: { name: string; rows: [string, string][] }) {\n  return (\n    <Window name={name} className=\"w-full max-w-md\">\n      <ul className=\"m-0 grid list-none gap-2 p-4 text-body-sm\">\n        {rows.map(([row, status]) => (\n          <li key={row} className=\"flex items-center justify-between rounded-control border border-line px-3 py-2\">\n            {row}\n            <span className=\"rounded-chip bg-tint px-1.5 py-0.5 font-mono text-caption leading-none text-fg-brand\">{status}</span>\n          </li>\n        ))}\n      </ul>\n    </Window>\n  );\n}\n\nconst CODE = `const order = await agentcard.commerce.buy({\n  query: \"Oat milk, 6 pack\",\n  store: \"any\",\n});`;\n\nexport function Site() {\n  return (\n    <section className=\"mx-auto w-(--ds-frame-column) py-20\">\n      <div className=\"mx-auto max-w-(--ds-layout-heading) pb-12 text-center\">\n        <h2 className=\"font-display text-h2 leading-display font-medium tracking-tighter\">One router, every way to buy</h2>\n        <p className=\"mx-auto mt-4 max-w-(--ds-layout-text) text-body leading-lead text-fg-muted\">Search, checkout and tracking, for any store your agent needs.</p>\n      </div>\n      <ProductGrid\n        products={[\n          { layout: \"lead\", title: \"Checkout\", description: \"One call takes your agent from a request to a confirmed order.\", action: { label: \"Read the docs\", href: \"https://docs.agentcard.sh\", icon: <ArrowUpRight /> }, media: <CodeWindow title=\"buy.ts\" code={CODE} dark className=\"w-full max-w-md\" /> },\n          { layout: \"half\", title: \"Search\", description: \"Catalogues from thousands of stores, searchable in plain words.\", action: { label: \"See stores\", href: \"#monitoring\" }, media: <Screen name=\"search.product\" rows={[[\"USB-C charger, 65W\", \"$32\"], [\"Running shoes, size 10\", \"$96\"], [\"Oat milk, 6 pack\", \"$18\"]]} /> },\n          { layout: \"half\", title: \"Tracking\", description: \"Every order followed to the door, with updates your agent can relay.\", action: { label: \"See pricing\", href: \"#pricing\" }, media: <Screen name=\"orders.product\" rows={[[\"#A-10293\", \"Shipped\"], [\"#A-10294\", \"Confirmed\"]]} /> },\n        ]}\n      />\n    </section>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "product-grid",
+        "code-window",
+        "window"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/product-grid/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Product grid",
+  "description": "Product overview cards with text, actions and media.",
+  "surface": "site",
+  "kinds": [
+    "card",
+    "media-frame",
+    "button-primary"
+  ],
+  "requires": [
+    "theme",
+    "button",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/product-grid.tsx",
+      "content": "import * as React from \"react\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { cn } from \"@/lib/utils\";\n\n// Products or use cases as large cards, in the home page's voice: white with 12px corners, a hairline and the window's\n// soft drop, each holding a mist stage for the product's picture and its copy. A `lead` card spans the row, the stage on\n// one side and the copy on the other (each lead turns the other way from the last); `half` cards pair up, stage above\n// copy, their stages and copy lined up across the pair. Titles are the display face at 44px (32px on phones) and 500,\n// the line 16px muted, then the blue key. Below 1024px every card stacks, stage first.\n\ntype ProductAction = { label: React.ReactNode; href: string; icon?: React.ReactNode };\n\ntype ProductItem = {\n  title: React.ReactNode;\n  description: React.ReactNode;\n  /** The card's key: a label and href (the blue key), or your own element. */\n  action?: ProductAction | React.ReactNode;\n  /** The product's picture on the blue stage: a screen, a window, a 3D object. */\n  media: React.ReactNode;\n  layout?: \"lead\" | \"half\";\n};\n\nconst isAction = (a: ProductItem[\"action\"]): a is ProductAction => typeof a === \"object\" && a !== null && !React.isValidElement(a) && \"href\" in a;\n\nfunction Action({ action, className }: { action: ProductItem[\"action\"]; className?: string }) {\n  if (!action) return null;\n  if (!isAction(action)) return <div className={className}>{action}</div>;\n  return (\n    <Button asChild className={className}>\n      <a href={action.href}>\n        {action.label}\n        {action.icon}\n      </a>\n    </Button>\n  );\n}\n\n// The stage: mist under a hairline, the picture centered on it.\nfunction Stage({ children, className }: { children: React.ReactNode; className?: string }) {\n  return (\n    <div\n      className={cn(\n        \"relative isolate flex min-h-80 items-center justify-center overflow-hidden rounded-card border border-line bg-subtle p-[clamp(0.875rem,1.8vw,1.375rem)]\",\n        className,\n      )}\n    >\n      {children}\n    </div>\n  );\n}\n\nconst CARD = \"rounded-panel border border-line-strong bg-surface p-3 text-fg shadow-card max-lg:mx-auto max-lg:w-full max-lg:max-w-140\";\nconst TITLE = \"mb-3 font-display text-h2 leading-display font-medium tracking-tighter\";\nconst LINE = \"text-body leading-lead text-fg-muted\";\n\nfunction LeadCard({ product, reverse }: { product: ProductItem; reverse: boolean }) {\n  return (\n    <li\n      className={cn(\n        CARD,\n        \"grid grid-cols-1 items-center lg:col-span-2 lg:gap-[clamp(2rem,5vw,4.5rem)]\",\n        reverse ? \"lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)]\" : \"lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]\",\n      )}\n    >\n      <Stage className={cn(\"self-stretch\", reverse && \"lg:order-2\")}>{product.media}</Stage>\n      <div className={cn(\"px-3 pt-5.5 pb-3 lg:px-0 lg:py-6\", reverse ? \"lg:pl-[clamp(1.25rem,3vw,3rem)]\" : \"lg:pr-[clamp(1.25rem,3vw,3rem)]\")}>\n        <h3 className={TITLE}>{product.title}</h3>\n        <p className={cn(LINE, \"max-w-[30ch]\")}>{product.description}</p>\n        <Action action={product.action} className=\"mt-5.5\" />\n      </div>\n    </li>\n  );\n}\n\nfunction HalfCard({ product }: { product: ProductItem }) {\n  return (\n    <li className={cn(CARD, \"grid grid-cols-1 lg:row-span-2 lg:grid-rows-subgrid lg:gap-0\")}>\n      <Stage className=\"self-stretch py-[clamp(1.125rem,2vw,1.625rem)]\">{product.media}</Stage>\n      <div className=\"flex flex-col self-stretch px-3 pt-5.5 pb-3\">\n        <h3 className={TITLE}>{product.title}</h3>\n        <p className={cn(LINE, \"mb-9 max-w-[44ch]\")}>{product.description}</p>\n        {product.action && <Action action={product.action} className=\"mt-auto self-start\" />}\n      </div>\n    </li>\n  );\n}\n\n/** The product cards: leads across the row, halves in pairs. */\nfunction ProductGrid({ products, className, ...props }: React.ComponentProps<\"ul\"> & { products: ProductItem[] }) {\n  let leads = 0;\n  return (\n    <ul data-slot=\"product-grid\" className={cn(\"grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8\", className)} {...props}>\n      {products.map((product, i) =>\n        product.layout === \"half\" ? <HalfCard key={i} product={product} /> : <LeadCard key={i} product={product} reverse={leads++ % 2 === 1} />,\n      )}\n    </ul>\n  );\n}\n\nexport { ProductGrid, type ProductItem, type ProductAction };\n"
+    }
+  ]
+}

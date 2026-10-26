@@ -2,29 +2,40 @@ import { CopyButton } from "@/components/ui/copy-button";
 import { cn } from "@/lib/utils";
 
 /**
- * A docs page's opening, as the brand's site opens a section: the 48px display title, tracked tight, and a 16px lead
- * in muted ink under it, then whatever acts on it (the install command). Centered for the index pages.
+ * A page's head, as the brand opens a section: the blue mono label, the title in the display face at 500 and tracked
+ * tight, a 16px line in muted ink under it, actions at the right, and a hairline under it all.
  */
-export function PageIntro({ eyebrow, title, lead, align = "center", children, className }: { eyebrow?: React.ReactNode; title: React.ReactNode; lead?: React.ReactNode; align?: "center" | "start"; children?: React.ReactNode; className?: string }) {
-  const centered = align === "center";
+export function PageHead({ eyebrow, title, description, children }: { eyebrow?: React.ReactNode; title: React.ReactNode; description?: React.ReactNode; children?: React.ReactNode }) {
   return (
-    <div className={cn("flex flex-col", centered ? "items-center text-center" : "items-start", className)}>
-      {eyebrow && <p className="mb-3 font-mono text-caption text-fg-brand">{eyebrow}</p>}
-      <h1 className="font-display text-h1 leading-heading font-medium tracking-hero text-balance">{title}</h1>
-      {lead && <p className={cn("mt-4 max-w-(--ds-layout-text) text-body leading-lead text-pretty text-fg-muted", centered && "mx-auto")}>{lead}</p>}
-      {children && <div className={cn("mt-10 w-full", centered && "flex justify-center")}>{children}</div>}
+    <header className="border-b border-line px-5 pt-10 pb-8 md:px-10 md:pt-14">
+      <div className="mx-auto flex max-w-200 flex-wrap items-start justify-between gap-x-6 gap-y-3">
+        <div className="min-w-0">
+          {eyebrow && <p className="mb-3 font-mono text-caption text-fg-label">{eyebrow}</p>}
+          <h1 className="font-display text-h2 leading-display font-medium tracking-tighter text-pretty">{title}</h1>
+          {description && <p className="mt-3 max-w-(--ds-layout-text) text-body leading-lead text-pretty text-fg-muted">{description}</p>}
+        </div>
+        {children && <div className="flex shrink-0 items-center gap-4 pt-1">{children}</div>}
+      </div>
+    </header>
+  );
+}
+
+/** The page's body: one column with the brand's air between its blocks. */
+export function PageBody({ className, children }: { className?: string; children: React.ReactNode }) {
+  return (
+    <div className="px-5 pt-10 pb-24 md:px-10">
+      <div className={cn("mx-auto grid max-w-200 grid-cols-[minmax(0,1fr)] gap-16", className)}>{children}</div>
     </div>
   );
 }
 
-/** A block of a docs page: its heading (centered, with its description under it, as the brand's sections), then its content. */
-export function Block({ id, title, description, align = "center", children, className }: { id?: string; title: React.ReactNode; description?: React.ReactNode; align?: "center" | "start"; children: React.ReactNode; className?: string }) {
-  const centered = align === "center";
+/** A block of a page: a 24px display heading and a muted line under it, then its content. */
+export function Section({ id, title, description, children }: { id?: string; title: string; description?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section id={id} className={cn("scroll-mt-24", className)}>
-      <div className={cn(centered ? "mx-auto max-w-(--ds-layout-heading) text-center" : "", "mb-12 md:mb-14")}>
-        <h2 className={cn("font-display font-medium text-balance", centered ? "text-h2 leading-display tracking-tighter" : "text-h3 leading-display tracking-tight")}>{title}</h2>
-        {description && <p className={cn("mt-4 text-pretty text-fg-muted", centered ? "mx-auto max-w-(--ds-layout-text) text-body leading-lead" : "text-body")}>{description}</p>}
+    <section id={id} className="grid min-w-0 scroll-mt-6 grid-cols-[minmax(0,1fr)] gap-5">
+      <div>
+        <h2 className="font-display text-h3 leading-display font-medium tracking-tight">{title}</h2>
+        {description && <p className="mt-2 text-body leading-lead text-pretty text-fg-muted">{description}</p>}
       </div>
       {children}
     </section>
@@ -34,7 +45,7 @@ export function Block({ id, title, description, align = "center", children, clas
 /** A shell command on ink, as the brand sets its install line: a faint prompt, the command in mono, a copy key. */
 export function Command({ command, wrap = false, className }: { command: string; wrap?: boolean; className?: string }) {
   return (
-    <div className={cn("flex w-full max-w-2xl items-center gap-3 rounded-panel border border-line bg-code py-1.5 pr-1.5 pl-4 shadow-code", className)}>
+    <div className={cn("flex w-full items-center gap-3 rounded-panel border border-line bg-code py-1.5 pr-1.5 pl-4 shadow-code", className)}>
       <span aria-hidden className="font-mono text-body-sm text-fg-code-dim">
         $
       </span>
@@ -42,9 +53,4 @@ export function Command({ command, wrap = false, className }: { command: string;
       <CopyButton value={command} label="Copy command" dark />
     </div>
   );
-}
-
-/** The docs' page column: the content column with air above and below, as the brand spaces its sections (120px). */
-export function Page({ className, children }: { className?: string; children: React.ReactNode }) {
-  return <main className={cn("mx-auto grid w-(--ds-frame-column) grid-cols-[minmax(0,1fr)] gap-24 pt-16 pb-30 md:gap-30 md:pt-20", className)}>{children}</main>;
 }

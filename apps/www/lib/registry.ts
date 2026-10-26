@@ -41,6 +41,11 @@ export const GROUPS: { type: Item["type"]; id: string; label: string; blurb: str
   { type: "visual", id: "visuals", label: "Visuals", blurb: "Logos, the wordmark and the glyph fields behind cards." },
 ];
 
+// The rail's order, and the order previous and next follow: each group, then its items A to Z.
+export const RAIL = GROUPS.map((g) => ({ ...g, items: items.filter((i) => i.type === g.type).sort((a, b) => a.title.localeCompare(b.title)) })).filter((g) => g.items.length);
+export const ORDER = RAIL.flatMap((g) => g.items);
+export const groupOf = (item: Pick<Item, "type">) => GROUPS.find((g) => g.type === item.type);
+
 export const counts = Object.fromEntries(GROUPS.map((g) => [g.type, items.filter((i) => i.type === g.type).length]));
 export const findItem = (name: string) => items.find((i) => i.name === name);
 
@@ -49,5 +54,5 @@ export const sourceOf = (rel: string) => readFileSync(path.join(root, rel), "utf
 export const exampleSource = (name: string) => sourceOf(`examples/${name}.tsx`);
 
 // These demos open overlays or focus/scroll their content on mount. Keep those effects inside a frame.
-const FRAMED_COMPONENTS = new Set(["command", "dialog", "dropdown-menu", "popover", "select", "sheet", "tooltip"]);
+const FRAMED_COMPONENTS = new Set(["alert-dialog", "combobox", "command", "context-menu", "date-picker", "dialog", "drawer", "dropdown-menu", "hover-card", "menubar", "navigation-menu", "popover", "select", "sheet", "sidebar", "sonner", "toast", "tooltip"]);
 export const needsPreviewFrame = (item: Pick<Item, "type" | "name">) => item.type === "site" || item.type === "block" || FRAMED_COMPONENTS.has(item.name);

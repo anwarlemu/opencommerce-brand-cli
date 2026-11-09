@@ -15,7 +15,7 @@ for (const p of ['bin.js', 'build', 'brand', 'README.md']) cpSync(join(root, p),
 // The hosted shadcn manifests duplicate source; native installs need only the bundled registry.
 cpSync(join(root, 'apps', 'www', 'public', 'r'), join(out, 'r'), { recursive: true, filter: source => !/[\\/]shadcn(?:-product)?(?:[\\/]|$)/.test(source) });
 // The code and its dependencies in one file, so installing the release fetches almost nothing. playwright-core
-// (screenshots for review) stays a package: it is large and loads its own files.
+// (screenshots for review) and resvg (PNG for `image`) stay packages: they load their own native files.
 await build({
 	entryPoints: [join(root, 'dist', 'cli.js')],
 	outfile: join(out, 'dist', 'cli.js'),
@@ -24,14 +24,16 @@ await build({
 	format: 'esm',
 	target: 'node20',
 	// Babel's optional external config loader is disabled by configFile:false and babelrc:false.
-	external: ['playwright-core', '@babel/preset-typescript'],
+	external: ['playwright-core', '@babel/preset-typescript', '@resvg/resvg-js'],
 	banner: { js: "import { createRequire as __ds_require } from 'node:module'; const require = __ds_require(import.meta.url);" },
 	logLevel: 'warning',
 });
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+const resvg = pkg.dependencies['@resvg/resvg-js'];
 delete pkg.devDependencies;
 delete pkg.dependencies;
 delete pkg.workspaces;
+pkg.dependencies = { '@resvg/resvg-js': resvg };
 pkg.scripts = {};
 writeFileSync(join(out, 'package.json'), `${JSON.stringify(pkg, null, 2)}\n`);
 console.log(`release tree in ${out}`);

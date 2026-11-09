@@ -80,6 +80,21 @@ Connect every control to its intended behavior. Include validation, loading, emp
 Run the project checks and the CLI token check. Test keyboard interaction and desktop and phone layouts.
 ```
 
+## Render an image
+
+`image` renders a PNG (and SVG when you ask) from the copy you pass in. It uses the brand tokens, the bundled fonts and the logo. It does not open a browser, so an agent can run it in CI.
+
+```sh
+npx opencommerce-ds image templates --json
+npx opencommerce-ds image --preset og --template lead --title "Open router for commerce" --text "One endpoint for agents to search, check out and track orders." --out og.png --json
+npx opencommerce-ds image post --preset square --template announcement --title "Agents can buy from any store" --action "Get started" --json
+npx opencommerce-ds image og --template frame --image ./screen.png --format both --out ./images
+```
+
+Presets: `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350), `landscape` (1200x675). `image` defaults to `og`. `image post` defaults to `square`. `image og` always renders 1200x630. Templates: `headline`, `lead`, `frame`, `quote`, `announcement`. `--format` is `png`, `svg` or `both`. `--json` lists the files written, with width and height. `--out` is a `.png` or `.svg` file, or a directory.
+
+Headings use a bundled Helvetica-compatible face (Neue Haas Grotesk Display is not redistributable). Body and keys use Inter. Labels and code use the bundled monospace. Sample output is in `samples/images/`. Regenerate it with `npx tsx scripts/render-samples.ts`.
+
 ## Check the implementation
 
 ```sh
@@ -106,6 +121,7 @@ Run these commands with `npx opencommerce-ds` after installing the CLI.
 | `list` | List available components, sections, page templates and visuals. |
 | `look <file\|element>` | Show component and token guidance for a file or element type. |
 | `tokens [term]` | Find a token by name or role. |
+| `image` | Render an Open Graph image or a social post. `image templates --json` lists presets and templates. |
 | `check [files...]` | Check style values. Use `--changed` for Git changes or `--fix` for exact token replacements. |
 | `review <url> --any` | Review a page that is not part of an existing conversion task list. |
 | `review <url>` | Review a tracked screen and mark its task complete when it passes. |

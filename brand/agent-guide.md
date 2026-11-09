@@ -59,6 +59,23 @@ The component reference states its source. `{{registry}}/r/audit.json` records t
 - Connect every action to its intended behavior. Handle empty, loading, disabled, invalid, success and error states. Preserve keyboard controls, focus return, accessible names and native form semantics. Never present a preview's local demo action as a completed backend operation.
 - Use the provided portal behavior. Surface is for an isolated preview or a scoped theme; ordinary pages do not need an extra Surface wrapper. Mount one Toaster per application when using toast notifications.
 
+## Render images
+
+The CLI can render Open Graph images and social posts from copy you pass in. It does not open a browser. Colors, type and the logo come from the brand tokens and the bundled fonts and marks.
+
+```sh
+{{cli}} image templates --json
+{{cli}} image --preset og --template lead --title "..." --text "..." --out og.png --json
+{{cli}} image post --preset square --template announcement --title "..." --action "Get started" --json
+{{cli}} image og --template frame --title "..." --image ./screen.png --format both --out ./images
+```
+
+Presets are `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350) and `landscape` (1200x675, for X and LinkedIn). `image` defaults to `og`. `image post` defaults to `square`. `image og` always renders 1200x630. Templates are `headline`, `lead` (a headline and a supporting line), `frame` (a screenshot in a window; pass `--image`, or `--text` for copy or code), `quote` (`--text` and optional `--by`) and `announcement` (a label, a headline and an optional key via `--action`). `--format` is `png` (the default), `svg` or `both`. `--ground` is `white` or `mist`. `--content file.json` reads the same fields, and flags override it.
+
+`--json` prints the files written, with width, height and byte size. SVG text is outlined, so the file does not need the fonts installed. Headings and the wordmark use the bundled Helvetica-compatible display face, because Neue Haas Grotesk Display is not redistributable; body and keys use Inter; labels and code use the bundled monospace.
+
+Pass `--preset all` to render every size. Give `--out` a directory when more than one file is written, or a `.png` or `.svg` path for a single file.
+
 ## Verify before finishing
 
 1. Run the consuming project's type checks, tests and production build.
@@ -71,8 +88,8 @@ The component reference states its source. `{{registry}}/r/audit.json` records t
 
 `init` and conversion install AGENTS.md and a local `.ds/agent-guide.md`, plus supported agent instruction files and hook configuration. Agents that do not load those files automatically should read them explicitly. Hooks support Claude Code, Codex and Cursor when enabled by that tool; other agents run the CLI checks directly. Codex hook activation may require the user's `/hooks` trust step. No hook integration is required to use the components correctly.
 
-Read-only commands: `guide`, `list`, `show`, `look`, `tokens`, `check` without `--fix`.
-Commands that write project files: `init`, `add`, `apply`, the legacy bare conversion command, `check --fix`, and review/snapshot state updates. Use `--dry-run` with `init`, `add` or conversion to inspect planned writes. JSON goes to stdout and progress goes to stderr. Installation/build failures return a nonzero exit code.
+Read-only commands: `guide`, `list`, `show`, `look`, `tokens`, `check` without `--fix`, `image templates`.
+Commands that write project files: `init`, `add`, `apply`, the legacy bare conversion command, `check --fix`, `image` (it writes image files), and review/snapshot state updates. Use `--dry-run` with `init`, `add` or conversion to inspect planned writes. JSON goes to stdout and progress goes to stderr. Installation/build failures return a nonzero exit code.
 
 ## Project configuration and agent handoff
 

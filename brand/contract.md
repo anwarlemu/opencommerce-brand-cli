@@ -5,6 +5,7 @@
 - Use `{{cli}} init` to prepare new work, then `{{cli}} add <names...>` for the components it needs. Inspect planned writes with `--dry-run`.
 - Use `{{cli}} apply --dry-run` to preview a requested restyle, then `{{cli}} apply` and follow its review tasks. The legacy bare command also converts styles; use explicit commands for discovery and setup.
 - Use component variants and brand tokens. `{{cli}} look <file>` gives element guidance; `{{cli}} tokens <term>` finds values.
+- Render Open Graph and social images with `{{cli}} image`. `{{cli}} image templates --json` lists presets and templates; `{{cli}} image --json` writes the files.
 - Connect controls to state, validation and real actions. Test keyboard controls, focus, invalid/disabled/loading states, and phone and desktop layouts.
 - Run the project's checks and build, then `{{cli}} check --json`. Token checks alone do not verify appearance or behavior.
 - Review screenshots against the library. `{{cli}} review <url> --any` captures and reviews an untracked page; report manual review honestly when no reviewer is available.

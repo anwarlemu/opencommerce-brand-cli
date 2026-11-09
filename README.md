@@ -91,7 +91,7 @@ npx opencommerce-ds image post --preset square --template announcement --title "
 npx opencommerce-ds image og --template frame --image ./screen.png --format both --out ./images
 ```
 
-Presets: `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350), `landscape` (1200x675). Templates: `headline`, `lead`, `frame`, `quote`, `announcement`. `--format` is `png`, `svg` or `both`. `--json` lists the files written, with width and height.
+Presets: `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350), `landscape` (1200x675). `image` defaults to `og`. `image post` defaults to `square`. `image og` always renders 1200x630. Templates: `headline`, `lead`, `frame`, `quote`, `announcement`. `--format` is `png`, `svg` or `both`. `--json` lists the files written, with width and height. `--out` is a `.png` or `.svg` file, or a directory.
 
 Headings use a bundled Helvetica-compatible face (Neue Haas Grotesk Display is not redistributable). Body and keys use Inter. Labels and code use the bundled monospace. Sample output is in `samples/images/`. Regenerate it with `npx tsx scripts/render-samples.ts`.
 

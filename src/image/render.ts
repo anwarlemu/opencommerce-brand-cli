@@ -123,15 +123,26 @@ export function rasterize(svg: string) {
 
 function jpegSize(buffer: Buffer) {
 	let offset = 2;
-	while (offset + 9 < buffer.length) {
+	while (offset + 1 < buffer.length) {
 		if (buffer[offset] !== 0xff) {
 			offset += 1;
 			continue;
 		}
-		const marker = buffer[offset + 1];
-		if (marker >= 0xc0 && marker <= 0xc3) return { width: buffer.readUInt16BE(offset + 7), height: buffer.readUInt16BE(offset + 5) };
-		const length = buffer.readUInt16BE(offset + 2);
-		offset += 2 + length;
+		while (offset < buffer.length && buffer[offset] === 0xff) offset += 1;
+		if (offset >= buffer.length) break;
+		const marker = buffer[offset];
+		offset += 1;
+		// Standalone markers carry no length: stuffed 0x00, TEM, restart, SOI and EOI.
+		if (marker === 0x00 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd9)) continue;
+		if (offset + 1 >= buffer.length) break;
+		const length = buffer.readUInt16BE(offset);
+		if (length < 2) throw new Error('Could not read the JPEG size.');
+		const startOfFrame = marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc;
+		if (startOfFrame) {
+			if (offset + 6 >= buffer.length) break;
+			return { height: buffer.readUInt16BE(offset + 3), width: buffer.readUInt16BE(offset + 5) };
+		}
+		offset += length;
 	}
 	throw new Error('Could not read the JPEG size.');
 }
@@ -173,11 +184,14 @@ function exists(file: string) {
 
 function destinations(presets: PresetId[], formats: ('png' | 'svg')[], template: TemplateId, out?: string) {
 	const single = presets.length === 1 && formats.length === 1;
-	if (out && /\.(png|svg)$/i.test(out)) {
-		if (!single) throw new Error('Pass a directory to --out when rendering more than one file.');
+	if (out) {
 		const ext = extname(out).slice(1).toLowerCase();
-		if (ext !== formats[0]) throw new Error(`--out is a .${ext} file, but --format is ${formats[0]}.`);
-		return [{ preset: presets[0], format: formats[0], path: resolve(out) }];
+		if (ext) {
+			if (ext !== 'png' && ext !== 'svg') throw new Error('--out must be a .png or .svg file, or a directory.');
+			if (!single) throw new Error('Pass a directory to --out when rendering more than one file.');
+			if (ext !== formats[0]) throw new Error(`--out is a .${ext} file, but --format is ${formats[0]}.`);
+			return [{ preset: presets[0], format: formats[0], path: resolve(out) }];
+		}
 	}
 	const dir = resolve(out || join('.ds', 'images'));
 	return presets.flatMap((preset) => formats.map((format) => ({ preset, format, path: join(dir, `${preset}-${template}.${format}`) })));

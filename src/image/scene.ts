@@ -1,5 +1,5 @@
 import { brand } from '../lib/brand.js';
-import { blockHeight, drawLines, fitText, getFaces, measure, ratios, textPath, type Fitted } from './fonts.js';
+import { drawLines, fitText, getFaces, measure, ratios, textPath } from './fonts.js';
 import { logoMark, lockupByline, trackingFor, type Paint } from './paint.js';
 
 export type SceneImage = { data: Buffer; width: number; height: number; mime: string };
@@ -77,14 +77,28 @@ function typePiece(text: string, font: 'display' | 'sans', start: number, min: n
 	return { gap: 0, height: fitted.height, draw: (top) => drawLines(face, fitted, leading, fill, centerX, top) };
 }
 
-function keyPiece(label: string, centerX: number, colors: Paint, tall: boolean): Piece {
+function keyPiece(label: string, centerX: number, maxWidth: number, colors: Paint, tall: boolean): Piece {
 	const face = getFaces().sansMedium;
-	const height = tall ? 48 : 44;
-	const size = Math.round(height * (15 / 40));
 	const tracking = colors.trackingTight;
-	const textWidth = measure(face, label, size, tracking);
-	const pad = Math.round(height * (18 / 40));
-	const width = Math.max(Math.round(textWidth + pad * 2), Math.round(height * 2.6));
+	let height = tall ? 48 : 44;
+	let size = Math.round(height * (15 / 40));
+	const padOf = (value: number) => Math.round(value * (18 / 40));
+	let text = label.trim();
+	let textWidth = measure(face, text, size, tracking);
+	while (textWidth + padOf(height) * 2 > maxWidth && size > 13) {
+		size -= 1;
+		height = Math.max(36, Math.round((size * 40) / 15));
+		textWidth = measure(face, text, size, tracking);
+	}
+	const limit = Math.max(24, maxWidth - padOf(height) * 2);
+	if (textWidth > limit) {
+		let cut = text;
+		while (cut.length > 1 && measure(face, `${cut}...`, size, tracking) > limit) cut = cut.slice(0, -1).trimEnd();
+		text = `${cut}...`;
+		textWidth = measure(face, text, size, tracking);
+	}
+	const pad = padOf(height);
+	const width = Math.min(maxWidth, Math.max(Math.round(textWidth + pad * 2), Math.round(height * 2.6)));
 	const radius = Math.round(height * (colors.radiusControl / 40));
 	const { cap, desc } = ratios(face);
 	const ink = (cap + desc) * size;
@@ -94,14 +108,14 @@ function keyPiece(label: string, centerX: number, colors: Paint, tall: boolean):
 		draw: (top) => {
 			const x = Math.round(centerX - width / 2);
 			const baseline = top + (height - ink) / 2 + cap * size;
-			return `<rect x="${x}" y="${Math.round(top)}" width="${width}" height="${height}" rx="${radius}" fill="${colors.brand}" stroke="${colors.blueEdge}" stroke-width="1"/>${textPath(face, label, Math.round(centerX - textWidth / 2), baseline, size, tracking, colors.onBrand)}`;
+			return `<rect x="${x}" y="${Math.round(top)}" width="${width}" height="${height}" rx="${radius}" fill="${colors.brand}" stroke="${colors.blueEdge}" stroke-width="1"/>${textPath(face, text, Math.round(centerX - textWidth / 2), baseline, size, tracking, colors.onBrand)}`;
 		},
 	};
 }
 
-function kicker(text: string, size: number, fill: string, centerX: number, colors: Paint): Piece {
+function kicker(text: string, size: number, maxWidth: number, fill: string, centerX: number, colors: Paint): Piece {
 	const face = getFaces().mono;
-	const fitted: Fitted = { lines: [text], size, tracking: 0, height: blockHeight(face, 1, size, 1.2) };
+	const fitted = fitText(face, text, maxWidth, size, Math.max(11, size - 4), 2, 1.2, () => 0);
 	return { gap: 0, height: fitted.height, draw: (top) => drawLines(face, fitted, 1.2, fill, centerX, top) };
 }
 
@@ -295,8 +309,8 @@ function poster(req: SceneRequest, colors: Paint) {
 		piece.gap = pieces.length ? gap : 0;
 		pieces.push(piece);
 	};
-	if (req.template !== 'quote' && req.label) add(kicker(req.label, L.kicker, req.template === 'announcement' ? colors.label : colors.secondary, centerX, colors), 0);
-	if (req.template === 'quote' && req.label) add(kicker(req.label, L.kicker, colors.secondary, centerX, colors), 0);
+	if (req.template !== 'quote' && req.label) add(kicker(req.label, L.kicker, column, req.template === 'announcement' ? colors.label : colors.secondary, centerX, colors), 0);
+	if (req.template === 'quote' && req.label) add(kicker(req.label, L.kicker, column, colors.secondary, centerX, colors), 0);
 	if (req.template === 'headline' || req.template === 'lead' || req.template === 'announcement') {
 		add(typePiece(req.title, 'display', L.headline, 32, Math.min(column, L.wide ? 1000 : 920), L.wide ? 3 : 4, colors.leadingHeading, colors.ink, centerX, colors, (size) => trackingFor(size, colors)), req.label ? 22 : 0);
 	}
@@ -310,7 +324,7 @@ function poster(req: SceneRequest, colors: Paint) {
 			add(typePiece(name, 'sans', L.wide ? 20 : 22, 16, column, 1, 1.3, colors.secondary, centerX, colors, () => 0), 26);
 		}
 	}
-	if (req.template === 'announcement' && req.action) add(keyPiece(req.action, centerX, colors, !L.wide), 32);
+	if (req.template === 'announcement' && req.action) add(keyPiece(req.action, centerX, column, colors, !L.wide), 32);
 	const areaTop = L.padY + L.mark + (L.wide ? 32 : 48);
 	const areaHeight = req.height - L.padY - areaTop;
 	const bias = L.wide ? 0.46 : req.height / req.width > 1.15 ? 0.4 : 0.48;

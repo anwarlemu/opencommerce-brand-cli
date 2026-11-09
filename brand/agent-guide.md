@@ -70,7 +70,7 @@ The CLI can render Open Graph images and social posts from copy you pass in. It 
 {{cli}} image og --template frame --title "..." --image ./screen.png --format both --out ./images
 ```
 
-Presets are `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350) and `landscape` (1200x675, for X and LinkedIn). Templates are `headline`, `lead` (a headline and a supporting line), `frame` (a screenshot in a window; pass `--image`, or `--text` for copy or code), `quote` (`--text` and optional `--by`) and `announcement` (a label, a headline and an optional key via `--action`). `--format` is `png` (the default), `svg` or `both`. `--ground` is `white` or `mist`. `--content file.json` reads the same fields, and flags override it.
+Presets are `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350) and `landscape` (1200x675, for X and LinkedIn). `image` defaults to `og`. `image post` defaults to `square`. `image og` always renders 1200x630. Templates are `headline`, `lead` (a headline and a supporting line), `frame` (a screenshot in a window; pass `--image`, or `--text` for copy or code), `quote` (`--text` and optional `--by`) and `announcement` (a label, a headline and an optional key via `--action`). `--format` is `png` (the default), `svg` or `both`. `--ground` is `white` or `mist`. `--content file.json` reads the same fields, and flags override it.
 
 `--json` prints the files written, with width, height and byte size. SVG text is outlined, so the file does not need the fonts installed. Headings and the wordmark use the bundled Helvetica-compatible display face, because Neue Haas Grotesk Display is not redistributable; body and keys use Inter; labels and code use the bundled monospace.
 

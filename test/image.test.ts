@@ -76,6 +76,25 @@ describe('image', () => {
 		expect(() => renderImages({ template: 'banner', title: 'Hello' })).toThrow(/Unknown template/);
 		expect(() => renderImages({ template: 'headline' })).toThrow(/needs --title/);
 		expect(() => renderImages({ preset: 'story', title: 'Hello' })).toThrow(/Unknown preset/);
+		expect(() => renderImages({ template: 'headline', title: 'Hello', ground: 'paper' })).toThrow(/Unknown ground/);
+		expect(() => renderImages({ template: 'headline', title: 'Hello', format: 'gif' })).toThrow(/Unknown format/);
+	});
+
+	it('rejects a content file with an unknown field and writes identical bytes twice', () => {
+		const dir = mkdtempSync(join(tmpdir(), 'ds-image-strict-'));
+		try {
+			const content = join(dir, 'card.json');
+			writeFileSync(content, JSON.stringify({ title: 'Hello', subtitle: 'nope' }));
+			expect(() => renderImages({ content })).toThrow(/Unknown content field "subtitle"/);
+			writeFileSync(content, JSON.stringify({ title: 1 }));
+			expect(() => renderImages({ content })).toThrow(/must be a string/);
+			const once = renderImages({ template: 'headline', title: 'Hello', preset: 'og', format: 'svg', out: join(dir, 'a.svg') });
+			const twice = renderImages({ template: 'headline', title: 'Hello', preset: 'og', format: 'svg', out: join(dir, 'b.svg') });
+			expect(readFileSync(once.files[0].path.startsWith('/') ? once.files[0].path : join(dir, 'a.svg'))).toEqual(readFileSync(join(dir, 'b.svg')));
+			expect(twice.files[0].bytes).toBe(once.files[0].bytes);
+		} finally {
+			rmSync(dir, { recursive: true, force: true });
+		}
 	});
 
 	it('rejects an --out file that is not a png or an svg', () => {

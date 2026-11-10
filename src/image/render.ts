@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, extname, isAbsolute, join, relative, resolve } from 'node:path';
 import { Resvg } from '@resvg/resvg-js';
+import { mergeCopy, readContent, type Copy } from './content.js';
 import { paint } from './paint.js';
 import { renderSvg, type SceneImage, type SceneRequest } from './scene.js';
 
@@ -46,24 +47,6 @@ export type ImageInput = {
 };
 
 export type Written = { path: string; format: 'png' | 'svg'; preset: PresetId; template: TemplateId; width: number; height: number; bytes: number };
-
-type Copy = { title: string; text: string; label: string; by: string; action: string; image?: string };
-
-function asText(value: unknown) {
-	return typeof value === 'string' ? value.trim() : '';
-}
-
-function readContent(file: string): Copy {
-	let parsed: unknown;
-	try {
-		parsed = JSON.parse(readFileSync(file, 'utf8'));
-	} catch {
-		throw new Error(`Could not read JSON from ${file}.`);
-	}
-	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error(`${file} must be a JSON object with title, text, label, by, action and image.`);
-	const record = parsed as Record<string, unknown>;
-	return { title: asText(record.title), text: asText(record.text), label: asText(record.label), by: asText(record.by), action: asText(record.action), image: asText(record.image) || undefined };
-}
 
 export function chooseTemplate(copy: Copy): TemplateId {
 	if (copy.image) return 'frame';
@@ -210,14 +193,7 @@ export function imageSpec() {
 /** Render one or more images and write them. Paths in the result are relative to the working directory when they can be. */
 export function renderImages(input: ImageInput): { template: TemplateId; ground: 'white' | 'mist'; files: Written[] } {
 	const fromFile = input.content ? readContent(resolve(input.content)) : undefined;
-	const copy: Copy = {
-		title: input.title?.trim() || fromFile?.title || '',
-		text: input.text?.trim() || fromFile?.text || '',
-		label: input.label?.trim() || fromFile?.label || '',
-		by: input.by?.trim() || fromFile?.by || '',
-		action: input.action?.trim() || fromFile?.action || '',
-		image: input.image?.trim() || fromFile?.image,
-	};
+	const copy = mergeCopy(input, fromFile);
 	const template = parseTemplate(input.template, copy);
 	assertCopy(template, copy);
 	const ground = parseGround(input.ground);

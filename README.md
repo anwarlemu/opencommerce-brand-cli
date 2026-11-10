@@ -6,7 +6,14 @@ Reference: https://opencommerce-ds.vercel.app
 
 ## Consistent CLI workflow
 
+Hand this CLI to an agent and start with one command. `manifest` (alias `describe`) lists every command, token, font, logo, template, size, component and rule. The same inputs produce the same bytes. Unknown names exit with an error instead of a guess.
+
 ```sh
+npx opencommerce-ds manifest --json
+npx opencommerce-ds brand system --json
+npx opencommerce-ds principles --json
+npx opencommerce-ds component inspect button --json
+npx opencommerce-ds component emit button --state Site --json
 npx opencommerce-ds info --json
 npx opencommerce-ds search button --json
 npx opencommerce-ds view button --json
@@ -95,6 +102,48 @@ Presets: `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350), `landsca
 
 Headings use a bundled Helvetica-compatible face (Neue Haas Grotesk Display is not redistributable). Body and keys use Inter. Labels and code use the bundled monospace. Sample output is in `samples/images/`. Regenerate it with `npx tsx scripts/render-samples.ts`.
 
+A content file must be a JSON object whose keys are `title`, `text`, `label`, `by`, `action` and `image`. Any other key, or a value that is not a string, is an error. The same inputs write the same files.
+
+## Render a short video
+
+`video` renders a 2 second mp4 (12 fps) without a browser. Frames are drawn from the brand tokens, the bundled fonts and the logo files, rasterized with system fonts off, and encoded with the pinned ffmpeg binary (`cpuflags none`, bitexact). `--template` and `--size` are required.
+
+```sh
+npx opencommerce-ds video templates --json
+npx opencommerce-ds video --template social --size square --title "Open router for commerce" --text "One endpoint for agents to search, check out and track orders." --out clip.mp4 --json
+npx opencommerce-ds video --template announcement --size vertical --title "Agents can buy from any store" --action "Get started" --json
+npx opencommerce-ds video --template product --size landscape --label order.ts --text "const order = { sku: \"cup\" }" --json
+```
+
+Templates: `social`, `announcement`, `product`. Sizes: `square` (1080x1080), `vertical` (1080x1920), `landscape` (1920x1080). `--ground` is `white` or `mist`. `--out` is an `.mp4` file or a directory (default `.ds/videos`). Sample output is in `samples/videos/`. Regenerate it with `npx tsx scripts/render-video-samples.ts`.
+
+## Read the brand system
+
+```sh
+npx opencommerce-ds brand tokens --group color --json
+npx opencommerce-ds brand tokens --name=--ds-color-brand --json
+npx opencommerce-ds brand fonts --json
+npx opencommerce-ds brand logos --json
+npx opencommerce-ds brand voice --json
+npx opencommerce-ds principles --surface site --json
+npx opencommerce-ds principles --surface product --json
+```
+
+Token groups are `color`, `type`, `space`, `radius`, `motion` and `shadow`. `--name` is exact. Pass it as `--name=--ds-color-brand`. `tokens <term>` searches by substring, and a term that matches nothing is an error.
+
+`brand fonts` lists the bundled faces and the display face that is not in this repo. `brand logos` returns the mark and the lockup with usage rules. There is no other logo. `brand voice` is the closed voice and tone list. `principles` returns do and do-not rules for `site` and for `product`. Product work uses the site system: this brand has no product theme and no product component directory.
+
+## Use components without guessing
+
+```sh
+npx opencommerce-ds component list --json
+npx opencommerce-ds component inspect button --json
+npx opencommerce-ds component emit button --state Site --json
+npx opencommerce-ds component emit button --props '{"variant":"secondary"}' --text "Read the docs" --json
+```
+
+`inspect` returns the props parsed from the source, the example states, the constraints and the file contents. `emit --state` copies an example. `emit --props` rejects unknown props and unknown values. `list` and `search` still filter the catalog by words.
+
 ## Check the implementation
 
 ```sh
@@ -121,7 +170,12 @@ Run these commands with `npx opencommerce-ds` after installing the CLI.
 | `list` | List available components, sections, page templates and visuals. |
 | `look <file\|element>` | Show component and token guidance for a file or element type. |
 | `tokens [term]` | Find a token by name or role. |
+| `manifest` | List every command, token, font, logo, template, size, component and rule. `describe` is the same command. |
+| `brand` | Read tokens, fonts, logos and voice. `brand tokens --name=` is an exact lookup. |
+| `principles` | Do and do-not rules for site and product. |
+| `component` | `list`, `inspect` and `emit` components, props and example states. |
 | `image` | Render an Open Graph image or a social post. `image templates --json` lists presets and templates. |
+| `video` | Render a 2 second mp4. `video templates --json` lists templates and sizes. |
 | `check [files...]` | Check style values. Use `--changed` for Git changes or `--fix` for exact token replacements. |
 | `review <url> --any` | Review a page that is not part of an existing conversion task list. |
 | `review <url>` | Review a tracked screen and mark its task complete when it passes. |
@@ -153,8 +207,8 @@ commits. Adding individual components with `add` does not run this conversion.
 - `/r/<name>.md` and `/r/<name>.json`: usage rules, exports, dependencies, examples and exact source.
 
 All references are generated from the same registry the CLI installs. Prefer individual component references to
-the complete file. `guide`, `list`, `show`, `look`, `tokens` and `check` without `--fix` are read-only. `init` and
-`add` accept `--dry-run`; add `--json` for structured results. JSON goes to stdout; progress goes to stderr.
+the complete file. `guide`, `manifest`, `describe`, `brand`, `principles`, `component`, `list`, `show`, `look`, `tokens` and `check` without `--fix` are read-only. `image templates` and `video templates` are read-only. `init` and
+`add` accept `--dry-run`; add `--json` for structured results. JSON goes to stdout; progress goes to stderr. Unknown names exit 1 with `{ "ok": false, "error": "..." }`.
 
 ## Source
 

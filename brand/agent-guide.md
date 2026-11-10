@@ -6,7 +6,8 @@ Use this system to build {{brand}} pages and interfaces from the user's brief. T
 
 1. Read the project instructions and package.json. Identify the framework, package manager, stylesheet and import aliases. Use the user's requirements to decide whether to build new UI or restyle existing UI.
 2. Read this guide, then the relevant component references. The library is at {{registry}}/components. Plain text is at {{registry}}/llms.txt; a complete copy is at {{registry}}/llms-full.txt.
-3. Reuse the library's components and variants. Do not recreate them from screenshots or guess their props. Each reference contains the actual exports, dependencies, working examples and source code.
+3. Run `{{cli}} manifest --json` (or `describe --json`) before inventing anything. It lists every command, token, font, logo, template, size, component and rule. Unknown names are errors.
+4. Reuse the library's components and variants. Do not recreate them from screenshots or guess their props. `{{cli}} component inspect <name> --json` returns the props and states that exist. `{{cli}} component emit` returns example code or JSX for values you checked.
 
 ## Install and prepare a project
 
@@ -74,7 +75,60 @@ Presets are `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350) and `l
 
 `--json` prints the files written, with width, height and byte size. SVG text is outlined, so the file does not need the fonts installed. Headings and the wordmark use the bundled Helvetica-compatible display face, because Neue Haas Grotesk Display is not redistributable; body and keys use Inter; labels and code use the bundled monospace.
 
-Pass `--preset all` to render every size. Give `--out` a directory when more than one file is written, or a `.png` or `.svg` path for a single file.
+Pass `--preset all` to render every size. Give `--out` a directory when more than one file is written, or a `.png` or `.svg` path for a single file. A content file is a JSON object. Unknown fields, unknown templates, unknown presets and unknown grounds are errors. The same inputs write the same bytes.
+
+## Read the brand system
+
+These commands only report what is in the package. They do not invent a token, a font file or a logo.
+
+```sh
+{{cli}} manifest --json
+{{cli}} brand system --json
+{{cli}} brand tokens --group color --json
+{{cli}} brand tokens --name=--ds-color-brand --json
+{{cli}} brand fonts --json
+{{cli}} brand logos --json
+{{cli}} brand voice --json
+{{cli}} principles --json
+{{cli}} principles --surface product --json
+```
+
+`brand tokens --group` accepts `color`, `type`, `space`, `radius`, `motion` and `shadow`. `--name` must be the exact token, passed as `--name=--ds-color-brand` so the leading dashes are not read as a flag. `tokens <term>` still searches by substring, and a term that matches nothing is an error.
+
+Fonts: Inter and JetBrains Mono are bundled, with their license files. The display face named in the tokens is not bundled. Renderers use the substitute face named by `brand fonts`. Do not download or invent a display font file.
+
+Logos: `brand logos` returns the mark and the lockup, their files, and the do and do-not rules. There is no other logo file.
+
+Voice: follow `brand voice`. The banned word list is closed. The product name stays lowercase.
+
+Principles: `site` is the page system. `product` explains that this brand has no separate product theme. Build product UI with the site tokens and the registry. Do not invent a dark product palette.
+
+## Use the component library
+
+```sh
+{{cli}} component list --json
+{{cli}} component list --type ui --json
+{{cli}} component inspect button --json
+{{cli}} component emit button --state Site --json
+{{cli}} component emit button --props '{"variant":"secondary","size":"sm"}' --text "Read the docs" --json
+```
+
+`component list` is the full catalog. `list` and `search` filter that catalog by words. `inspect` returns exports, parsed props, example state names, constraints and source. `emit --state` copies that example. `emit --props` checks every key and value against the parsed schema and errors on anything unknown. Pass `--text` for the child text. Do not pass `--state` and `--props` together. If a component has no parsed prop schema, emit a state instead of inventing JSX.
+
+`show` and `view` remain the full registry record. Prefer `inspect` and `emit` when you need props and a snippet.
+
+## Render a short video
+
+`video` renders a 2 second mp4 at 12 frames per second. It does not open a browser. Frames are SVG from the same tokens, bundled fonts and logo files as `image`, rasterized with system fonts off, then encoded with the pinned ffmpeg build and bitexact flags. The same inputs write the same bytes.
+
+```sh
+{{cli}} video templates --json
+{{cli}} video --template social --size square --title "..." --text "..." --out clip.mp4 --json
+{{cli}} video --template announcement --size vertical --title "..." --label "Now available" --action "Get started" --json
+{{cli}} video --template product --size landscape --label order.ts --text "const order = { sku: \"cup\" }" --json
+```
+
+Templates are `social`, `announcement` and `product`. Sizes are `square` (1080x1080), `vertical` (1080x1920, 9:16) and `landscape` (1920x1080, 16:9). `--template` and `--size` are required. `--ground` is `white` or `mist`. `--out` is an `.mp4` file or a directory (default `.ds/videos`). Motion uses the duration and ease-out tokens: elements settle in, then hold. Entrances are short. There is no other template, size, frame rate or duration.
 
 ## Verify before finishing
 
@@ -88,12 +142,12 @@ Pass `--preset all` to render every size. Give `--out` a directory when more tha
 
 `init` and conversion install AGENTS.md and a local `.ds/agent-guide.md`, plus supported agent instruction files and hook configuration. Agents that do not load those files automatically should read them explicitly. Hooks support Claude Code, Codex and Cursor when enabled by that tool; other agents run the CLI checks directly. Codex hook activation may require the user's `/hooks` trust step. No hook integration is required to use the components correctly.
 
-Read-only commands: `guide`, `list`, `show`, `look`, `tokens`, `check` without `--fix`, `image templates`.
-Commands that write project files: `init`, `add`, `apply`, the legacy bare conversion command, `check --fix`, `image` (it writes image files), and review/snapshot state updates. Use `--dry-run` with `init`, `add` or conversion to inspect planned writes. JSON goes to stdout and progress goes to stderr. Installation/build failures return a nonzero exit code.
+Read-only commands: `guide`, `manifest`, `describe`, `brand`, `principles`, `component list`, `component inspect`, `component emit`, `list`, `show`, `look`, `tokens`, `check` without `--fix`, `image templates`, `video templates`.
+Commands that write files: `init`, `add`, `apply`, the legacy bare conversion command, `check --fix`, `image` (image files), `video` (mp4 files), and review/snapshot state updates. Use `--dry-run` with `init`, `add` or conversion to inspect planned writes. JSON goes to stdout and progress goes to stderr. Unknown names and installation failures return a nonzero exit code. The error JSON is `{ "ok": false, "error": "..." }`.
 
 ## Project configuration and agent handoff
 
-Start with `{{cli}} info --json`, then `search <term> --json` and `view <names...> --json`. These commands are read-only. `show` and `inspect` remain aliases of `view`.
+Start with `{{cli}} manifest --json`, then `info --json`, `search <term> --json` and `view <names...> --json`. These commands are read-only. `show` and `inspect` remain aliases of `view`. `component inspect` is the prop and state view.
 
 `add` respects components.json, inherited TypeScript or JavaScript aliases, the target stylesheet and the package manager. It emits JSX/JS when `tsx` is false, installs the theme and agent guidance, and preserves differing local files. Use `add <names...> --diff` to review changes before `--overwrite`. Use `--cwd <app>` from a repository root. For shared workspace packages, use the upstream installer described below.
 

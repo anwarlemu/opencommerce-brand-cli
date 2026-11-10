@@ -37,6 +37,8 @@ npm run ci           # build, limits, registry, tests; must pass before you push
 - `src/plan/`: the task queue (`state.json` in the app), element detection and `look` output.
 - `src/check/`: the value check (rules.ts), used by hooks, pre-commit and `check`.
 - `src/review/`, `src/hooks/`, `src/commands/`.
+- `src/system/` and `brand/system.json`: `manifest` / `describe`, `brand`, `principles`, and `component list|inspect|emit`. The JSON is the machine-readable brand system. Do not add a font, logo or rule that is not backed by a file in `brand/`.
+- `src/video/`: 2 second clips. Frames are SVG from the bundled fonts and tokens, rasterized by resvg, encoded by the pinned `ffmpeg-static` binary with `cpuflags none` and bitexact flags. Templates and sizes are fixed in `src/video/motion.ts`.
 
 ## Rules
 

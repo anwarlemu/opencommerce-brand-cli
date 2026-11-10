@@ -76,7 +76,7 @@ export function installAgents(w: Writer) {
 	w.write('.cursor/hooks.json', `${JSON.stringify(cursor, null, 2)}\n`);
 	installPreCommit(w);
 	const gitignore = w.read('.gitignore') ?? '';
-	const ignore = ['.ds/session.json', '.ds/review/', '.ds/hooks.log', '.ds/images/'].filter((l) => !gitignore.split('\n').includes(l));
+	const ignore = ['.ds/session.json', '.ds/review/', '.ds/hooks.log', '.ds/images/', '.ds/videos/'].filter((l) => !gitignore.split('\n').includes(l));
 	if (ignore.length) w.write('.gitignore', `${gitignore.trimEnd()}\n${ignore.join('\n')}\n`.replace(/^\n/, ''));
 }
 

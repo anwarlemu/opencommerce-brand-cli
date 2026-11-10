@@ -75,12 +75,13 @@ export function check(paths: string[], opts: { fix?: boolean; changed?: boolean;
 export function tokensCommand(term: string | undefined, opts: { json?: boolean }) {
 	const t = tokens();
 	const rows = Object.entries(t.site).filter(([k, v]) => !term || k.includes(term) || v.toLowerCase().includes(term.toLowerCase()));
+	if (term && !rows.length) throw new Error(`Unknown token "${term}". Run \`${cli()} brand tokens --json\` for every name.`);
 	const product = Object.entries(t.product).filter(([k, v]) => t.site[k] !== v && (!term || k.includes(term)));
 	emit(opts, { site: Object.fromEntries(rows), product: Object.fromEntries(product) }, () =>
 		[
 			...rows.map(([k, v]) => `  ${k.padEnd(34)} ${v}`),
 			...(product.length ? ['  In a product (15px root, compact):', ...product.map(([k, v]) => `  ${k.padEnd(34)} ${v}`)] : []),
-			rows.length ? `Use them as var(--name). Tailwind 4 classes read the same names (bg-surface, text-fg-muted, rounded-card).` : `No token matches "${term}".`,
+			`Use them as var(--name). Tailwind 4 classes read the same names (bg-surface, text-fg-muted, rounded-card).`,
 		].join('\n'),
 	);
 }

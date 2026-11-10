@@ -13,9 +13,13 @@ Install with `add <names...> --dry-run --json`, then `add <names...> --json`. Ex
 
 For new applications, `create --template vite --name <directory>` scaffolds the framework and installs the brand. Existing applications use `init`. Use `apply --dry-run` only when the user requests conversion of existing styles; package installation and restyling are different operations.
 
-Read `guide` for brand rules and `tokens <term> --json` for custom styling. Keep colors scoped to component roles; preserve artwork, chart data and unrelated palettes. Use `check --json` and the application's build and interaction tests to verify the result.
+Start with `manifest --json` (the same catalog as `describe`). It lists every command, token, font, logo, template, size, component and rule. Unknown names are errors. Do not invent a token, component, prop, template or size.
 
-Render on-brand images with `npx {{bin}} image`. `image templates --json` lists Open Graph and social presets, templates and inputs. `image` defaults to 1200x630. `image post` defaults to the 1080x1080 square. Pass the copy with `--title`, `--text`, `--label`, `--by`, `--action` or `--image`, and read the written files from `--json`. `image` does not open a browser.
+Read `principles --json` before layout. `brand tokens --json`, `brand fonts --json`, `brand logos --json` and `brand voice --json` are the brand system. `component list --json`, then `component inspect <name> --json`, then `component emit <name> --state <state> --json` or `--props` with `--text`. Emit checks props against the source. `guide` has the longer rules. `tokens <term> --json` searches values. Keep colors scoped to component roles; preserve artwork, chart data and unrelated palettes. Use `check --json` and the application's build and interaction tests to verify the result.
+
+Render on-brand images with `npx {{bin}} image`. `image templates --json` lists Open Graph and social presets, templates and inputs. `image` defaults to 1200x630. `image post` defaults to the 1080x1080 square. Pass the copy with `--title`, `--text`, `--label`, `--by`, `--action` or `--image`, and read the written files from `--json`. `image` does not open a browser. Unknown templates, presets and content fields error.
+
+Render a short video with `npx {{bin}} video`. `video templates --json` lists `social`, `announcement` and `product`, and the sizes `square`, `vertical` and `landscape`. Pass `--template` and `--size`. The clip is 2 seconds, encoded without a browser from the bundled fonts and logo files.
 
 The standard shadcn registry is `{{registry}}/r/shadcn/{name}.json`, under `@{{bin}}` in components.json. Use `npx shadcn@4.22.1 add @{{bin}}/theme @{{bin}}/<name>` for shadcn's workspace routing and ecosystem integrations. The same registry works with its MCP server. Component references are at `{{registry}}/components`.
 

@@ -17,13 +17,13 @@ export type SceneRequest = {
 	image?: SceneImage;
 };
 
-type Box = { x: number; y: number; w: number; h: number };
+export type Box = { x: number; y: number; w: number; h: number };
 
 function esc(value: string) {
 	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
-function layoutFor(width: number, height: number) {
+export function layoutFor(width: number, height: number) {
 	const wide = width / height > 1.3;
 	return {
 		wide,
@@ -37,7 +37,7 @@ function layoutFor(width: number, height: number) {
 	};
 }
 
-function drawLockup(x: number, y: number, mark: number, colors: Paint) {
+export function drawLockup(x: number, y: number, mark: number, colors: Paint) {
 	const { display } = getFaces();
 	const nameSize = Math.round(mark * (17 / 32));
 	const bylineSize = Math.max(12, Math.round(mark * (12 / 32)));
@@ -77,7 +77,7 @@ function typePiece(text: string, font: 'display' | 'sans', start: number, min: n
 	return { gap: 0, height: fitted.height, draw: (top) => drawLines(face, fitted, leading, fill, centerX, top) };
 }
 
-function keyPiece(label: string, centerX: number, maxWidth: number, colors: Paint, tall: boolean): Piece {
+export function keyPiece(label: string, centerX: number, maxWidth: number, colors: Paint, tall: boolean): Piece {
 	const face = getFaces().sansMedium;
 	const tracking = colors.trackingTight;
 	let height = tall ? 48 : 44;
@@ -131,7 +131,7 @@ function outsideDistance(px: number, py: number, box: Box) {
 }
 
 /** The page's faint * and @ field, dense beside the window and gone before the edge. */
-function glyphField(box: Box, headerBottom: number, colors: Paint) {
+export function glyphField(box: Box, headerBottom: number, colors: Paint) {
 	const face = getFaces().mono;
 	const step = 30;
 	const size = 13;
@@ -198,7 +198,7 @@ function looksLikeCode(text: string) {
 	return text.includes('\n') && /(import |export |const |function |=>|[{;])/.test(text);
 }
 
-function drawCode(body: Box, text: string, colors: Paint) {
+export function drawCode(body: Box, text: string, colors: Paint, lineAlpha?: (index: number) => number) {
 	const face = getFaces().mono;
 	const lines = text.replace(/\r\n/g, '\n').split('\n');
 	let size = 15;
@@ -213,19 +213,22 @@ function drawCode(body: Box, text: string, colors: Paint) {
 	const top = spare > pad * 2 ? body.y + (body.h - content) / 2 : body.y + pad;
 	let baseline = top + cap * size;
 	const parts: string[] = [];
-	for (const line of lines) {
-		if (baseline - cap * size > body.y + body.h - 16) break;
-		let x = body.x + pad;
-		for (const span of codeSpans(line, colors)) {
-			parts.push(textPath(face, span.text, x, baseline, size, 0, span.fill));
-			x += measure(face, span.text, size, 0);
+	lines.forEach((line, lineIndex) => {
+		if (baseline - cap * size > body.y + body.h - 16) return;
+		const alpha = lineAlpha ? lineAlpha(lineIndex) : 1;
+		if (alpha > 0) {
+			let x = body.x + pad;
+			for (const span of codeSpans(line, colors)) {
+				parts.push(textPath(face, span.text, x, baseline, size, 0, span.fill, alpha));
+				x += measure(face, span.text, size, 0);
+			}
 		}
 		baseline += lineHeight;
-	}
+	});
 	return parts.join('');
 }
 
-function drawProse(body: Box, text: string, colors: Paint) {
+export function drawProse(body: Box, text: string, colors: Paint, lineAlpha?: (index: number) => number) {
 	const face = getFaces().sans;
 	const pad = 36;
 	const maxWidth = body.w - pad * 2;
@@ -234,10 +237,11 @@ function drawProse(body: Box, text: string, colors: Paint) {
 	const { cap } = ratios(face);
 	let baseline = top + cap * fitted.size;
 	const parts: string[] = [];
-	for (const line of fitted.lines) {
-		parts.push(textPath(face, line, body.x + pad, baseline, fitted.size, 0, colors.ink));
+	fitted.lines.forEach((line, lineIndex) => {
+		const alpha = lineAlpha ? lineAlpha(lineIndex) : 1;
+		if (alpha > 0) parts.push(textPath(face, line, body.x + pad, baseline, fitted.size, 0, colors.ink, alpha));
 		baseline += fitted.size * colors.leadingLead;
-	}
+	});
 	return parts.join('');
 }
 
@@ -249,7 +253,7 @@ function drawStatement(body: Box, text: string, colors: Paint) {
 	return drawLines(face, fitted, colors.leadingHeading, colors.ink, body.x + body.w / 2, top);
 }
 
-function drawWindow(box: Box, barName: string, colors: Paint, body: string, dark: boolean) {
+export function drawWindow(box: Box, barName: string, colors: Paint, body: string, dark: boolean) {
 	const radius = colors.radiusPanel;
 	const barH = 40;
 	const clip = `frame${box.x}${box.y}`;

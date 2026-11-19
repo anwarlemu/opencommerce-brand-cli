@@ -1,0 +1,138 @@
+{
+  "schemaVersion": 1,
+  "fonts": {
+    "faces": [
+      {
+        "id": "sans",
+        "role": "Body, buttons and links.",
+        "family": "Inter",
+        "token": "--ds-font-sans",
+        "bundled": true,
+        "weights": [400, 500],
+        "files": ["brand/fonts/Inter-Regular.ttf", "brand/fonts/Inter-Medium.ttf"],
+        "license": "SIL Open Font License",
+        "licenseFile": "brand/fonts/Inter-OFL.txt"
+      },
+      {
+        "id": "display",
+        "role": "Headings and the wordmark.",
+        "family": "Neue Haas Grotesk Display",
+        "token": "--ds-font-display",
+        "bundled": false,
+        "reason": "Neue Haas Grotesk Display is the display face named in the type tokens. It is not redistributable, so this repo does not include the font file. Rendered images and videos use the substitute face.",
+        "substitute": {
+          "family": "TeX Gyre Heros",
+          "role": "Helvetica-compatible stand-in for rendered images and videos.",
+          "file": "brand/fonts/TeXGyreHeros-Regular.otf",
+          "license": "GUST Font License",
+          "licenseFile": "brand/fonts/TeXGyre-GUST-LICENSE.txt",
+          "note": "Heros has no medium master. Renderers use the regular cut. The CSS stack stays on the display token."
+        }
+      },
+      {
+        "id": "mono",
+        "role": "Labels, window bars, code and figures.",
+        "family": "JetBrains Mono",
+        "token": "--ds-font-mono",
+        "bundled": true,
+        "weights": [400],
+        "files": ["brand/fonts/JetBrainsMono-Regular.ttf"],
+        "license": "SIL Open Font License",
+        "licenseFile": "brand/fonts/JetBrainsMono-OFL.txt",
+        "note": "The CSS token names the platform monospace. Renderers use this file so a machine without that face still matches."
+      }
+    ]
+  },
+  "logos": [
+    {
+      "id": "mark",
+      "file": "brand/logo/mark.svg",
+      "name": "Mark",
+      "summary": "The square mark shipped in brand/logo/mark.svg. The window bar sets it in blue between brackets.",
+      "do": [
+        { "id": "mark-file", "text": "Use brand/logo/mark.svg as drawn. Do not redraw the mark.", "source": "brand/logo/mark.svg" },
+        { "id": "mark-window", "text": "In a window bar, place the mark in blue between brackets, as the site does.", "source": "brand/principles.md" }
+      ],
+      "dont": [
+        { "id": "mark-recolor", "text": "Do not recolor the mark. Its fills are the brand blue and white.", "source": "brand/logo/mark.svg" },
+        { "id": "mark-decoration", "text": "Do not use the mark as a repeating decoration or on a blue band.", "source": "brand/principles.md" },
+        { "id": "mark-extra", "text": "Do not invent another icon file. This is the only mark in the repo.", "source": "brand/logo/mark.svg" }
+      ]
+    },
+    {
+      "id": "lockup",
+      "file": "brand/logo/lockup.svg",
+      "name": "Lockup",
+      "summary": "The wordmark and the byline shipped in brand/logo/lockup.svg. The header uses this lockup.",
+      "do": [
+        { "id": "lockup-header", "text": "Use the lockup in the header, including the byline that is in the file.", "source": "brand/principles.md" },
+        { "id": "lockup-type", "text": "Set the name in the display face at weight 500, tracked tight.", "source": "brand/principles.md" },
+        { "id": "lockup-footer", "text": "The footer sets the name large as a faint outline. That treatment is not a separate logo file.", "source": "brand/principles.md" }
+      ],
+      "dont": [
+        { "id": "lockup-weight", "text": "Do not set the wordmark in bold or in caps.", "source": "brand/principles.md" },
+        { "id": "lockup-byline", "text": "Do not drop the byline from the lockup.", "source": "brand/logo/lockup.svg" },
+        { "id": "lockup-extra", "text": "Do not invent a second wordmark file.", "source": "brand/logo/lockup.svg" }
+      ]
+    }
+  ],
+  "voice": {
+    "summary": "Plain, short and concrete. A developer is reading.",
+    "do": [
+      { "id": "voice-plain", "text": "Write plain, short, concrete sentences.", "source": "brand/principles.md" },
+      { "id": "voice-case", "text": "Use sentence case and American spelling.", "source": "brand/principles.md" },
+      { "id": "voice-name", "text": "Keep the product name lowercase.", "source": "brand/principles.md" }
+    ],
+    "dont": [
+      { "id": "voice-dash", "text": "Do not use em dashes.", "source": "brand/principles.md" },
+      { "id": "voice-banned", "text": "Do not use seamless, revolutionary, cutting-edge, unleash, supercharge, next-generation, world-class, leverage or elevate.", "source": "brand/principles.md" }
+    ],
+    "banned": ["seamless", "revolutionary", "cutting-edge", "unleash", "supercharge", "next-generation", "world-class", "leverage", "elevate"],
+    "productName": "opencommerce",
+    "case": "lowercase",
+    "spelling": "American",
+    "sources": ["brand/principles.md"]
+  },
+  "principles": {
+    "site": {
+      "summary": "A calm white developer page. One blue, exact type, and the product shown in windows.",
+      "do": [
+        { "id": "site-ground", "text": "Keep one white page from the header to the footer. Blue is the chromatic voice for the primary key, links, the window mark, a lit tile and chart bars.", "source": "brand/principles.md" },
+        { "id": "site-ink", "text": "Set text in the ink token, never pure black. Secondary copy uses the secondary text token. Hints use the faint text token.", "source": "brand/principles.md" },
+        { "id": "site-type", "text": "Set headings and the wordmark in the display stack at weight 500, tracked tight. Set body, buttons and links in the sans stack. Set code, window bars, tags and table figures in the mono stack. Nothing is bold and nothing is in caps.", "source": "brand/principles.md" },
+        { "id": "site-keys", "text": "Keep keys flat: the control radius, a border a shade darker than the fill, and no shadow. A press scales a key to 97 percent.", "source": "brand/principles.md" },
+        { "id": "site-windows", "text": "Put features, plans, tables and code in windows: white, the window border, the panel radius, a mist bar, a mono name and the mark in blue.", "source": "brand/principles.md" },
+        { "id": "site-sections", "text": "Center a section: a heading, a description in secondary text, then the content. Use the layout tokens for the frame, the medium column and the gutter. On phones the gutter token narrows.", "source": "brand/site.css" },
+        { "id": "site-motion", "text": "Keep motion between the fast and slow duration tokens, on the ease-out token. Use the in-out token only for something that travels and stays on screen. Honor reduced motion.", "source": "brand/principles.md" },
+        { "id": "site-access", "text": "Keep text contrast at least 4.5:1, touch targets at least 44px on phones, and a visible focus ring. Do not let text touch an edge.", "source": "brand/rubric.md" },
+        { "id": "site-brief", "text": "For a new page, follow the brief. When only restyling, preserve words, links, images, elements and behavior.", "source": "brand/principles.md" }
+      ],
+      "dont": [
+        { "id": "site-no-blue-ground", "text": "Do not use blue grounds or bands, or a gradient behind text.", "source": "brand/principles.md" },
+        { "id": "site-no-glow", "text": "Do not add glows, purple or teal accents, or stock 3D imagery.", "source": "brand/principles.md" },
+        { "id": "site-no-pill", "text": "Do not use rounded pill buttons, raised or beveled keys, or a drop shadow under a key.", "source": "brand/principles.md" },
+        { "id": "site-no-gray-card", "text": "Do not use a soft gray card that has no window bar.", "source": "brand/principles.md" },
+        { "id": "site-no-bold", "text": "Do not set bold headings or all-caps labels.", "source": "brand/principles.md" },
+        { "id": "site-no-dark", "text": "Do not ship a dark mode page. This brand has no dark theme.", "source": "brand/principles.md" },
+        { "id": "site-no-decoration", "text": "Do not use blue as decoration everywhere.", "source": "brand/principles.md" },
+        { "id": "site-no-ease-in", "text": "Do not use ease-in, and do not use transition all.", "source": "brand/tokens.css" }
+      ],
+      "sources": ["brand/principles.md", "brand/rubric.md", "brand/tokens.css", "brand/site.css"]
+    },
+    "product": {
+      "summary": "This brand ships a site surface only. brand.json lists site, tokens.css has no product block, and there is no product component directory. Build product UI with the site tokens and the components in the registry.",
+      "do": [
+        { "id": "product-same-system", "text": "Use the site tokens, the site type stack and the UI components in the registry.", "source": "brand/brand.json" },
+        { "id": "product-one-key", "text": "Keep one primary key in a view. Pair it with the secondary key.", "source": "brand/principles.md" },
+        { "id": "product-tokens", "text": "Use the same motion, radius and spacing tokens as the site.", "source": "brand/tokens.css" },
+        { "id": "product-emit", "text": "Use the component variants in the registry. Do not guess props.", "source": "brand/contract.md" }
+      ],
+      "dont": [
+        { "id": "product-no-theme", "text": "Do not invent a product theme, a dark palette, or a component that is not in the registry.", "source": "brand/brand.json" },
+        { "id": "product-no-font", "text": "Do not invent a second type scale or a font that is not listed by brand fonts.", "source": "brand/fonts/README.md" },
+        { "id": "product-no-pill", "text": "Do not use pill buttons, blue grounds or ease-in. The site refuse list applies.", "source": "brand/principles.md" }
+      ],
+      "sources": ["brand/brand.json", "brand/tokens.css", "brand/principles.md", "brand/fonts/README.md"]
+    }
+  }
+}

@@ -1,6 +1,13 @@
 import { appendFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { Command } from 'commander';
+import { imageCommands } from './commands/image.js';
+import { systemCommands } from './commands/system.js';
+import { videoCommands } from './commands/video.js';
+import { deckCommand } from './commands/deck.js';
+import { illustrateCommand } from './commands/illustrate.js';
+import { merchCommand } from './commands/merch.js';
+import { figmaCommand } from './commands/figma.js';
 import { review, snapshot } from './commands/review.js';
 import { run } from './commands/run.js';
 import { guide } from './commands/guide.js';
@@ -10,11 +17,12 @@ import { type HookResult, cursorPreToolUse, cursorStop, preToolUse, sessionStart
 import { readHookInput } from './hooks/payload.js';
 import { brand, cli, hasProduct } from './lib/brand.js';
 import { findProjectRoot } from './lib/paths.js';
+import { unknownName } from './lib/names.js';
 
 const program = new Command();
 const b = brand();
 
-program.name(b.bin).description(`Build ${b.name} pages and interfaces with the component library and design tokens. Use add, look, check and review during implementation.`);
+program.name(b.bin).description(`Build ${b.name} pages and interfaces from this CLI. Start with manifest --json. It lists tokens, components, templates and rules.`);
 // A brand with a site only styles every project as a site: no surface or theme to choose.
 if (hasProduct())
 	program
@@ -33,6 +41,13 @@ program.command('review [url]').description('Screenshot a page at desktop and ph
 program.command('look [target]').description('The brand styling (CSS, Tailwind, states) for every element in a file, or for one element kind').option('--surface <surface>', 'site or product').option('--json', 'JSON output').action((target, _opts, command) => look(target, command.optsWithGlobals()));
 program.command('check [files...]').description('Check that every style value is a brand token (used by hooks, pre-commit and CI)').option('--fix', 'replace exact matches with their token').option('--changed', 'only files changed in git').option('--json', 'JSON output').action((files, _opts, command) => check(files ?? [], command.optsWithGlobals()));
 program.command('tokens [term]').description('Find a brand token by name or value').option('--json', 'JSON output').action((term, _opts, command) => tokensCommand(term, command.optsWithGlobals()));
+systemCommands(program);
+imageCommands(program);
+videoCommands(program);
+deckCommand(program);
+illustrateCommand(program);
+merchCommand(program);
+figmaCommand(program);
 program.command('approve').description('Approve ds-override comments (a person, in a terminal)').option('--all', 'approve every pending override').action((opts) => approve(opts));
 program.command('snapshot [url]').description('Save how each main screen looks before hand edits (run once, with the app running); reviews compare against it').action((url) => snapshot(url));
 program.command('skip <screen>').description('Leave a screen as it is when it cannot pass without changing words or elements; the person sees the reason').requiredOption('--reason <text>', 'why').action((id, opts) => skip(id, opts.reason));
@@ -69,8 +84,17 @@ program
 
 workflow(program);
 
+// A first word that is not a command is a typo, not an argument: name the nearest commands and exit 1.
+const first = process.argv[2];
+if (first && !first.startsWith('-') && first !== 'help' && !program.commands.some((c) => c.name() === first || c.aliases().includes(first))) {
+	const error = unknownName('command', first, program.commands.map((c) => c.name()));
+	if (process.argv.includes('--json')) process.stdout.write(`${JSON.stringify({ ok: false, error: error.message, suggestions: (error as Error & { suggestions?: string[] }).suggestions })}\n`);
+	else process.stderr.write(`${error.message}\n`);
+	process.exit(1);
+}
+
 program.parseAsync().catch((error: Error) => {
-	if (program.opts().json || process.argv.includes('--json')) process.stdout.write(`${JSON.stringify({ ok: false, error: error.message })}\n`);
+	if (program.opts().json || process.argv.includes('--json')) process.stdout.write(`${JSON.stringify({ ok: false, error: error.message, ...((error as Error & { suggestions?: string[] }).suggestions ? { suggestions: (error as Error & { suggestions?: string[] }).suggestions } : {}) })}\n`);
 	else process.stderr.write(`${error.message}\n`);
 	process.exit(1);
 });

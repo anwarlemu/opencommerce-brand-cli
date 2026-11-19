@@ -6,7 +6,8 @@ Use this system to build {{brand}} pages and interfaces from the user's brief. T
 
 1. Read the project instructions and package.json. Identify the framework, package manager, stylesheet and import aliases. Use the user's requirements to decide whether to build new UI or restyle existing UI.
 2. Read this guide, then the relevant component references. The library is at {{registry}}/components. Plain text is at {{registry}}/llms.txt; a complete copy is at {{registry}}/llms-full.txt.
-3. Reuse the library's components and variants. Do not recreate them from screenshots or guess their props. Each reference contains the actual exports, dependencies, working examples and source code.
+3. Run `{{cli}} manifest --json` (or `describe --json`) before inventing anything. It lists every command, token, font, logo, template, size, component and rule. Unknown names are errors.
+4. Reuse the library's components and variants. Do not recreate them from screenshots or guess their props. `{{cli}} component inspect <name> --json` returns the props and states that exist. `{{cli}} component emit` returns example code or JSX for values you checked.
 
 ## Install and prepare a project
 
@@ -59,6 +60,108 @@ The component reference states its source. `{{registry}}/r/audit.json` records t
 - Connect every action to its intended behavior. Handle empty, loading, disabled, invalid, success and error states. Preserve keyboard controls, focus return, accessible names and native form semantics. Never present a preview's local demo action as a completed backend operation.
 - Use the provided portal behavior. Surface is for an isolated preview or a scoped theme; ordinary pages do not need an extra Surface wrapper. Mount one Toaster per application when using toast notifications.
 
+## Render images
+
+The CLI can render Open Graph images and social posts from copy you pass in. It does not open a browser. Colors, type and the logo come from the brand tokens and the bundled fonts and marks.
+
+```sh
+{{cli}} image templates --json
+{{cli}} image --preset og --template lead --title "..." --text "..." --out og.png --json
+{{cli}} image post --preset square --template announcement --title "..." --action "Get started" --json
+{{cli}} image og --template frame --title "..." --image ./screen.png --format both --out ./images
+{{cli}} image --template hero --preset og --chip "Product by Agentcard" --title "..." --text "..." --out og.png
+{{cli}} image --template window --preset square --title "..." --image ./screen.png --label screen.png
+{{cli}} image --template cards --preset portrait --title "..." --content cards.json
+```
+
+Presets are `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350), `story` (1080x1920), `landscape` (1200x675, for X and LinkedIn), `x-banner` (1500x500) and `linkedin-banner` (1584x396), or any `WIDTHxHEIGHT` from 200 to 4000. `image` defaults to `og`. `image post` defaults to `square`. `image og` always renders 1200x630. Templates are `headline`, `lead` (a headline and a supporting line), `frame` (a screenshot in a window; pass `--image`, or `--text` for copy or code), `quote` (`--text` and optional `--by`) and `announcement` (a label, a headline and an optional key via `--action`). The brand image tool's four layouts are `hero` (chip, headline and line centered, a window rising from the bottom with code or your `--image`), `window` (words beside a window), `closing` (the mist card with the lockup and keys) and `cards` (numbered cards; `--cards` with blank lines between cards, heading first). They take `--chip`, `--action` and `--secondary` (the blue and white keys), `--label` (the window bar), `--code`, `--highlight`, `--seed`, `--no-logo`, `--no-glyphs` and `--no-window`, and open with the tool's own copy when you pass none. `--format` is `png` (the default), `svg` or `both`. `--ground` is `white` or `mist`. `--content file.json` reads the same fields, and flags override it.
+
+`--json` prints the files written, with width, height and byte size. SVG text is outlined, so the file does not need the fonts installed. Headings and the wordmark use the bundled Helvetica-compatible display face, because Neue Haas Grotesk Display is not redistributable; body and keys use Inter; labels and code use the bundled monospace.
+
+Pass `--preset all` to render every size. Give `--out` a directory when more than one file is written, or a `.png` or `.svg` path for a single file. A content file is a JSON object. Unknown fields, unknown templates, unknown presets and unknown grounds are errors. The same inputs write the same bytes.
+
+## Read the brand system
+
+These commands only report what is in the package. They do not invent a token, a font file or a logo.
+
+```sh
+{{cli}} manifest --json
+{{cli}} brand system --json
+{{cli}} brand tokens --group color --json
+{{cli}} brand tokens --name=--ds-color-brand --json
+{{cli}} brand fonts --json
+{{cli}} brand logos --json
+{{cli}} brand voice --json
+{{cli}} principles --json
+{{cli}} principles --surface product --json
+```
+
+`brand tokens --group` accepts `color`, `type`, `space`, `radius`, `motion` and `shadow`. `--name` must be the exact token, passed as `--name=--ds-color-brand` so the leading dashes are not read as a flag. `tokens <term>` still searches by substring, and a term that matches nothing is an error.
+
+Fonts: Inter and JetBrains Mono are bundled, with their license files. The display face named in the tokens is not bundled. Renderers use the substitute face named by `brand fonts`. Do not download or invent a display font file.
+
+Logos: `brand logos` returns the mark and the lockup, their files, and the do and do-not rules. There is no other logo file.
+
+Voice: follow `brand voice`. The banned word list is closed. The product name stays lowercase.
+
+Principles: `site` is the page system. `product` explains that this brand has no separate product theme. Build product UI with the site tokens and the registry. Do not invent a dark product palette.
+
+## Use the component library
+
+```sh
+{{cli}} component list --json
+{{cli}} component list --type ui --json
+{{cli}} component inspect button --json
+{{cli}} component emit button --state Site --json
+{{cli}} component emit button --props '{"variant":"secondary","size":"sm"}' --text "Read the docs" --json
+```
+
+`component list` is the full catalog. `list` and `search` filter that catalog by words. `inspect` returns exports, parsed props, example state names, constraints and source. `emit --state` copies that example. `emit --props` checks every key and value against the parsed schema and errors on anything unknown. Pass `--text` for the child text. Do not pass `--state` and `--props` together. If a component has no parsed prop schema, emit a state instead of inventing JSX.
+
+`show` and `view` remain the full registry record. Prefer `inspect` and `emit` when you need props and a snippet.
+
+## Make slides, print files and illustrations
+
+```sh
+{{cli}} deck --list
+{{cli}} deck --input deck.json --out deck          # a PNG per slide and deck.pdf
+{{cli}} deck cover --title "..." --body "..."
+{{cli}} merch --list
+{{cli}} merch tee-front --out merch                # SVG at physical size and a 300 dpi PNG
+{{cli}} merch sticker --guides                     # trim and safe lines for proofing
+{{cli}} illustrate --list
+{{cli}} illustrate field --size 1500x500 --seed 7
+{{cli}} illustrate halftone --image ./photo.png
+```
+
+Slides are `cover`, `section`, `statement`, `bullets`, `stat`, `quote`, `image` and `end`, each a layout of the image tool at 1920x1080. `deck.json` holds `{ "slides": [ { "type": "cover", "title": "..." } ] }`; unknown slots error. Merch items are print files only (no mockups) with bleed and safe area; sizes are common vendor print areas, so confirm with the vendor. The brand has one ground, so merch prints on white or light blanks, and logos are the files in `brand/logo/` as drawn. Illustrations follow `brand/illustration.md`: glyphs on a lattice, faint ink, blue only where the site puts it.
+
+## Work in Figma
+
+The CLI never calls Figma. Each action writes files and prints the Figma MCP calls to make, in order.
+
+```sh
+{{cli}} figma tokens                               # variables JSON and use_figma scripts
+{{cli}} figma push illustration field              # also asset, slide, component, page
+{{cli}} figma pull "https://figma.com/design/<key>/x?node-id=1-2"
+{{cli}} figma check figma/variables-1-2.json figma/design-1-2.txt
+```
+
+`figma check` lists every off-brand color, font, size, radius and space with the nearest token and exits 1 when there are any. Build from library components and tokens, never the raw Figma values.
+
+## Render a short video
+
+`video` renders a 2 second mp4 at 12 frames per second. It does not open a browser. Frames are SVG from the same tokens, bundled fonts and logo files as `image`, rasterized with system fonts off, then encoded with the pinned ffmpeg build and bitexact flags. The same inputs write the same bytes.
+
+```sh
+{{cli}} video templates --json
+{{cli}} video --template social --size square --title "..." --text "..." --out clip.mp4 --json
+{{cli}} video --template announcement --size vertical --title "..." --label "Now available" --action "Get started" --json
+{{cli}} video --template product --size landscape --label order.ts --text "const order = { sku: \"cup\" }" --json
+```
+
+Templates are `social`, `announcement` and `product` (2 seconds at 12 fps), `hero`, `window`, `closing` and `cards` (the image tool's layouts, 4 seconds at 30 fps: they play in once on the ease-out token, staggered 60ms, and rest while the glyph field drifts as the site's does), `field` (6 seconds at 12 fps, the site's drift) and `mark` and `orbit` (6 seconds at 30 fps, the hero's swaying [*]). Sizes are `square` (1080x1080), `vertical` (1080x1920, 9:16) and `landscape` (1920x1080, 16:9). `--template` and `--size` are required. `--ground` is `white` or `mist`. `--out` is an `.mp4` or `.webm` file or a directory (default `.ds/videos`); `--format webm` also picks WebM. `--still <seconds>` writes one PNG frame instead. There is no other template, size, frame rate or duration.
+
 ## Verify before finishing
 
 1. Run the consuming project's type checks, tests and production build.
@@ -71,12 +174,12 @@ The component reference states its source. `{{registry}}/r/audit.json` records t
 
 `init` and conversion install AGENTS.md and a local `.ds/agent-guide.md`, plus supported agent instruction files and hook configuration. Agents that do not load those files automatically should read them explicitly. Hooks support Claude Code, Codex and Cursor when enabled by that tool; other agents run the CLI checks directly. Codex hook activation may require the user's `/hooks` trust step. No hook integration is required to use the components correctly.
 
-Read-only commands: `guide`, `list`, `show`, `look`, `tokens`, `check` without `--fix`.
-Commands that write project files: `init`, `add`, `apply`, the legacy bare conversion command, `check --fix`, and review/snapshot state updates. Use `--dry-run` with `init`, `add` or conversion to inspect planned writes. JSON goes to stdout and progress goes to stderr. Installation/build failures return a nonzero exit code.
+Read-only commands: `guide`, `manifest`, `describe`, `brand`, `principles`, `component list`, `component inspect`, `component emit`, `list`, `show`, `look`, `tokens`, `check` without `--fix`, `image templates`, `video templates`, the `--list` of `deck`, `merch` and `illustrate`, `figma pull` and `figma check`.
+Commands that write files: `init`, `add`, `apply`, the legacy bare conversion command, `check --fix`, `image` (image files), `video` (mp4, webm or png files), `deck`, `merch`, `illustrate` and `figma tokens|push` (files under `--out`), and review/snapshot state updates. Use `--dry-run` with `init`, `add` or conversion to inspect planned writes. JSON goes to stdout and progress goes to stderr. Unknown names and installation failures return a nonzero exit code. The error JSON is `{ "ok": false, "error": "..." }`.
 
 ## Project configuration and agent handoff
 
-Start with `{{cli}} info --json`, then `search <term> --json` and `view <names...> --json`. These commands are read-only. `show` and `inspect` remain aliases of `view`.
+Start with `{{cli}} manifest --json`, then `info --json`, `search <term> --json` and `view <names...> --json`. These commands are read-only. `show` and `inspect` remain aliases of `view`. `component inspect` is the prop and state view.
 
 `add` respects components.json, inherited TypeScript or JavaScript aliases, the target stylesheet and the package manager. It emits JSX/JS when `tsx` is false, installs the theme and agent guidance, and preserves differing local files. Use `add <names...> --diff` to review changes before `--overwrite`. Use `--cwd <app>` from a repository root. For shared workspace packages, use the upstream installer described below.
 

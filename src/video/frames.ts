@@ -2,7 +2,10 @@ import { drawLines, fitText, getFaces } from '../image/fonts.js';
 import { paint, trackingFor, type Paint } from '../image/paint.js';
 import { drawCode, drawLockup, drawProse, drawWindow, glyphField, keyPiece, layoutFor, type Box } from '../image/scene.js';
 import { tokens } from '../lib/brand.js';
-import { duration, played, timeOf, type VideoSize, type VideoTemplate, VIDEO_SIZES } from './motion.js';
+import { duration, played, templateDef, timeOf, type VideoSize, type VideoTemplate, VIDEO_SIZES } from './motion.js';
+import { designFor, type LayoutId } from '../assets/layouts.js';
+import { layoutSvg } from '../image/render.js';
+import { illustrate } from '../illustrate/render.js';
 
 export type VideoFrame = {
 	template: VideoTemplate;
@@ -12,6 +15,12 @@ export type VideoFrame = {
 	text: string;
 	label: string;
 	action: string;
+	chip?: string;
+	secondary?: string;
+	code?: string;
+	cards?: string;
+	footer?: string;
+	seed?: number;
 };
 
 type FrameReq = VideoFrame & { width: number; height: number };
@@ -135,7 +144,45 @@ function product(req: FrameReq, frame: number, colors: Paint) {
 	return `${field}${lock}${titleSvg}${window}`;
 }
 
-export function frameSvg(req: VideoFrame, frame: number) {
+/** A layout frame: the entrance (field, words, window, then code lines or cards staggered 60ms), each on the ease-out
+ *  token at the duration tokens, while the field drifts linearly from the first frame. */
+function layoutFrame(req: VideoFrame, frame: number, fps: number) {
+	const size = VIDEO_SIZES[req.size];
+	const ms = (frame / fps) * 1000;
+	const fast = duration('--ds-duration-fast');
+	const base = duration('--ds-duration-base');
+	const slow = duration('--ds-duration-slow');
+	const d = designFor(req.template as LayoutId, size.width, size.height);
+	if (req.title || req.text || req.chip || req.cards) {
+		d.title = req.title;
+		d.text = req.text;
+		d.chip = req.chip ?? '';
+	}
+	if (req.cards) d.cards = req.cards;
+	if (req.footer) d.footer = req.footer;
+	d.primary = req.action;
+	d.secondary = req.secondary ?? '';
+	if (req.label) d.windowName = req.label;
+	if (req.code) d.code = req.code;
+	if (req.seed !== undefined) d.seed = req.seed;
+	d.t = frame / fps;
+	d.enter = {
+		field: played(ms, 0, slow),
+		words: played(ms, 80, base),
+		window: played(ms, 160, slow),
+		codeLine: (i) => played(ms, 360 + i * 60, fast),
+		item: (i) => played(ms, 160 + i * 60, slow),
+	};
+	return layoutSvg(d, req.ground);
+}
+
+export function frameSvg(req: VideoFrame, frame: number, fps = 12) {
+	const def = templateDef(req.template);
+	if (def.kind === 'layout') return layoutFrame(req, frame, fps);
+	if (def.kind === 'art') {
+		const size = VIDEO_SIZES[req.size];
+		return illustrate({ subject: req.template, width: size.width, height: size.height, t: frame / fps, seed: req.seed, ground: req.ground }).svg;
+	}
 	const size = VIDEO_SIZES[req.size];
 	const colors = paint();
 	const ground = req.ground === 'mist' ? colors.mist : colors.white;

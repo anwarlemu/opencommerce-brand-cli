@@ -8,7 +8,7 @@ import { PRESETS, TEMPLATES, loadImage, pngSize, renderImages, type TemplateId }
 const ROOT = join(import.meta.dirname, '..');
 const BIN = join(ROOT, 'bin.js');
 
-const copy: Record<TemplateId, { title?: string; text?: string; label?: string; by?: string; action?: string }> = {
+const copy: Partial<Record<TemplateId, { title?: string; text?: string; label?: string; by?: string; action?: string }>> = {
 	headline: { title: 'Open router for commerce' },
 	lead: { title: 'Open router for commerce', text: 'One endpoint for agents to search, check out and track orders.' },
 	frame: { title: 'Watch it in action', label: 'agent.ts' },
@@ -22,7 +22,7 @@ describe('image', () => {
 		try {
 			for (const template of TEMPLATES) {
 				for (const [preset, size] of Object.entries(PRESETS)) {
-					const result = renderImages({ ...copy[template.id], template: template.id, preset, format: 'png', out: join(dir, `${preset}-${template.id}.png`) });
+					const result = renderImages({ ...copy[template.id as TemplateId], template: template.id, preset, format: 'png', out: join(dir, `${preset}-${template.id}.png`) });
 					expect(result.files).toHaveLength(1);
 					expect(result.template).toBe(template.id);
 					const file = result.files[0];
@@ -75,7 +75,8 @@ describe('image', () => {
 	it('rejects an unknown template and a headline with no title', () => {
 		expect(() => renderImages({ template: 'banner', title: 'Hello' })).toThrow(/Unknown template/);
 		expect(() => renderImages({ template: 'headline' })).toThrow(/needs --title/);
-		expect(() => renderImages({ preset: 'story', title: 'Hello' })).toThrow(/Unknown preset/);
+		expect(() => renderImages({ preset: 'stroy', title: 'Hello' })).toThrow(/Unknown preset `stroy`. Did you mean `story`/);
+		expect(() => renderImages({ preset: '9000x100', title: 'Hello' })).toThrow(/200 to 4000/);
 		expect(() => renderImages({ template: 'headline', title: 'Hello', ground: 'paper' })).toThrow(/Unknown ground/);
 		expect(() => renderImages({ template: 'headline', title: 'Hello', format: 'gif' })).toThrow(/Unknown format/);
 	});
@@ -165,8 +166,8 @@ describe('image', () => {
 		expect(postHelp).toMatch(/square/);
 		expect(postHelp).toMatch(/--preset/);
 		const listed = JSON.parse(execFileSync(process.execPath, [BIN, 'image', 'templates', '--json'], { encoding: 'utf8' }));
-		expect(listed.presets.map((preset: { id: string }) => preset.id)).toEqual(['og', 'square', 'portrait', 'landscape']);
-		expect(listed.templates).toHaveLength(5);
+		expect(listed.presets.map((preset: { id: string }) => preset.id)).toEqual(['og', 'square', 'portrait', 'story', 'landscape', 'x-banner', 'linkedin-banner']);
+		expect(listed.templates).toHaveLength(9);
 		const dir = mkdtempSync(join(tmpdir(), 'ds-image-cli-'));
 		try {
 			const stdout = execFileSync(process.execPath, [BIN, 'image', '--preset', '1200x675', '--template', 'headline', '--title', 'Hello', '--out', join(dir, 'card.png'), '--json'], { encoding: 'utf8' });

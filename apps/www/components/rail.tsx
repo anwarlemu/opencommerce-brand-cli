@@ -23,6 +23,9 @@ const PAGES = [
   { href: "/", label: "Introduction" },
   { href: "/components", label: "All components" },
   { href: "/theme", label: "Theme" },
+  { href: "/assets", label: "Assets" },
+  { href: "/illustrations", label: "Illustrations" },
+  { href: "/figma", label: "Figma" },
 ];
 
 function List({ groups, query, onNavigate }: { groups: Group[]; query: string; onNavigate: () => void }) {
@@ -83,6 +86,9 @@ export function DocsRail({ groups, name, repo, site }: { groups: Group[]; name: 
   const entries = [
     ...groups.flatMap((g) => g.items.map((i) => ({ name: i.name, title: i.title, group: g.label, href: `/components/${i.name}` }))),
     { name: "theme", title: "Theme", group: "Docs", href: "/theme" },
+    { name: "assets", title: "Assets", group: "Docs", href: "/assets" },
+    { name: "illustrations", title: "Illustrations", group: "Docs", href: "/illustrations" },
+    { name: "figma", title: "Figma", group: "Docs", href: "/figma" },
   ];
 
   React.useEffect(() => {

@@ -26,3 +26,13 @@ Each is in force today; each names where it lives, so a change is one edit.
 11. Review passes at 7 on every score. `brand/brand.json`.
 12. The repo is meant to be public so installs need no token, like the Agentcard harness. Make it private if the
     brand's files should not be public.
+13. Assets (image layouts, deck, video, merch, illustrate) follow the brand's image tool in agd-playground
+    (`src/components/opencommerce-og/`) and the site at fd85848. Where the tool's literals and the tokens disagree,
+    the tokens win; each disagreement is a note in `brand/assets/image.json`.
+14. The tool's attribution draws Agentcard's own lockup; it is not a file in `brand/logo`, so the CLI typesets the
+    maker's name. Add the lockup file to `brand/logo/` (and `brand/system.json`) to draw it instead.
+15. Merch prints on white or light blanks only, with the logo files as drawn (no blue grounds, no recolored mark).
+    Sizes are common vendor print areas, not a vendor's template. `brand/assets/merch.json`.
+16. The site's commerce drawings in characters (cart, terminal, parcel and the rest in `commerce-ascii.ts`) come from
+    Agentcard's artwork and are not shown on the site, so `illustrate` does not ship them. `brand/assets/illustrate.json`.
+

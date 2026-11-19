@@ -71,8 +71,8 @@ describe('agent catalog', () => {
 		expect(data.entry).toBe('manifest');
 		expect(data.alias).toBe('describe');
 		expect(data.tokens.other).toEqual([]);
-		expect(data.image.templates.map((item) => item.id)).toEqual(['headline', 'lead', 'frame', 'quote', 'announcement']);
-		expect(data.video.templates.map((item) => item.id)).toEqual(['social', 'announcement', 'product']);
+		expect(data.image.templates.map((item) => item.id)).toEqual(['headline', 'lead', 'frame', 'quote', 'announcement', 'hero', 'window', 'closing', 'cards']);
+		expect(data.video.templates.map((item) => item.id)).toEqual(['social', 'announcement', 'product', 'hero', 'window', 'closing', 'cards', 'field', 'mark', 'orbit']);
 		expect(data.video.sizes.map((item) => item.id)).toEqual(['square', 'vertical', 'landscape']);
 		expect(data.components.map((item) => item.name)).toContain('button');
 		expect(data.principles.product.summary.toLowerCase()).toContain('site');

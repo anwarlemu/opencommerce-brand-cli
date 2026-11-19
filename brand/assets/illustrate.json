@@ -1,0 +1,45 @@
+{
+	"$comment": "Illustration subjects, drawn in the brand's own graphic language: characters on a lattice, faint ink with blue only where the site puts it. Each subject names its source in the brand's site (opencommerce-agentcard-web) or the image tool (agd-playground src/components/opencommerce-og/draw.ts). Rules are in brand/illustration.md.",
+	"subjects": {
+		"field": {
+			"description": "The field of * and @: clumps from a noise map that crumble at their coasts, faint ink with short blue runs deep inside, feathering out toward the edges.",
+			"source": "opencommerce-agentcard-web src/components/scatter-stage.tsx and src/lib/noise.ts; draw.ts drawGlyphs",
+			"size": [1200, 630],
+			"seed": 23,
+			"image": false
+		},
+		"window": {
+			"description": "A window (mist bar, dimmed arrow, a file-like name, the blue [*]) with code on its blue band, or your --image, and the field gathering round it.",
+			"source": "opencommerce-agentcard-web src/components/window.tsx and globals.css (THE WINDOW); draw.ts drawWindow and drawSplit",
+			"size": [1200, 800],
+			"seed": 23,
+			"image": true
+		},
+		"mark": {
+			"description": "The [*] as a solid slab drawn in characters on a fine grid, shaded from a point light; the brightest faces turn blue.",
+			"source": "opencommerce-agentcard-web src/lib/mark-3d.ts and src/components/merchant-orbit.tsx (the sun)",
+			"size": [800, 800],
+			"seed": 0,
+			"image": false
+		},
+		"orbit": {
+			"description": "The hero's system without its stores: nine flat rings of dots nested round the [*] slab, the far side fainter and passing behind it.",
+			"source": "opencommerce-agentcard-web src/components/merchant-orbit.tsx (rings and sun; the store tiles are third-party marks and are left out)",
+			"size": [1600, 900],
+			"seed": 0,
+			"image": false
+		},
+		"halftone": {
+			"description": "Your --image drawn in characters on the mark's fine grid: darker tones take denser glyphs from the mark's ramp, the darkest turn blue, white stays white.",
+			"source": "the mark's shading in src/components/merchant-orbit.tsx (SUN_RAMP, lit cells in blue) and the halftone drawings in src/components/hero-ascii.ts (pictures sampled into characters)",
+			"size": [1200, 0],
+			"seed": 0,
+			"image": true,
+			"needsImage": true
+		}
+	},
+	"ramp": ".:-=+*#%@",
+	"grids": { "main": [7, 12, 11], "fine": [4.4, 7.4, 7.4], "field": [9, 13, 11] },
+	"rings": { "count": 9, "first": 0.24, "step": 0.13, "tilt": 0.34, "roll": -0.06 },
+	"still": { "ry": -0.28, "rx": -0.18 }
+}

@@ -33,7 +33,7 @@ describe('video', () => {
 	it('renders every template at every size as a PNG of that size', { timeout: 120000 }, () => {
 		for (const template of VIDEO_TEMPLATES) {
 			for (const [size, box] of Object.entries(VIDEO_SIZES)) {
-				const png = renderFramePng({ template: template.id, size, ...copy[template.id] }, 0, 1);
+				const png = renderFramePng({ template: template.id, size, ...(copy as Record<string, object>)[template.id] }, 0, 1);
 				expect(pngSize(png)).toEqual({ width: box.width, height: box.height });
 			}
 		}
@@ -61,7 +61,7 @@ describe('video', () => {
 
 	it('lists templates from the CLI and rejects an unknown template', () => {
 		const listed = JSON.parse(execFileSync(process.execPath, [BIN, 'video', 'templates', '--json'], { encoding: 'utf8' }));
-		expect(listed.templates.map((item: { id: string }) => item.id)).toEqual(['social', 'announcement', 'product']);
+		expect(listed.templates.map((item: { id: string }) => item.id)).toEqual(['social', 'announcement', 'product', 'hero', 'window', 'closing', 'cards', 'field', 'mark', 'orbit']);
 		expect(listed.sizes.map((item: { id: string }) => item.id)).toEqual(['square', 'vertical', 'landscape']);
 		expect(listed.renderer.fps).toBe(12);
 		expect(listed.renderer.frames).toBe(24);

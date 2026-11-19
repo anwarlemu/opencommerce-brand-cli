@@ -1,0 +1,73 @@
+{
+	"$comment": "Share images and social posts. Layouts and opening copy follow the brand's image tool in agd-playground (src/components/opencommerce-og/draw.ts and Editor.tsx, routes opencommerce-og-image-playground and opencommerce-social-post). The four layouts there are hero, window, closing and cards; the CLI keeps its earlier five (headline, lead, frame, quote, announcement) beside them. Sizes are the tool's six plus the social set. Colors, radii, shadows, faces, tracking and line heights come from brand/tokens.css; where the tool's literals disagree, the token wins (see notes). Pixel sizes are the tool's, in the 1200x630 preview's pixels, grown with the image's area (unit k).",
+	"unit": { "width": 1200, "height": 630 },
+	"custom": { "min": 200, "max": 4000 },
+	"sizes": {
+		"og": { "width": 1200, "height": 630, "description": "Open Graph and link previews, 1200x630" },
+		"square": { "width": 1080, "height": 1080, "description": "Square social post, 1080x1080" },
+		"portrait": { "width": 1080, "height": 1350, "description": "Portrait social post, 4:5 (1080x1350)" },
+		"story": { "width": 1080, "height": 1920, "description": "Story, 9:16 (1080x1920)" },
+		"landscape": { "width": 1200, "height": 675, "description": "Landscape post for X and LinkedIn, 16:9 (1200x675)" },
+		"x-banner": { "width": 1500, "height": 500, "description": "X profile banner, 1500x500" },
+		"linkedin-banner": { "width": 1584, "height": 396, "description": "LinkedIn page banner, 1584x396" }
+	},
+	"aliases": {
+		"wide": "landscape",
+		"banner": "x-banner",
+		"1200x630": "og",
+		"1080x1080": "square",
+		"1080x1350": "portrait",
+		"1080x1920": "story",
+		"1200x675": "landscape",
+		"1500x500": "x-banner",
+		"1584x396": "linkedin-banner"
+	},
+	"templates": {
+		"hero": {
+			"description": "The chip, the headline and its line centered, optional keys, and a window rising from the bottom edge with the glyph field in the margins either side.",
+			"source": "draw.ts drawHero",
+			"textSize": 90,
+			"textWidth": { "wide": 0.86, "tall": 0.9 },
+			"defaults": { "chip": "Product by Agentcard", "title": "Open router for commerce", "text": "Buy from any online store from a single endpoint.", "label": "agent.ts", "inside": "code", "highlight": "1-5", "seed": 3, "logo": false }
+		},
+		"window": {
+			"description": "The words on one side and the window on the other with the glyph field round it; stacked on a tall image.",
+			"source": "draw.ts drawSplit",
+			"textSize": 54,
+			"textWidth": { "wide": 0.4, "tall": 0.86 },
+			"defaults": { "chip": "", "title": "Built for agents that buy", "text": "One endpoint, every online store.", "label": "agent.ts", "inside": "code", "highlight": "1-5", "seed": 23, "logo": true }
+		},
+		"closing": {
+			"description": "A mist card with 16px corners and a hairline edge, the glyph field gathering at its edges, the lockup, words and keys centered.",
+			"source": "draw.ts drawClosing",
+			"textSize": 64,
+			"textWidth": { "wide": 0.86, "tall": 0.9 },
+			"defaults": { "chip": "", "title": "Give your agent a checkout", "text": "One endpoint, every online store. Start free, and your first purchase can go through today.", "seed": 11, "logo": true }
+		},
+		"cards": {
+			"description": "Numbered cards on white: a title across the top, window-white cards with the blue number, the glyph field round the edges, and a footer with the lockup and an address.",
+			"source": "draw.ts drawOcCards and context-og/cards.ts",
+			"textSize": 38,
+			"textWidth": { "wide": 0.86, "tall": 0.9 },
+			"defaults": {
+				"title": "Built for agents that buy",
+				"cards": "Every merchant\nOne integration reaches any online store, with no per-merchant adapters to build or maintain.\n\nMonitored uptime\nDependable and continuous uptime monitoring to ensure your services are always available.\n\nSpeed optimized\nRoutes are cached and warmed, so a purchase lands in seconds instead of minutes.\n\nCheckout completion\nCarts, payment and confirmation are handled end to end, and every step reports back.",
+				"footer": "opencommerce.agentcard.sh",
+				"seed": 17,
+				"logo": true
+			}
+		}
+	},
+	"code": "const commerceAgent = tool({\n  name: \"make_purchase\",\n  execute: async ({ thing }) => {\n    return agentcard.purchase({ thing });\n  },\n});",
+	"notes": [
+		"Line heights: the tool sets headlines at 1.04 and the line under them at 1.5; the tokens say --ds-leading-heading 1.02 and --ds-leading-lead 1.55, and the CLI uses the tokens.",
+		"Window drop: the tool's canvas shadow is rgba(23,24,24,0.22) with a 32px blur and no spread; the CLI draws --ds-shadow-card (a hairline drop and 0 12px 32px -20px at 22 percent), so the drop is tighter than the tool's.",
+		"Headline weight: the tool sets the display face at 500; the CLI outlines the bundled substitute (TeX Gyre Heros, one weight), since Neue Haas Grotesk Display is not licensed to ship.",
+		"Attribution chip: the tool draws Agentcard's own lockup after 'Product by'. That lockup is not a file in brand/logo, so the CLI typesets the maker's name in the display face instead.",
+		"Merchants: the tool can fill the window with sixteen store logos (public/opencommerce-og). Those are third-party marks and are not shipped; the window takes code or your own --image.",
+		"Lockup: the tool follows the name with 'Product by' and Agentcard's lockup; the CLI uses brand/logo/lockup.svg (the name and 'by Agentcard').",
+		"Hero without room for its window: the tool leaves the words at the top; the CLI centers them, as it does when the window is turned off.",
+		"The window arrow is typed in the platform mono; the bundled mono has no such glyph, so it is drawn from Inter.",
+		"Code in a narrow window: the tool lets long lines run past the window's edge (hero on a tall image); the CLI shrinks the code until its longest line fits."
+	]
+}

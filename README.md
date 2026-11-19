@@ -98,15 +98,26 @@ npx opencommerce-ds image post --preset square --template announcement --title "
 npx opencommerce-ds image og --template frame --image ./screen.png --format both --out ./images
 ```
 
-Presets: `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350), `landscape` (1200x675). `image` defaults to `og`. `image post` defaults to `square`. `image og` always renders 1200x630. Templates: `headline`, `lead`, `frame`, `quote`, `announcement`. `--format` is `png`, `svg` or `both`. `--json` lists the files written, with width and height. `--out` is a `.png` or `.svg` file, or a directory.
+Presets: `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350), `story` (1080x1920), `landscape` (1200x675), `x-banner` (1500x500), `linkedin-banner` (1584x396), or `WIDTHxHEIGHT`. `image` defaults to `og`. `image post` defaults to `square`. `image og` always renders 1200x630. Templates: `hero`, `window`, `closing`, `cards` (the brand image tool's layouts, in agd-playground) and `headline`, `lead`, `frame`, `quote`, `announcement`. `--format` is `png`, `svg` or `both`. `--json` lists the files written, with width and height. `--out` is a `.png` or `.svg` file, or a directory.
 
 Headings use a bundled Helvetica-compatible face (Neue Haas Grotesk Display is not redistributable). Body and keys use Inter. Labels and code use the bundled monospace. Sample output is in `samples/images/`. Regenerate it with `npx tsx scripts/render-samples.ts`.
 
-A content file must be a JSON object whose keys are `title`, `text`, `label`, `by`, `action` and `image`. Any other key, or a value that is not a string, is an error. The same inputs write the same files.
+A content file must be a JSON object whose keys are `title`, `text`, `label`, `by`, `action`, `secondary`, `chip`, `code`, `highlight`, `cards`, `footer` and `image`. Any other key, or a value that is not a string, is an error. The same inputs write the same files.
+
+## Slides, print files, illustrations and Figma
+
+```sh
+npx opencommerce-ds deck --input deck.json --out deck        # cover, section, statement, bullets, stat, quote, image, end
+npx opencommerce-ds merch --all --out merch                  # tee, hoodie, cap, tote, mug wrap, die-cut sticker, poster
+npx opencommerce-ds illustrate orbit                         # field, window, mark, orbit, halftone (--image)
+npx opencommerce-ds figma tokens                             # also push, pull, check
+```
+
+`deck` writes a PNG (or SVG) per 1920x1080 slide and one PDF. `merch` writes print files with bleed and safe area (SVG at physical size, PNG at `--dpi`); the sizes are common vendor print areas, so confirm with your vendor, and every item prints on white or light blanks with the logo files as drawn. `illustrate` draws the brand's glyph language as vector SVG and PNG; the rules are in `brand/illustration.md`. `figma` writes files and prints the Figma MCP steps; it never calls Figma. Layouts and sizes live in `brand/assets/*.json`. The docs site's Assets, Illustrations and Figma pages show the output; regenerate it with `npx tsx scripts/render-assets.ts --video`.
 
 ## Render a short video
 
-`video` renders a 2 second mp4 (12 fps) without a browser. Frames are drawn from the brand tokens, the bundled fonts and the logo files, rasterized with system fonts off, and encoded with the pinned ffmpeg binary (`cpuflags none`, bitexact). `--template` and `--size` are required.
+`video` renders a short MP4 or WebM without a browser. Frames are drawn from the brand tokens, the bundled fonts and the logo files, rasterized with system fonts off, and encoded with the pinned ffmpeg binary (`cpuflags none`, bitexact). `--template` and `--size` are required.
 
 ```sh
 npx opencommerce-ds video templates --json
@@ -115,7 +126,7 @@ npx opencommerce-ds video --template announcement --size vertical --title "Agent
 npx opencommerce-ds video --template product --size landscape --label order.ts --text "const order = { sku: \"cup\" }" --json
 ```
 
-Templates: `social`, `announcement`, `product`. Sizes: `square` (1080x1080), `vertical` (1080x1920), `landscape` (1920x1080). `--ground` is `white` or `mist`. `--out` is an `.mp4` file or a directory (default `.ds/videos`). Sample output is in `samples/videos/`. Regenerate it with `npx tsx scripts/render-video-samples.ts`.
+Templates: `hero`, `window`, `closing`, `cards` (4 s at 30 fps), `field` (6 s at 12 fps), `mark`, `orbit` (6 s at 30 fps), `social`, `announcement`, `product` (2 s at 12 fps). Sizes: `square` (1080x1080), `vertical` (1080x1920), `landscape` (1920x1080). `--ground` is `white` or `mist`. `--out` is an `.mp4` or `.webm` file or a directory (default `.ds/videos`). `--still <seconds>` writes one PNG. Sample output is in `samples/videos/`. Regenerate it with `npx tsx scripts/render-video-samples.ts`.
 
 ## Read the brand system
 
@@ -175,7 +186,11 @@ Run these commands with `npx opencommerce-ds` after installing the CLI.
 | `principles` | Do and do-not rules for site and product. |
 | `component` | `list`, `inspect` and `emit` components, props and example states. |
 | `image` | Render an Open Graph image or a social post. `image templates --json` lists presets and templates. |
-| `video` | Render a 2 second mp4. `video templates --json` lists templates and sizes. |
+| `video` | Render a short MP4 or WebM, or one still. `video templates --json` lists templates and sizes. |
+| `deck` | Slides at 1920x1080: a PNG per slide and one PDF. `deck --list` shows slide types and slots. |
+| `merch` | Print files with bleed and safe area. `merch --list` shows items and sizes. |
+| `illustrate` | Illustrations in the brand style, SVG and PNG. `illustrate --list` shows subjects. |
+| `figma` | `tokens`, `push`, `pull`, `check`: files plus the Figma MCP steps. |
 | `check [files...]` | Check style values. Use `--changed` for Git changes or `--fix` for exact token replacements. |
 | `review <url> --any` | Review a page that is not part of an existing conversion task list. |
 | `review <url>` | Review a tracked screen and mark its task complete when it passes. |

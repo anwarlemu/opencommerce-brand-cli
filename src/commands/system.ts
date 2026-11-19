@@ -25,7 +25,12 @@ export function systemCommands(program: Command) {
 				`Components: ${data.components.length}`,
 				`Image templates: ${data.image.templates.map((item) => item.id).join(', ')}`,
 				`Video templates: ${data.video.templates.map((item) => item.id).join(', ')}`,
+				`Image sizes: ${data.image.presets.map((item) => item.id).join(', ')}, or WIDTHxHEIGHT`,
 				`Video sizes: ${data.video.sizes.map((item) => item.id).join(', ')}`,
+				`Deck slides: ${data.deck.slides.map((item) => item.id).join(', ')}`,
+				`Merch items: ${data.merch.items.map((item) => item.id).join(', ')}`,
+				`Illustration subjects: ${Object.keys(data.illustrate.subjects).join(', ')}`,
+				`Figma: ${data.figma.actions.join(', ')}`,
 				data.gaps.length ? `Gaps: ${data.gaps.map((gap) => gap.id).join(', ')}` : '',
 			]
 				.filter(Boolean)

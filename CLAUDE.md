@@ -38,7 +38,13 @@ npm run ci           # build, limits, registry, tests; must pass before you push
 - `src/check/`: the value check (rules.ts), used by hooks, pre-commit and `check`.
 - `src/review/`, `src/hooks/`, `src/commands/`.
 - `src/system/` and `brand/system.json`: `manifest` / `describe`, `brand`, `principles`, and `component list|inspect|emit`. The JSON is the machine-readable brand system. Do not add a font, logo or rule that is not backed by a file in `brand/`.
-- `src/video/`: 2 second clips. Frames are SVG from the bundled fonts and tokens, rasterized by resvg, encoded by the pinned `ffmpeg-static` binary with `cpuflags none` and bitexact flags. Templates and sizes are fixed in `src/video/motion.ts`.
+- `src/assets/` (brand-free): `kit.ts` (the window, keys, chip, lockup, words and the glyph field as SVG), `layouts.ts`
+  (the image tool's hero, window, closing and cards), `deck.ts`, `merch.ts`, `pdf.ts`, `noise.ts` (the site's noise).
+  Layouts, sizes, slides and print items live in `brand/assets/*.json`. `src/illustrate/` draws the subjects in
+  `brand/assets/illustrate.json` under the rules in `brand/illustration.md`. `src/figma/` and `src/commands/figma.ts`
+  write Figma files and print MCP steps (never call Figma). Sources: agd-playground `src/components/opencommerce-og/`
+  (read-only) and the site. `scripts/render-assets.ts --video` regenerates the docs gallery in `apps/www/public/assets`.
+- `src/video/`: short clips. Frames are SVG from the bundled fonts and tokens, rasterized by resvg, encoded by the pinned `ffmpeg-static` binary with `cpuflags none` and bitexact flags. Templates, frame rates, durations and sizes are fixed in `src/video/motion.ts`; WebM is VP9, one thread.
 
 ## Rules
 

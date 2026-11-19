@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "name": "item",
+  "useFor": "Use for lists of things a reader scans and acts on: merchants, orders, agents, files. Group rows in ItemGroup with ItemSeparator between them. Use asChild with a link to make a row navigate; mark the current row with aria-current.",
+  "constraints": [
+    "Bold titles",
+    "Two primary keys in one row",
+    "Rows with no rule or card between them in a long list"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (monitoring.tsx rows, in-action.tsx step list, card.tsx)",
+  "exports": [
+    "Item",
+    "ItemActions",
+    "ItemContent",
+    "ItemDescription",
+    "ItemFooter",
+    "ItemGroup",
+    "ItemHeader",
+    "ItemMedia",
+    "ItemSeparator",
+    "ItemTitle"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/item",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/item.md",
+  "examples": [
+    {
+      "path": "examples/item.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\nimport { ChevronRight, CreditCard, Package, ShoppingCart, Truck } from \"lucide-react\";\n\nimport { Badge } from \"@/components/ui/badge\";\nimport { Button } from \"@/components/ui/button\";\nimport { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle } from \"@/components/ui/item\";\n\nconst ORDERS = [\n  { id: \"A-10293\", store: \"Amazon\", items: \"2 items\", total: \"$48.20\", status: \"Delivered\" },\n  { id: \"T-48211\", store: \"Target\", items: \"1 item\", total: \"$19.99\", status: \"Shipped\" },\n  { id: \"S-77310\", store: \"Staples\", items: \"6 items\", total: \"$112.45\", status: \"Confirmed\" },\n];\n\nexport function Site() {\n  const [current, setCurrent] = useState(\"A-10293\");\n  return (\n    <ItemGroup className=\"mx-auto w-full max-w-xl\">\n      {ORDERS.map((order, i) => (\n        <div key={order.id}>\n          {i > 0 && <ItemSeparator />}\n          <Item asChild>\n            <button type=\"button\" aria-current={current === order.id || undefined} onClick={() => setCurrent(order.id)} className=\"w-full text-left\">\n              <ItemMedia variant=\"icon\">\n                <Package strokeWidth={1.5} />\n              </ItemMedia>\n              <ItemContent>\n                <ItemTitle>{order.store}</ItemTitle>\n                <ItemDescription>\n                  {order.items} <span className=\"font-mono text-bar\">#{order.id}</span>\n                </ItemDescription>\n              </ItemContent>\n              <ItemActions>\n                <span className=\"font-mono text-snippet text-fg\">{order.total}</span>\n                <ChevronRight aria-hidden strokeWidth={1.5} className=\"size-4 text-fg-faint\" />\n              </ItemActions>\n            </button>\n          </Item>\n        </div>\n      ))}\n    </ItemGroup>\n  );\n}\n\nexport function Variants() {\n  return (\n    <div className=\"mx-auto grid w-full max-w-xl gap-3\">\n      <Item variant=\"outline\">\n        <ItemMedia variant=\"icon\">\n          <CreditCard strokeWidth={1.5} />\n        </ItemMedia>\n        <ItemContent>\n          <ItemTitle>Travel agent card</ItemTitle>\n          <ItemDescription>Visa ending 4832, $2,000 a month.</ItemDescription>\n        </ItemContent>\n        <ItemActions>\n          <Button size=\"sm\" variant=\"secondary\">\n            Manage\n          </Button>\n        </ItemActions>\n      </Item>\n      <Item variant=\"muted\">\n        <ItemMedia variant=\"icon\">\n          <Truck strokeWidth={1.5} />\n        </ItemMedia>\n        <ItemContent>\n          <ItemTitle>Tracking every order</ItemTitle>\n          <ItemDescription>Your agent hears about each shipment as the carrier scans it.</ItemDescription>\n        </ItemContent>\n      </Item>\n      <Item variant=\"outline\" size=\"sm\">\n        <ItemHeader>\n          <Badge variant=\"chip\">checkout</Badge>\n          <span className=\"font-mono text-bar text-fg-muted\">9s</span>\n        </ItemHeader>\n        <ItemContent>\n          <ItemTitle>Purchase from Best Buy</ItemTitle>\n        </ItemContent>\n        <ItemFooter>\n          <span className=\"font-mono text-bar text-fg-muted\">route warmed</span>\n          <Badge variant=\"success\">Confirmed</Badge>\n        </ItemFooter>\n      </Item>\n      <Item size=\"xs\">\n        <ItemMedia>\n          <ShoppingCart aria-hidden strokeWidth={1.5} className=\"size-4 text-fg-brand\" />\n        </ItemMedia>\n        <ItemContent>\n          <ItemTitle>Cart saved at Wayfair</ItemTitle>\n        </ItemContent>\n      </Item>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Variants"
+      ],
+      "requires": [
+        "item",
+        "badge",
+        "button"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/item/Site"
+        },
+        {
+          "name": "Variants",
+          "url": "https://opencommerce-ds.vercel.app/preview/item/Variants"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Item",
+  "description": "A row of content: an ink title over a muted line, with a merchant-tile mark and actions; bare, outlined as a small card or on the mist.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "separator",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-slot",
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/item.tsx",
+      "content": "import * as React from \"react\";\nimport { Slot } from \"@radix-ui/react-slot\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { Separator } from \"@/components/ui/separator\";\nimport { cn } from \"@/lib/utils\";\n\n// A row of content, drawn from the live merchant table and the step list (monitoring.tsx, in-action.tsx; computed): 16px\n// Inter in ink over a 14px line at 64 percent ink, on 9 percent rules when grouped. `default` is bare and, when it is a\n// link or a button, takes the mist under the pointer (160ms); a current row (aria-current or data-selected) sits on the\n// pale blue with 6px corners, as the selected step does. `outline` is the small white card (the 9 percent edge, 6px\n// corners, the hairline drop); `muted` sits on the mist. Media: `icon` is the merchant tile (a 32px white square on the\n// edge, its glyph in the blue), `image` a 40px square photo.\nfunction ItemGroup({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div role=\"list\" data-slot=\"item-group\" className={cn(\"group/item-group flex flex-col\", className)} {...props} />;\n}\n\nfunction ItemSeparator({ className, ...props }: React.ComponentProps<typeof Separator>) {\n  return <Separator data-slot=\"item-separator\" orientation=\"horizontal\" className={cn(\"my-0\", className)} {...props} />;\n}\n\nconst itemVariants = cva(\n  \"group/item flex flex-wrap items-center rounded-card border border-transparent font-sans text-body leading-snug text-fg outline-none transition-[background-color,border-color] duration-160 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring aria-[current=page]:bg-blue-5 aria-[current=true]:bg-blue-5 data-[selected=true]:bg-blue-5 motion-reduce:transition-none [a]:hover:bg-subtle [button]:hover:bg-subtle\",\n  {\n    variants: {\n      variant: {\n        default: \"bg-transparent\",\n        outline: \"border-line bg-surface shadow-tile\",\n        muted: \"bg-subtle [a]:hover:bg-wash-hover [button]:hover:bg-wash-hover\",\n      },\n      size: {\n        default: \"gap-3.5 px-4 py-3.5\",\n        sm: \"gap-2.5 px-3 py-2.5\",\n        xs: \"gap-2 px-2 py-1.5 text-body-sm\",\n      },\n    },\n    defaultVariants: { variant: \"default\", size: \"default\" },\n  },\n);\n\nfunction Item({ className, variant = \"default\", size = \"default\", asChild = false, ...props }: React.ComponentProps<\"div\"> & VariantProps<typeof itemVariants> & { asChild?: boolean }) {\n  const Comp = asChild ? Slot : \"div\";\n  return <Comp data-slot=\"item\" data-variant={variant} data-size={size} className={cn(itemVariants({ variant, size, className }))} {...props} />;\n}\n\nconst itemMediaVariants = cva(\"flex shrink-0 items-center justify-center gap-2 group-has-data-[slot=item-description]/item:self-start [&_svg]:pointer-events-none\", {\n  variants: {\n    variant: {\n      default: \"bg-transparent\",\n      icon: \"size-8 rounded-card border border-line bg-surface text-fg-brand shadow-tile [&_svg:not([class*='size-'])]:size-4\",\n      image: \"size-10 overflow-hidden rounded-card border border-line [&_img]:size-full [&_img]:object-cover\",\n    },\n  },\n  defaultVariants: { variant: \"default\" },\n});\n\nfunction ItemMedia({ className, variant = \"default\", ...props }: React.ComponentProps<\"div\"> & VariantProps<typeof itemMediaVariants>) {\n  return <div data-slot=\"item-media\" data-variant={variant} className={cn(itemMediaVariants({ variant, className }))} {...props} />;\n}\n\nfunction ItemContent({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"item-content\" className={cn(\"flex min-w-0 flex-1 flex-col gap-1 [&+[data-slot=item-content]]:flex-none\", className)} {...props} />;\n}\n\nfunction ItemTitle({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"item-title\" className={cn(\"flex w-fit min-w-0 items-center gap-2 text-body leading-snug text-fg\", className)} {...props} />;\n}\n\n/** The line under a title, 14px at 64 percent ink, clamped to two lines. */\nfunction ItemDescription({ className, ...props }: React.ComponentProps<\"p\">) {\n  return <p data-slot=\"item-description\" className={cn(\"line-clamp-2 text-body-sm leading-relaxed font-normal text-balance text-fg-muted [&>a]:text-fg-brand [&>a]:underline [&>a]:underline-offset-3\", className)} {...props} />;\n}\n\nfunction ItemActions({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"item-actions\" className={cn(\"flex items-center gap-2\", className)} {...props} />;\n}\n\n/** The top line of an item: what it is at the left, a figure or a status at the right. */\nfunction ItemHeader({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"item-header\" className={cn(\"flex basis-full items-center justify-between gap-2\", className)} {...props} />;\n}\n\nfunction ItemFooter({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"item-footer\" className={cn(\"flex basis-full items-center justify-between gap-2\", className)} {...props} />;\n}\n\nexport { Item, ItemActions, ItemContent, ItemDescription, ItemFooter, ItemGroup, ItemHeader, ItemMedia, ItemSeparator, ItemTitle };\n"
+    }
+  ]
+}

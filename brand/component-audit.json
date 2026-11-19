@@ -1,0 +1,410 @@
+{
+ "checkedAt": "2026-10-19",
+ "reference": "opencommerce-agentcard-web (main at fe64096), built and served locally",
+ "resolvedReference": "https://opencommerce-agentcard-web.vercel.app",
+ "method": "Computed styles of the rendered site at desktop size (test/fixtures/reference-styles.json, 114 comparisons), its source for structure, and interaction and overflow checks for every library example at desktop and phone sizes. This is not a pixel-identical certification of every extension.",
+ "components": [
+  {
+   "name": "about-page",
+   "basis": "composition",
+   "reference": "Extension in the opencommerce site's voice (opencommerce-agentcard-web src/components); the structure from agentcard.sh /about",
+   "notes": "Composed from the audited site components; content is supplied by the application."
+  },
+  {
+   "name": "accordion",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/faq.tsx; src/app/globals.css (details[open] > .faq-answer)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "avatar",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (the merchant logo tile)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "badge",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/pricing.tsx (the plan chip), features.tsx and globals.css (.feat-pill, .feat-pill-wait, .feat-pill-done)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "banner",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "button",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/app/globals.css (.btn, .btn-primary, .btn-secondary, .nav-cta)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "card",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/app/globals.css (.feat-tile, .feat-order)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "checkbox",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-primary, --bevel-edge-blue)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "code-window",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/code-block.tsx, hero.tsx, in-action.tsx; src/app/globals.css (.code, .code-dark, .tok-*, .code-line)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "collapse",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (details[open] > .faq-answer)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "command",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar, .code)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "copy-button",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/copy-button.tsx; src/app/globals.css (.copy-layer, .key-white, .key-dark)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "cta",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/cta.tsx, src/components/install-tabs.tsx, src/app/globals.css (.cta-binary)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "dialog",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar, .win-mark)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "docs-link",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/components/site-footer.tsx (links)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "dropdown-menu",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-tray, .nav-link)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "empty-state",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "faq",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/faq.tsx, src/app/globals.css (.faq-answer)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "feature-rows",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/features.tsx, src/components/feature-play.tsx, src/app/globals.css (THE FEATURE PICTURES)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "field",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter); labels are an extension",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "glyph-field",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/binary-stage.tsx, src/lib/noise.ts, src/app/globals.css (.hero-binary, .cta-binary)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "hero",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/hero.tsx, src/components/binary-stage.tsx, src/app/globals.css (.h-hero, .lead, .hero-binary)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "hold-button",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-secondary, :active scale)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "home-page",
+   "basis": "composition",
+   "reference": "opencommerce-agentcard-web src/components/home-page.tsx",
+   "notes": "Composed from the audited site components; content is supplied by the application."
+  },
+  {
+   "name": "input",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter, computed)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "install-tabs",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/install-tabs.tsx, src/components/cta.tsx",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "integrations",
+   "basis": "extension",
+   "reference": "Extension in the opencommerce site's voice (its windows, keys and code; opencommerce-agentcard-web src/components/window.tsx, in-action.tsx); the layout from agentcard.sh / (.v7-intg-row)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "kbd",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.code, --line-strong)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "label",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (table head labels)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "logo-strip",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/logo-strip.tsx, src/components/merchant-logo.tsx, src/app/globals.css (THE LOGO STRIP, .logo-mask)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "logo",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/logo.tsx, src/app/icon2.svg; brand/logo (lockup.svg, mark.svg)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "marquee",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/logo-strip.tsx, src/app/globals.css (THE LOGO STRIP)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "nav-dock",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/nav-pills.tsx, src/app/globals.css (.nav-tray, .nav-link, .nav-lit)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "outline-wordmark",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/footer-wordmark.tsx, src/app/globals.css (THE FOOTER WORDMARK)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "page-header",
+   "basis": "extension",
+   "reference": "Extension in the opencommerce site's voice (.h-hero type, mono labels and hairlines; opencommerce-agentcard-web src/app/globals.css)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "popover",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-tray, .win)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "pricing-page",
+   "basis": "composition",
+   "reference": "opencommerce-agentcard-web src/components/pricing.tsx, faq.tsx (as a page of its own)",
+   "notes": "Composed from the audited site components; content is supplied by the application."
+  },
+  {
+   "name": "pricing",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/pricing.tsx, src/lib/content.ts (PRICING)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "product-grid",
+   "basis": "extension",
+   "reference": "Extension in the opencommerce site's voice (its windows, mist insets and keys; opencommerce-agentcard-web src/app/globals.css .win); the layout from agentcard.sh / (.v7-sol)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "progress",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/components/features.tsx (the speed race bars)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "prose",
+   "basis": "extension",
+   "reference": "Extension in the opencommerce site's voice (its type, hairlines, code and mono labels; opencommerce-agentcard-web src/app/globals.css); the structure from agentcard.sh/terms",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "scroll-area",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.key-white)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "secret-field",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter), copy-button.tsx",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "section",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/band.tsx, src/components/section-head.tsx, src/app/globals.css (.sec, .h-section, .lead)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "segmented-control",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/nav-pills.tsx; src/app/globals.css (.nav-tray, .nav-link, .nav-lit)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "select",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "separator",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/app/globals.css (--line)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "sheet",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "site-footer",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/site-footer.tsx, src/components/footer-wordmark.tsx",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "site-header",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/site-header.tsx, src/components/logo.tsx, src/components/mobile-nav.tsx, src/app/globals.css (.nav-tray, .nav-cta, .mobile-sheet)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "skeleton",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (--mist)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "sonner",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.feat-order, .feat-node)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "spinner",
+   "basis": "extension",
+   "reference": "Extension using the site text colors and reduced-motion behavior; no standalone spinner found on the current public site",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "status-table",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/monitoring.tsx",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "steps",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/in-action.tsx, src/app/globals.css (.swap-in, step-timer)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "surface",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/app/globals.css (--ground, --mist); src/components/cta.tsx (the mist card)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "switch",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-primary, .feat-tile)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "table",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/monitoring.tsx (the merchant table)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "tabs",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/components/nav-pills.tsx; src/app/globals.css (.nav-tray, .nav-link, .nav-lit, .nav-lit-shadow)",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  },
+  {
+   "name": "tag-filter",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/components/pricing.tsx (the plan chip), monitoring.tsx (#merchant-filter)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "tags-input",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter), pricing.tsx (the plan chip)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "team-directory",
+   "basis": "extension",
+   "reference": "Extension in the opencommerce site's voice (its windows, hairlines and mono labels; opencommerce-agentcard-web src/components/window.tsx); the grid from agentcard.sh/about",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "testimonials",
+   "basis": "extension",
+   "reference": "Extension in the opencommerce site's voice (its windows and mono tags; opencommerce-agentcard-web src/components/window.tsx, pricing.tsx)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "textarea",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "tooltip",
+   "basis": "extension",
+   "reference": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .feat-tile)",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "updates-feed",
+   "basis": "extension",
+   "reference": "Extension in the opencommerce site's voice (mono tags, hairlines; opencommerce-agentcard-web src/components/pricing.tsx chip); the structure from agentcard.sh/updates",
+   "notes": "The opencommerce site has no standalone equivalent; built from its tokens, windows, keys and fields."
+  },
+  {
+   "name": "window",
+   "basis": "live",
+   "reference": "opencommerce-agentcard-web src/app/globals.css (.win, .win-bar, .win-mark), src/components/window.tsx",
+   "notes": "Compared with the opencommerce site as rendered (computed styles) and its source."
+  }
+ ]
+}

@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "name": "not-found-page",
+  "useFor": "Use for the 404 page. Keep the message to one line and two keys; point the second key at the most useful page.",
+  "constraints": [
+    "Jokes or illustrations that shout",
+    "More than two keys",
+    "A blue or dark page"
+  ],
+  "documentation": "Composed from `SiteHeader`, `Hero`, `CodeWindow` and `SiteFooter`; the field of *s and @s comes with the hero's media.",
+  "source": "Extension in the opencommerce site's voice (opencommerce-agentcard-web src/components/hero.tsx)",
+  "exports": [
+    "NotFoundPage"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/not-found-page",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/not-found-page.md",
+  "examples": [
+    {
+      "path": "examples/not-found-page.tsx",
+      "content": "import { NotFoundPage } from \"@/components/blocks/not-found-page\";\n\nexport function Block() {\n  return <NotFoundPage />;\n}\n",
+      "exports": [
+        "Block"
+      ],
+      "requires": [
+        "not-found-page"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Block",
+          "url": "https://opencommerce-ds.vercel.app/preview/not-found-page/Block"
+        }
+      ]
+    }
+  ],
+  "type": "block",
+  "title": "Not found page",
+  "description": "Not found (404) template with the header, a short message, keys back home and to the docs, the missed request in a code window over the field of glyphs, and the footer.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "hero",
+    "site-footer",
+    "site-header",
+    "button",
+    "code-window"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/blocks/not-found-page.tsx",
+      "content": "import { Hero } from \"@/components/site/hero\";\nimport { SiteFooter } from \"@/components/site/site-footer\";\nimport { SiteHeader } from \"@/components/site/site-header\";\nimport { Button } from \"@/components/ui/button\";\nimport { CodeWindow } from \"@/components/ui/code-window\";\n\n// The page for an address that leads nowhere, in the home page's voice: the glass header, the hero's stack (the pill\n// names the error, a short title and line, the blue key home and the white key to the docs), and under it the request\n// that missed, in a code window over the field of *s and @s, then the footer. Keep it short: one message, two keys.\n\nconst SIGNUP = \"https://app.agentcard.sh\";\nconst DOCS = \"https://docs.agentcard.sh\";\n\nconst LINKS = [\n  { label: \"Home\", href: \"/\" },\n  { label: \"Features\", href: \"/features\" },\n  { label: \"Pricing\", href: \"/pricing\" },\n  { label: \"Docs\", href: DOCS },\n];\n\nconst FOOTER = [\n  { title: \"Product\", links: [{ label: \"Features\", href: \"/features\" }, { label: \"Pricing\", href: \"/pricing\" }, { label: \"Changelog\", href: \"/changelog\" }] },\n  { title: \"Developers\", links: [{ label: \"Docs\", href: DOCS }, { label: \"SDK\", href: \"https://www.npmjs.com/package/@agentcard/sdk\" }] },\n  { title: \"Company\", links: [{ label: \"About\", href: \"/about\" }, { label: \"Blog\", href: \"/blog\" }, { label: \"Contact\", href: \"/contact\" }] },\n];\n\nconst REQUEST = `GET /stores/acme-supply/old-checkout\n404 Not found\n\n// This page moved, or it never existed.\n// Every store is still one call away.`;\n\nexport function NotFoundPage() {\n  return (\n    <div className=\"bg-surface text-fg\">\n      <SiteHeader href=\"/\" links={LINKS} spy={false} action={{ label: \"Get started\", href: SIGNUP }} />\n      <main className=\"overflow-x-clip\">\n        <Hero\n          eyebrow=\"404\"\n          title=\"Page not found\"\n          subtitle=\"The page you were looking for is not here. The rest of the site is.\"\n          actions={\n            <>\n              <Button asChild>\n                <a href=\"/\">Back home</a>\n              </Button>\n              <Button asChild variant=\"secondary\">\n                <a href={DOCS}>Read the docs</a>\n              </Button>\n            </>\n          }\n          media={<CodeWindow title=\"request.log\" code={REQUEST} highlight={[1]} preClassName=\"text-caption leading-normal\" />}\n          className=\"pb-12 md:pb-20\"\n        />\n      </main>\n      <SiteFooter description=\"The open router for commerce. Buy from any online store from a single endpoint.\" legal={<span>© 2026 Agentcard, Inc.</span>} groups={FOOTER} />\n    </div>\n  );\n}\n"
+    }
+  ]
+}

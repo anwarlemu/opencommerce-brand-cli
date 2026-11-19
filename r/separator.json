@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "name": "separator",
+  "useFor": "Use between related content groups or inline controls.",
+  "constraints": [
+    "Thick or colored rules",
+    "Rules between every row of a card",
+    "Dotted or dashed rules"
+  ],
+  "documentation": "",
+  "source": "opencommerce-agentcard-web src/app/globals.css (--line)",
+  "exports": [
+    "Separator"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/separator",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/separator.md",
+  "examples": [
+    {
+      "path": "examples/separator.tsx",
+      "content": "import { Separator } from \"@/components/ui/separator\";\n\nexport function Site() {\n  return (\n    <div className=\"grid max-w-2xl gap-8\">\n      <div className=\"grid gap-4\">\n        <p className=\"font-mono text-bar text-fg-muted\">get-started.md</p>\n        <h2 className=\"text-h2 leading-display tracking-tighter\">Give your agent a checkout</h2>\n        <p className=\"text-body leading-lead text-fg-muted\">One endpoint, every online store.</p>\n      </div>\n      <Separator />\n      <div className=\"flex h-5 items-center gap-4 font-sans text-body-sm text-fg-muted\">\n        <span>Search</span>\n        <Separator orientation=\"vertical\" />\n        <span>Checkout</span>\n        <Separator orientation=\"vertical\" />\n        <span>Tracking</span>\n      </div>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "separator"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/separator/Site"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Separator",
+  "description": "Horizontal or vertical divider.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-separator"
+  ],
+  "files": [
+    {
+      "path": "components/ui/separator.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as SeparatorPrimitive from \"@radix-ui/react-separator\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The brand's rule: one pixel of ink at 14 percent, as between the FAQ's questions and under a page's title block.\nfunction Separator({ className, orientation = \"horizontal\", decorative = true, ...props }: React.ComponentProps<typeof SeparatorPrimitive.Root>) {\n  return (\n    <SeparatorPrimitive.Root\n      data-slot=\"separator\"\n      decorative={decorative}\n      orientation={orientation}\n      className={cn(\"shrink-0 bg-line data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px\", className)}\n      {...props}\n    />\n  );\n}\n\nexport { Separator };\n"
+    }
+  ]
+}

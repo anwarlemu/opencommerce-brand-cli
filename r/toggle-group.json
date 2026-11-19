@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "name": "toggle-group",
+  "useFor": "Use type=\"single\" for one view or filter among a few (Live, Failed, All) and type=\"multiple\" for filters that combine. Use variant outline with spacing 0 for a joined bar of white keys. Prefer Tabs when each option shows its own panel.",
+  "constraints": [
+    "A gliding key (choices change instantly)",
+    "More than six options in the tray",
+    "Blue filled keys for the chosen option"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (the header's trays and the segmented control)",
+  "exports": [
+    "ToggleGroup",
+    "ToggleGroupItem"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/toggle-group",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/toggle-group.md",
+  "examples": [
+    {
+      "path": "examples/toggle-group.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { AlignCenter, AlignLeft, AlignRight, Bold, Italic, Underline } from \"lucide-react\";\n\nimport { ToggleGroup, ToggleGroupItem } from \"@/components/ui/toggle-group\";\n\nexport function Site() {\n  const [view, setView] = React.useState(\"live\");\n  return (\n    <ToggleGroup type=\"single\" value={view} onValueChange={(v) => v && setView(v)} aria-label=\"Route status\">\n      <ToggleGroupItem value=\"live\">Live</ToggleGroupItem>\n      <ToggleGroupItem value=\"degraded\">Degraded</ToggleGroupItem>\n      <ToggleGroupItem value=\"failed\">Failed</ToggleGroupItem>\n      <ToggleGroupItem value=\"all\">All</ToggleGroupItem>\n    </ToggleGroup>\n  );\n}\n\nexport function Outline() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-6\">\n      <ToggleGroup type=\"multiple\" variant=\"outline\" defaultValue={[\"bold\"]} aria-label=\"Text style\">\n        <ToggleGroupItem value=\"bold\" aria-label=\"Bold\">\n          <Bold />\n        </ToggleGroupItem>\n        <ToggleGroupItem value=\"italic\" aria-label=\"Italic\">\n          <Italic />\n        </ToggleGroupItem>\n        <ToggleGroupItem value=\"underline\" aria-label=\"Underline\">\n          <Underline />\n        </ToggleGroupItem>\n      </ToggleGroup>\n      <ToggleGroup type=\"single\" variant=\"outline\" spacing={0} defaultValue=\"left\" aria-label=\"Alignment\">\n        <ToggleGroupItem value=\"left\" aria-label=\"Align left\">\n          <AlignLeft />\n        </ToggleGroupItem>\n        <ToggleGroupItem value=\"center\" aria-label=\"Align center\">\n          <AlignCenter />\n        </ToggleGroupItem>\n        <ToggleGroupItem value=\"right\" aria-label=\"Align right\">\n          <AlignRight />\n        </ToggleGroupItem>\n      </ToggleGroup>\n    </div>\n  );\n}\n\nexport function Sizes() {\n  return (\n    <div className=\"grid gap-4\">\n      <ToggleGroup type=\"single\" size=\"sm\" defaultValue=\"day\" aria-label=\"Range\">\n        <ToggleGroupItem value=\"day\">24h</ToggleGroupItem>\n        <ToggleGroupItem value=\"week\">7d</ToggleGroupItem>\n        <ToggleGroupItem value=\"month\">30d</ToggleGroupItem>\n      </ToggleGroup>\n      <ToggleGroup type=\"single\" orientation=\"vertical\" variant=\"outline\" spacing={0} defaultValue=\"usd\" aria-label=\"Currency\" className=\"w-40\">\n        <ToggleGroupItem value=\"usd\">USD</ToggleGroupItem>\n        <ToggleGroupItem value=\"eur\">EUR</ToggleGroupItem>\n        <ToggleGroupItem value=\"gbp\" disabled>GBP</ToggleGroupItem>\n      </ToggleGroup>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Outline",
+        "Sizes"
+      ],
+      "requires": [
+        "toggle-group"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/toggle-group/Site"
+        },
+        {
+          "name": "Outline",
+          "url": "https://opencommerce-ds.vercel.app/preview/toggle-group/Outline"
+        },
+        {
+          "name": "Sizes",
+          "url": "https://opencommerce-ds.vercel.app/preview/toggle-group/Sizes"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Toggle Group",
+  "description": "The header's frosted tray of options with the chosen one a white key and a blue label, or separate white keys.",
+  "surface": "site",
+  "kinds": [
+    "tabs"
+  ],
+  "requires": [
+    "theme",
+    "toggle",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-toggle-group",
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/toggle-group.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as ToggleGroupPrimitive from \"@radix-ui/react-toggle-group\";\nimport { type VariantProps } from \"class-variance-authority\";\n\nimport { toggleVariants } from \"@/components/ui/toggle\";\nimport { cn } from \"@/lib/utils\";\n\n// The header's tray as a set of toggles (the segmented control's look): a frosted pane on the 10 percent ink edge with a\n// 3px inset, and the chosen option a white key with 5px corners, the lit drop and a blue label. Choosing is instant (no\n// gliding key): toggles change often and must feel immediate. `variant=\"outline\"` drops the tray for separate white keys\n// on the hairline, the chosen ones lit in blue. `spacing={0}` joins outline keys into one bar with shared edges.\nconst ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariants> & { spacing?: number; orientation?: \"horizontal\" | \"vertical\" }>({\n  size: \"default\",\n  variant: \"default\",\n  spacing: 0.5,\n  orientation: \"horizontal\",\n});\n\nfunction ToggleGroup({\n  className,\n  variant = \"default\",\n  size = \"default\",\n  spacing = variant === \"outline\" ? 2 : 0.5,\n  orientation = \"horizontal\",\n  children,\n  ...props\n}: React.ComponentProps<typeof ToggleGroupPrimitive.Root> & VariantProps<typeof toggleVariants> & { spacing?: number; orientation?: \"horizontal\" | \"vertical\" }) {\n  return (\n    <ToggleGroupPrimitive.Root\n      data-slot=\"toggle-group\"\n      data-variant={variant}\n      data-size={size}\n      data-spacing={spacing}\n      data-orientation={orientation}\n      orientation={orientation}\n      style={{ \"--gap\": spacing } as React.CSSProperties}\n      className={cn(\n        \"group/toggle-group flex w-fit max-w-full items-center gap-[calc(var(--spacing)*var(--gap))] data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch\",\n        variant === \"default\" && \"overflow-x-auto rounded-control border border-line-glass bg-glass p-0.75 shadow-glass backdrop-blur-lg backdrop-saturate-140 [scrollbar-width:none]\",\n        className,\n      )}\n      {...props}\n    >\n      <ToggleGroupContext.Provider value={{ variant, size, spacing, orientation }}>{children}</ToggleGroupContext.Provider>\n    </ToggleGroupPrimitive.Root>\n  );\n}\n\nfunction ToggleGroupItem({ className, children, variant, size, ...props }: React.ComponentProps<typeof ToggleGroupPrimitive.Item> & VariantProps<typeof toggleVariants>) {\n  const context = React.useContext(ToggleGroupContext);\n  const v = context.variant || variant || \"default\";\n  const joined = v === \"outline\" && context.spacing === 0;\n  return (\n    <ToggleGroupPrimitive.Item\n      data-slot=\"toggle-group-item\"\n      data-variant={v}\n      data-size={context.size || size}\n      data-spacing={context.spacing}\n      className={cn(\n        toggleVariants({ variant: v, size: context.size || size }),\n        // In the tray the chosen option is the white key with a blue label, as in the segmented control.\n        v === \"default\" && \"rounded-menu hover:bg-wash-glass-hover data-[state=on]:bg-surface data-[state=on]:text-fg-brand data-[state=on]:shadow-lit data-[state=on]:hover:bg-surface\",\n        joined && \"rounded-none first:rounded-l-control last:rounded-r-control [&+&]:-ml-px data-[state=on]:z-10 group-data-[orientation=vertical]/toggle-group:first:rounded-t-control group-data-[orientation=vertical]/toggle-group:first:rounded-bl-none group-data-[orientation=vertical]/toggle-group:last:rounded-b-control group-data-[orientation=vertical]/toggle-group:last:rounded-tr-none group-data-[orientation=vertical]/toggle-group:[&+&]:-mt-px group-data-[orientation=vertical]/toggle-group:[&+&]:ml-0\",\n        \"focus-visible:z-10\",\n        className,\n      )}\n      {...props}\n    >\n      {children}\n    </ToggleGroupPrimitive.Item>\n  );\n}\n\nexport { ToggleGroup, ToggleGroupItem };\n"
+    }
+  ]
+}

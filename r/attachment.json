@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "name": "attachment",
+  "useFor": "Use for files sent with a message or attached to an order: receipts, invoices, exports. Set state to idle, uploading, processing, error or done; add AttachmentActions with AttachmentAction keys (remove, retry, download) and AttachmentTrigger to open the file. Line several up in AttachmentGroup.",
+  "constraints": [
+    "Thumbnails for every file type",
+    "Progress bars inside the card",
+    "Red fills for errors"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (card.tsx small card, the merchant tiles, mono figures)",
+  "exports": [
+    "Attachment",
+    "AttachmentAction",
+    "AttachmentActions",
+    "AttachmentContent",
+    "AttachmentDescription",
+    "AttachmentGroup",
+    "AttachmentMedia",
+    "AttachmentTitle",
+    "AttachmentTrigger"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/attachment",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/attachment.md",
+  "examples": [
+    {
+      "path": "examples/attachment.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Download, FileText, ImageIcon, RotateCw, X } from \"lucide-react\";\n\nimport { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentGroup, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from \"@/components/ui/attachment\";\n\nconst FILES = [\n  { name: \"receipt-A-10293.pdf\", size: \"84 KB\" },\n  { name: \"invoice-october.pdf\", size: \"212 KB\" },\n  { name: \"packing-slip.pdf\", size: \"36 KB\" },\n];\n\nexport function Site() {\n  const [files, setFiles] = useState(FILES);\n  const [opened, setOpened] = useState<string>();\n  return (\n    <div className=\"grid w-full gap-3\">\n      <AttachmentGroup>\n        {files.map((file) => (\n          <Attachment key={file.name}>\n            <AttachmentTrigger aria-label={`Open ${file.name}`} onClick={() => setOpened(file.name)} />\n            <AttachmentMedia>\n              <FileText strokeWidth={1.5} />\n            </AttachmentMedia>\n            <AttachmentContent>\n              <AttachmentTitle>{file.name}</AttachmentTitle>\n              <AttachmentDescription>{file.size}</AttachmentDescription>\n            </AttachmentContent>\n            <AttachmentActions>\n              <AttachmentAction aria-label={`Remove ${file.name}`} onClick={() => setFiles((all) => all.filter((f) => f.name !== file.name))}>\n                <X strokeWidth={1.5} />\n              </AttachmentAction>\n            </AttachmentActions>\n          </Attachment>\n        ))}\n      </AttachmentGroup>\n      <p aria-live=\"polite\" className=\"text-body-sm text-fg-muted\">\n        {opened ? `Opened ${opened}.` : files.length ? \"Choose a file to open it.\" : \"All files removed.\"}\n      </p>\n    </div>\n  );\n}\n\nexport function States() {\n  return (\n    <div className=\"flex flex-wrap gap-3\">\n      <Attachment state=\"idle\">\n        <AttachmentMedia>\n          <FileText strokeWidth={1.5} />\n        </AttachmentMedia>\n        <AttachmentContent>\n          <AttachmentTitle>return-label.pdf</AttachmentTitle>\n          <AttachmentDescription>Waiting</AttachmentDescription>\n        </AttachmentContent>\n      </Attachment>\n      <Attachment state=\"uploading\">\n        <AttachmentMedia>\n          <FileText strokeWidth={1.5} />\n        </AttachmentMedia>\n        <AttachmentContent>\n          <AttachmentTitle>receipt-T-48211.pdf</AttachmentTitle>\n          <AttachmentDescription>Uploading 62%</AttachmentDescription>\n        </AttachmentContent>\n      </Attachment>\n      <Attachment state=\"error\">\n        <AttachmentMedia>\n          <FileText strokeWidth={1.5} />\n        </AttachmentMedia>\n        <AttachmentContent>\n          <AttachmentTitle>statement.pdf</AttachmentTitle>\n          <AttachmentDescription>The file is over 20 MB.</AttachmentDescription>\n        </AttachmentContent>\n        <AttachmentActions>\n          <AttachmentAction aria-label=\"Retry\">\n            <RotateCw strokeWidth={1.5} />\n          </AttachmentAction>\n        </AttachmentActions>\n      </Attachment>\n    </div>\n  );\n}\n\nexport function Sizes() {\n  return (\n    <div className=\"flex flex-wrap items-start gap-3\">\n      {([\"default\", \"sm\", \"xs\"] as const).map((size) => (\n        <Attachment key={size} size={size}>\n          <AttachmentMedia>\n            <FileText strokeWidth={1.5} />\n          </AttachmentMedia>\n          <AttachmentContent>\n            <AttachmentTitle>order-{size}.pdf</AttachmentTitle>\n            <AttachmentDescription>48 KB</AttachmentDescription>\n          </AttachmentContent>\n        </Attachment>\n      ))}\n      <Attachment orientation=\"vertical\">\n        <AttachmentMedia>\n          <ImageIcon strokeWidth={1.5} />\n        </AttachmentMedia>\n        <AttachmentContent>\n          <AttachmentTitle>product.jpg</AttachmentTitle>\n          <AttachmentDescription>1.2 MB</AttachmentDescription>\n        </AttachmentContent>\n        <AttachmentActions>\n          <AttachmentAction aria-label=\"Download product.jpg\">\n            <Download strokeWidth={1.5} />\n          </AttachmentAction>\n        </AttachmentActions>\n      </Attachment>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "States",
+        "Sizes"
+      ],
+      "requires": [
+        "attachment"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/attachment/Site"
+        },
+        {
+          "name": "States",
+          "url": "https://opencommerce-ds.vercel.app/preview/attachment/States"
+        },
+        {
+          "name": "Sizes",
+          "url": "https://opencommerce-ds.vercel.app/preview/attachment/Sizes"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Attachment",
+  "description": "A file card: white on the 9 percent edge with 6px corners, its file in a pale blue tile, the name in 14px Inter and the size in the mono.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "button",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-slot",
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/attachment.tsx",
+      "content": "import * as React from \"react\";\nimport { Slot } from \"@radix-ui/react-slot\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { cn } from \"@/lib/utils\";\n\n// A file attached to a message or an order, as the site's small cards (globals.css .feat-tile, the merchant tiles;\n// computed): white on the 9 percent ink edge with 6px corners and a hairline drop. The file sits in a merchant tile (the\n// pale blue with its glyph in the blue, 6px corners); its name is 14px Inter at 500 in ink and its size or status the\n// 11.5px platform mono at 64 percent ink, as figures are set on the site. A file still waiting has a dashed edge; one\n// uploading breathes its name; one that failed takes the red edge and a red line. Under the pointer an openable file\n// takes the mist (160ms).\nconst attachmentVariants = cva(\n  \"group/attachment relative flex w-fit max-w-full min-w-0 shrink-0 flex-wrap rounded-card border border-line bg-surface text-fg shadow-tile transition-[background-color,border-color] duration-160 ease-out has-[>[data-slot=attachment-trigger]]:hover:bg-subtle has-[>[data-slot=attachment-trigger]:focus-visible]:outline-2 has-[>[data-slot=attachment-trigger]:focus-visible]:outline-offset-2 has-[>[data-slot=attachment-trigger]:focus-visible]:outline-solid has-[>[data-slot=attachment-trigger]:focus-visible]:outline-focus-ring data-[state=error]:border-danger data-[state=idle]:border-dashed data-[state=idle]:border-line-mid motion-reduce:transition-none\",\n  {\n    variants: {\n      size: {\n        default: \"gap-3 text-body-sm has-data-[slot=attachment-content]:px-3 has-data-[slot=attachment-content]:py-2.5 has-data-[slot=attachment-media]:p-2.5\",\n        sm: \"gap-2.5 text-body-sm has-data-[slot=attachment-content]:px-2.5 has-data-[slot=attachment-content]:py-2 has-data-[slot=attachment-media]:p-2\",\n        xs: \"gap-2 text-caption has-data-[slot=attachment-content]:px-2 has-data-[slot=attachment-content]:py-1.5 has-data-[slot=attachment-media]:p-1.5\",\n      },\n      orientation: {\n        horizontal: \"min-w-48 items-center\",\n        vertical: \"w-28 flex-col has-data-[slot=attachment-content]:w-36\",\n      },\n    },\n    defaultVariants: { size: \"default\", orientation: \"horizontal\" },\n  },\n);\n\ntype AttachmentState = \"idle\" | \"uploading\" | \"processing\" | \"error\" | \"done\";\n\nfunction Attachment({ className, state = \"done\", size = \"default\", orientation = \"horizontal\", ...props }: React.ComponentProps<\"div\"> & VariantProps<typeof attachmentVariants> & { state?: AttachmentState }) {\n  return <div data-slot=\"attachment\" data-state={state} data-size={size} data-orientation={orientation} aria-busy={state === \"uploading\" || state === \"processing\" || undefined} className={cn(attachmentVariants({ size, orientation }), className)} {...props} />;\n}\n\nconst attachmentMediaVariants = cva(\n  \"relative flex aspect-square w-10 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-blue-5 text-fg-brand group-data-[orientation=vertical]/attachment:w-full group-data-[size=sm]/attachment:w-8 group-data-[size=xs]/attachment:w-7 group-data-[size=xs]/attachment:rounded-chip group-data-[state=error]/attachment:bg-subtle group-data-[state=error]/attachment:text-danger [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4.5 group-data-[orientation=vertical]/attachment:[&_svg:not([class*='size-'])]:size-6 group-data-[size=xs]/attachment:[&_svg:not([class*='size-'])]:size-3.5\",\n  {\n    variants: {\n      variant: {\n        icon: \"\",\n        // A photo shows itself; it stays faint until it has uploaded.\n        image: \"bg-subtle opacity-60 group-data-[state=done]/attachment:opacity-100 group-data-[state=idle]/attachment:opacity-100 *:[img]:aspect-square *:[img]:w-full *:[img]:object-cover\",\n      },\n    },\n    defaultVariants: { variant: \"icon\" },\n  },\n);\n\nfunction AttachmentMedia({ className, variant = \"icon\", ...props }: React.ComponentProps<\"div\"> & VariantProps<typeof attachmentMediaVariants>) {\n  return <div data-slot=\"attachment-media\" data-variant={variant} className={cn(attachmentMediaVariants({ variant }), className)} {...props} />;\n}\n\nfunction AttachmentContent({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"attachment-content\" className={cn(\"max-w-full min-w-0 flex-1 leading-snug group-data-[orientation=vertical]/attachment:px-1 group-data-[orientation=vertical]/attachment:pb-1\", className)} {...props} />;\n}\n\nfunction AttachmentTitle({ className, ...props }: React.ComponentProps<\"span\">) {\n  return (\n    <span\n      data-slot=\"attachment-title\"\n      className={cn(\"block max-w-full min-w-0 truncate font-sans font-medium text-fg group-data-[state=processing]/attachment:animate-pulse-soft group-data-[state=uploading]/attachment:animate-pulse-soft motion-reduce:animate-none\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction AttachmentDescription({ className, ...props }: React.ComponentProps<\"span\">) {\n  return <span data-slot=\"attachment-description\" className={cn(\"mt-1 block max-w-full min-w-0 truncate font-mono text-bar leading-tight text-fg-muted group-data-[state=error]/attachment:font-sans group-data-[state=error]/attachment:text-caption group-data-[state=error]/attachment:text-danger\", className)} {...props} />;\n}\n\nfunction AttachmentActions({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"attachment-actions\" className={cn(\"relative z-20 flex shrink-0 items-center gap-0.5 group-data-[orientation=vertical]/attachment:absolute group-data-[orientation=vertical]/attachment:top-3.5 group-data-[orientation=vertical]/attachment:right-3.5\", className)} {...props} />;\n}\n\n/** A row action on the attachment (remove, retry, download): the ghost key at 28px. */\nfunction AttachmentAction({ className, variant, size = \"icon\", ...props }: React.ComponentProps<typeof Button>) {\n  return <Button data-slot=\"attachment-action\" variant={variant ?? \"ghost\"} size={size} className={cn(\"size-7 group-data-[orientation=vertical]/attachment:border-line group-data-[orientation=vertical]/attachment:bg-surface group-data-[orientation=vertical]/attachment:shadow-tile\", className)} {...props} />;\n}\n\n/** Makes the whole card open the file: a button (or a link with asChild) stretched over it. */\nfunction AttachmentTrigger({ className, asChild = false, type, ...props }: React.ComponentProps<\"button\"> & { asChild?: boolean }) {\n  const Comp = asChild ? Slot : \"button\";\n  return <Comp data-slot=\"attachment-trigger\" type={asChild ? undefined : (type ?? \"button\")} className={cn(\"absolute inset-0 z-10 cursor-pointer rounded-card outline-none\", className)} {...props} />;\n}\n\nfunction AttachmentGroup({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"attachment-group\"\n      className={cn(\"flex min-w-0 snap-x snap-mandatory scroll-px-1 gap-3 overflow-x-auto overscroll-x-contain p-1 [scrollbar-width:none] *:data-[slot=attachment]:flex-none *:data-[slot=attachment]:snap-start\", className)}\n      {...props}\n    />\n  );\n}\n\nexport { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentGroup, AttachmentMedia, AttachmentTitle, AttachmentTrigger };\n"
+    }
+  ]
+}

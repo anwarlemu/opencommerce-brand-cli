@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "name": "blog-page",
+  "useFor": "Use as a starting point for a blog or news index. Replace the sample posts, people and page links.",
+  "constraints": [
+    "Stock photos on posts",
+    "Cards that tilt or lift on hover",
+    "Tags in caps",
+    "More than one post across the column"
+  ],
+  "documentation": "Composed from `SiteHeader`, `PageHeader`, `Window`, `Badge` (chip), `Pagination` and `SiteFooter`. Each post window is\none link: the title's anchor covers the window.",
+  "source": "Extension in the opencommerce site's voice (opencommerce-agentcard-web src/components: windows, mono labels, chips)",
+  "exports": [
+    "BlogPage"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/blog-page",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/blog-page.md",
+  "examples": [
+    {
+      "path": "examples/blog-page.tsx",
+      "content": "import { BlogPage } from \"@/components/blocks/blog-page\";\n\nexport function Block() {\n  return <BlogPage />;\n}\n",
+      "exports": [
+        "Block"
+      ],
+      "requires": [
+        "blog-page"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Block",
+          "url": "https://opencommerce-ds.vercel.app/preview/blog-page/Block"
+        }
+      ]
+    }
+  ],
+  "type": "block",
+  "title": "Blog page",
+  "description": "Blog index template with the header, the page's opening, the posts as windows (the latest across the column), page keys and the footer.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "page-header",
+    "site-footer",
+    "site-header",
+    "badge",
+    "pagination",
+    "window",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/blocks/blog-page.tsx",
+      "content": "import { PageHeader } from \"@/components/site/page-header\";\nimport { SiteFooter } from \"@/components/site/site-footer\";\nimport { SiteHeader } from \"@/components/site/site-header\";\nimport { Badge } from \"@/components/ui/badge\";\nimport { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from \"@/components/ui/pagination\";\nimport { Window } from \"@/components/ui/window\";\nimport { cn } from \"@/lib/utils\";\n\n// A blog index in the home page's voice: the glass header, the page's opening on the 800px column, the posts as\n// windows two to a row (the latest across the whole column), each named after its post (warmed-routes.post) with the\n// date in the platform mono, the title in the display face, one muted line and, on a hairline, the author and a tag.\n// The whole window is the link. Under the posts, the page keys. Sample posts and people; replace them with your own.\n\nconst SIGNUP = \"https://app.agentcard.sh\";\nconst DOCS = \"https://docs.agentcard.sh\";\n\nconst LINKS = [\n  { label: \"Home\", href: \"/\" },\n  { label: \"Features\", href: \"/features\" },\n  { label: \"Pricing\", href: \"/pricing\" },\n  { label: \"Blog\", href: \"/blog\", current: true },\n  { label: \"Docs\", href: DOCS },\n];\n\nconst FOOTER = [\n  { title: \"Product\", links: [{ label: \"Features\", href: \"/features\" }, { label: \"Pricing\", href: \"/pricing\" }, { label: \"Changelog\", href: \"/changelog\" }] },\n  { title: \"Developers\", links: [{ label: \"Docs\", href: DOCS }, { label: \"SDK\", href: \"https://www.npmjs.com/package/@agentcard/sdk\" }] },\n  { title: \"Company\", links: [{ label: \"About\", href: \"/about\" }, { label: \"Blog\", href: \"/blog\" }, { label: \"Contact\", href: \"/contact\" }] },\n];\n\ntype Post = { slug: string; title: string; excerpt: string; date: string; dateTime: string; read: string; author: string; tag: string };\n\nconst POSTS: Post[] = [\n  { slug: \"warmed-routes\", title: \"How warmed routes cut checkout from minutes to seconds\", excerpt: \"The stores your agents use most stay warm. Here is what that means, and what it took to keep 4,000 of them ready.\", date: \"Nov 12, 2026\", dateTime: \"2026-11-12\", read: \"8 min read\", author: \"Ada Okafor\", tag: \"Engineering\" },\n  { slug: \"spending-limits\", title: \"Spending limits your customers set themselves\", excerpt: \"A ceiling per order and per month, enforced before the agent ever reaches a checkout page.\", date: \"Nov 4, 2026\", dateTime: \"2026-11-04\", read: \"5 min read\", author: \"Luis Romero\", tag: \"Product\" },\n  { slug: \"monitoring-every-route\", title: \"Monitoring every route, every hour\", excerpt: \"Why we buy from each store around the clock, and how the status table turns that into a picture you can trust.\", date: \"Oct 28, 2026\", dateTime: \"2026-10-28\", read: \"6 min read\", author: \"Mara Lindqvist\", tag: \"Engineering\" },\n  { slug: \"first-purchase\", title: \"Your agent’s first purchase, step by step\", excerpt: \"From installing the SDK to a tracking number in under fifteen minutes, with the code for each step.\", date: \"Oct 19, 2026\", dateTime: \"2026-10-19\", read: \"4 min read\", author: \"Noor Haddad\", tag: \"Guide\" },\n  { slug: \"checkout-changes\", title: \"What happens when a store changes its checkout\", excerpt: \"Routes are re-learned within minutes. A look at how we notice, and what your agent sees meanwhile.\", date: \"Oct 9, 2026\", dateTime: \"2026-10-09\", read: \"7 min read\", author: \"Ada Okafor\", tag: \"Engineering\" },\n];\n\nfunction Initials({ name }: { name: string }) {\n  const letters = name\n    .split(\" \")\n    .map((w) => w[0])\n    .join(\"\")\n    .slice(0, 2);\n  return (\n    <span aria-hidden className=\"flex size-6 flex-none items-center justify-center rounded-chip bg-tint font-display text-caption leading-none text-fg-brand\">\n      {letters}\n    </span>\n  );\n}\n\nfunction PostWindow({ post, lead = false }: { post: Post; lead?: boolean }) {\n  return (\n    <li className={cn(\"flex\", lead && \"sm:col-span-2\")}>\n      <Window name={`${post.slug}.post`} className=\"relative w-full\" bodyClassName=\"flex flex-col\">\n        <article className=\"flex flex-1 flex-col px-6 pt-6 pb-6 md:px-8 md:pt-7\">\n          <p className=\"font-mono text-caption leading-body text-fg-muted\">\n            <time dateTime={post.dateTime}>{post.date}</time> · {post.read}\n          </p>\n          <h2 className={cn(\"mt-2 font-display leading-snug font-medium tracking-tight text-balance\", lead ? \"text-h3\" : \"text-h4\")}>\n            <a href={`/blog/${post.slug}`} className=\"rounded-chip outline-none after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring\">\n              {post.title}\n            </a>\n          </h2>\n          <p className=\"mt-2 max-w-xl flex-1 text-body leading-relaxed text-fg-muted\">{post.excerpt}</p>\n          <footer className=\"mt-6 flex items-center gap-2 border-t border-line pt-4 text-body-sm\">\n            <Initials name={post.author} />\n            <span>{post.author}</span>\n            <Badge variant=\"chip\" className=\"ml-auto\">\n              {post.tag}\n            </Badge>\n          </footer>\n        </article>\n      </Window>\n    </li>\n  );\n}\n\nexport function BlogPage() {\n  const [latest, ...rest] = POSTS;\n  return (\n    <div className=\"bg-surface text-fg\">\n      <SiteHeader href=\"/\" links={LINKS} spy={false} action={{ label: \"Get started\", href: SIGNUP }} />\n      <main>\n        <PageHeader eyebrow=\"Blog\" title=\"Notes from the router\" lead=\"How we keep every store reachable, what we ship, and how teams give their agents a checkout.\" />\n        <div className=\"mx-auto w-(--ds-frame-column) max-w-(--ds-layout-medium) pt-12 pb-18 md:pb-30\">\n          <ul className=\"m-0 grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2\">\n            <PostWindow post={latest} lead />\n            {rest.map((post) => (\n              <PostWindow key={post.slug} post={post} />\n            ))}\n          </ul>\n          <Pagination className=\"mt-12\">\n            <PaginationContent>\n              <PaginationItem>\n                <PaginationPrevious href=\"/blog\" aria-disabled=\"true\" tabIndex={-1} />\n              </PaginationItem>\n              <PaginationItem>\n                <PaginationLink href=\"/blog\" isActive>\n                  1\n                </PaginationLink>\n              </PaginationItem>\n              <PaginationItem>\n                <PaginationLink href=\"/blog/page/2\">2</PaginationLink>\n              </PaginationItem>\n              <PaginationItem>\n                <PaginationLink href=\"/blog/page/3\">3</PaginationLink>\n              </PaginationItem>\n              <PaginationItem>\n                <PaginationEllipsis />\n              </PaginationItem>\n              <PaginationItem>\n                <PaginationNext href=\"/blog/page/2\" />\n              </PaginationItem>\n            </PaginationContent>\n          </Pagination>\n        </div>\n      </main>\n      <SiteFooter description=\"The open router for commerce. Buy from any online store from a single endpoint.\" legal={<span>© 2026 Agentcard, Inc.</span>} groups={FOOTER} />\n    </div>\n  );\n}\n"
+    }
+  ]
+}

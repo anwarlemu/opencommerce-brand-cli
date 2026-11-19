@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "name": "hover-card",
+  "useFor": "Use to preview what a link points to without leaving the page (a merchant's status, an order's items). The trigger must still work as a link on its own; the card is for sighted pointer users only, so never put the only copy of anything in it.",
+  "constraints": [
+    "Actions or forms inside the card (use a popover)",
+    "A hover card on a button",
+    "The only way to reach information"
+  ],
+  "documentation": "",
+  "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win) and popover.tsx",
+  "exports": [
+    "HoverCard",
+    "HoverCardContent",
+    "HoverCardTrigger"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/hover-card",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/hover-card.md",
+  "examples": [
+    {
+      "path": "examples/hover-card.tsx",
+      "content": "import { Badge } from \"@/components/ui/badge\";\nimport { HoverCard, HoverCardContent, HoverCardTrigger } from \"@/components/ui/hover-card\";\n\nfunction Merchant() {\n  return (\n    <div className=\"grid gap-3\">\n      <div className=\"flex items-start justify-between gap-3\">\n        <div className=\"grid gap-0.5\">\n          <p className=\"font-display text-h5 leading-display font-medium tracking-tight text-fg\">Northwind Outfitters</p>\n          <p className=\"font-mono text-bar text-fg-muted\">northwind.example</p>\n        </div>\n        <Badge variant=\"success\">Operational</Badge>\n      </div>\n      <p className=\"text-body-sm leading-relaxed text-fg-muted\">Search, checkout and order tracking are live. Median checkout in the last hour: 3.4s.</p>\n      <dl className=\"grid grid-cols-2 gap-2 border-t border-line pt-3 text-caption\">\n        <dt className=\"text-fg-muted\">Checkouts today</dt>\n        <dd className=\"text-right font-mono text-fg tabular-nums\">1,284</dd>\n        <dt className=\"text-fg-muted\">Success rate</dt>\n        <dd className=\"text-right font-mono text-fg tabular-nums\">99.2%</dd>\n      </dl>\n    </div>\n  );\n}\n\nexport function Site() {\n  return (\n    <p className=\"max-w-120 text-body leading-relaxed text-fg-muted\">\n      Your agent's last order went to{\" \"}\n      <HoverCard>\n        <HoverCardTrigger href=\"#merchant\" className=\"text-fg-brand underline decoration-line-brand underline-offset-4\">\n          Northwind Outfitters\n        </HoverCardTrigger>\n        <HoverCardContent className=\"w-80\">\n          <Merchant />\n        </HoverCardContent>\n      </HoverCard>{\" \"}\n      and shipped this morning.\n    </p>\n  );\n}\n\nexport function Open() {\n  return (\n    <div className=\"h-64\">\n      <HoverCard defaultOpen>\n        <HoverCardTrigger href=\"#merchant\" className=\"text-body text-fg-brand underline decoration-line-brand underline-offset-4\">\n          Northwind Outfitters\n        </HoverCardTrigger>\n        <HoverCardContent align=\"start\" className=\"w-80\">\n          <Merchant />\n        </HoverCardContent>\n      </HoverCard>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Open"
+      ],
+      "requires": [
+        "hover-card",
+        "badge"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/hover-card/Site"
+        },
+        {
+          "name": "Open",
+          "url": "https://opencommerce-ds.vercel.app/preview/hover-card/Open"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Hover Card",
+  "description": "A preview of a merchant, an order or a person that opens beside a link under the pointer.",
+  "surface": "site",
+  "kinds": [
+    "popover-panel"
+  ],
+  "requires": [
+    "theme",
+    "surface",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-hover-card"
+  ],
+  "files": [
+    {
+      "path": "components/ui/hover-card.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as HoverCardPrimitive from \"@radix-ui/react-hover-card\";\n\nimport { usePortalContainer } from \"@/lib/surface\";\nimport { cn } from \"@/lib/utils\";\n\n// A preview on hover (a merchant, an order behind a link): the brand's floating panel (popover.tsx), white, a 9 percent\n// ink edge, 8px corners and a soft drop, 6px off its trigger, growing out of the side nearest it (scale 0.97 and a fade,\n// 160ms ease-out). It waits 500ms before opening, so passing over a link does not flash it, and 200ms before closing,\n// so the pointer can travel into it. Reduced motion keeps only the fade.\nfunction HoverCard({ openDelay = 500, closeDelay = 200, ...props }: React.ComponentProps<typeof HoverCardPrimitive.Root>) {\n  return <HoverCardPrimitive.Root data-slot=\"hover-card\" openDelay={openDelay} closeDelay={closeDelay} {...props} />;\n}\n\nfunction HoverCardTrigger(props: React.ComponentProps<typeof HoverCardPrimitive.Trigger>) {\n  return <HoverCardPrimitive.Trigger data-slot=\"hover-card-trigger\" {...props} />;\n}\n\nfunction HoverCardContent({ className, align = \"center\", sideOffset = 6, collisionPadding = 8, ...props }: React.ComponentProps<typeof HoverCardPrimitive.Content>) {\n  return (\n    <HoverCardPrimitive.Portal data-slot=\"hover-card-portal\" container={usePortalContainer()}>\n      <HoverCardPrimitive.Content\n        data-slot=\"hover-card-content\"\n        align={align}\n        sideOffset={sideOffset}\n        collisionPadding={collisionPadding}\n        className={cn(\n          \"z-50 w-72 max-w-(--radix-hover-card-content-available-width) origin-(--radix-hover-card-content-transform-origin) animate-pop-in rounded-control border border-line bg-surface p-4 text-body-sm text-fg shadow-floating outline-none motion-reduce:animate-none\",\n          className,\n        )}\n        {...props}\n      />\n    </HoverCardPrimitive.Portal>\n  );\n}\n\nexport { HoverCard, HoverCardContent, HoverCardTrigger };\n"
+    }
+  ]
+}

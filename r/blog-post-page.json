@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "name": "blog-post-page",
+  "useFor": "Use as a starting point for one post. Pass the rendered post as Prose children and replace the author, date and related posts.",
+  "constraints": [
+    "Body text wider than 576px",
+    "Bold headings",
+    "A hero image in color beside a gray page",
+    "Two closing cards"
+  ],
+  "documentation": "Composed from `SiteHeader`, `Breadcrumb`, `PageHeader` (the author line as its children, with `Avatar`), `Prose`,\n`Window`, `Badge`, `Cta` and `SiteFooter`.",
+  "source": "Extension in the opencommerce site's voice (opencommerce-agentcard-web src/components; the prose from agentcard.sh/terms)",
+  "exports": [
+    "BlogPostPage"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/blog-post-page",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/blog-post-page.md",
+  "examples": [
+    {
+      "path": "examples/blog-post-page.tsx",
+      "content": "import { BlogPostPage } from \"@/components/blocks/blog-post-page\";\n\nexport function Block() {\n  return <BlogPostPage />;\n}\n",
+      "exports": [
+        "Block"
+      ],
+      "requires": [
+        "blog-post-page"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Block",
+          "url": "https://opencommerce-ds.vercel.app/preview/blog-post-page/Block"
+        }
+      ]
+    }
+  ],
+  "type": "block",
+  "title": "Blog post page",
+  "description": "Blog post template with a trail back to the blog, the title and author line, the post in the reading column, related posts, closing card and footer.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "cta",
+    "page-header",
+    "prose",
+    "section",
+    "site-footer",
+    "site-header",
+    "avatar",
+    "badge",
+    "breadcrumb",
+    "button",
+    "window"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/blocks/blog-post-page.tsx",
+      "content": "import { Cta } from \"@/components/site/cta\";\nimport { PageHeader } from \"@/components/site/page-header\";\nimport { Prose } from \"@/components/site/prose\";\nimport { Eyebrow, SiteSection } from \"@/components/site/section\";\nimport { SiteFooter } from \"@/components/site/site-footer\";\nimport { SiteHeader } from \"@/components/site/site-header\";\nimport { Avatar, AvatarFallback } from \"@/components/ui/avatar\";\nimport { Badge } from \"@/components/ui/badge\";\nimport { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from \"@/components/ui/breadcrumb\";\nimport { Button } from \"@/components/ui/button\";\nimport { Window } from \"@/components/ui/window\";\n\n// One post in the home page's voice: the glass header, a trail back to the blog, the page's opening on the 800px\n// column with the author line under the title, the post in the 576px reading column (Prose), two related posts as\n// windows, the closing card and the footer. Sample post and people; replace them with your own.\n\nconst SIGNUP = \"https://app.agentcard.sh\";\nconst DOCS = \"https://docs.agentcard.sh\";\n\nconst LINKS = [\n  { label: \"Home\", href: \"/\" },\n  { label: \"Features\", href: \"/features\" },\n  { label: \"Pricing\", href: \"/pricing\" },\n  { label: \"Blog\", href: \"/blog\", current: true },\n  { label: \"Docs\", href: DOCS },\n];\n\nconst FOOTER = [\n  { title: \"Product\", links: [{ label: \"Features\", href: \"/features\" }, { label: \"Pricing\", href: \"/pricing\" }, { label: \"Changelog\", href: \"/changelog\" }] },\n  { title: \"Developers\", links: [{ label: \"Docs\", href: DOCS }, { label: \"SDK\", href: \"https://www.npmjs.com/package/@agentcard/sdk\" }] },\n  { title: \"Company\", links: [{ label: \"About\", href: \"/about\" }, { label: \"Blog\", href: \"/blog\" }, { label: \"Contact\", href: \"/contact\" }] },\n];\n\nconst RELATED = [\n  { slug: \"monitoring-every-route\", title: \"Monitoring every route, every hour\", excerpt: \"Why we buy from each store around the clock, and how the status table turns that into a picture you can trust.\", date: \"Oct 28, 2026\", dateTime: \"2026-10-28\", tag: \"Engineering\" },\n  { slug: \"checkout-changes\", title: \"What happens when a store changes its checkout\", excerpt: \"Routes are re-learned within minutes. A look at how we notice, and what your agent sees meanwhile.\", date: \"Oct 9, 2026\", dateTime: \"2026-10-09\", tag: \"Engineering\" },\n];\n\nexport function BlogPostPage() {\n  return (\n    <div className=\"bg-surface text-fg\">\n      <SiteHeader href=\"/\" links={LINKS} spy={false} action={{ label: \"Get started\", href: SIGNUP }} />\n      <main>\n        <div className=\"mx-auto w-(--ds-frame-column) max-w-(--ds-layout-medium) pt-18 md:pt-24\">\n          <Breadcrumb>\n            <BreadcrumbList>\n              <BreadcrumbItem>\n                <BreadcrumbLink href=\"/blog\">Blog</BreadcrumbLink>\n              </BreadcrumbItem>\n              <BreadcrumbSeparator />\n              <BreadcrumbItem>\n                <BreadcrumbPage>Warmed routes</BreadcrumbPage>\n              </BreadcrumbItem>\n            </BreadcrumbList>\n          </Breadcrumb>\n        </div>\n        <PageHeader className=\"pt-6 md:pt-8\" eyebrow=\"Engineering\" title=\"How warmed routes cut checkout from minutes to seconds\">\n          <div className=\"mt-6 flex flex-wrap items-center gap-3\">\n            <Avatar>\n              <AvatarFallback>AO</AvatarFallback>\n            </Avatar>\n            <div className=\"flex flex-col\">\n              <span className=\"text-body-sm text-fg\">Ada Okafor</span>\n              <span className=\"font-mono text-caption leading-body text-fg-muted\">\n                <time dateTime=\"2026-11-12\">Nov 12, 2026</time> · 8 min read\n              </span>\n            </div>\n          </div>\n        </PageHeader>\n        <div className=\"mx-auto w-(--ds-frame-column) max-w-(--ds-layout-medium) pt-8\">\n          <Prose className=\"mx-0\">\n            <p>\n              A cold route is a store your agent has not bought from in a while. Reaching its checkout means loading the catalogue, finding the item, filling the cart and walking every step of the payment form. On a good day that takes two or three minutes.\n            </p>\n            <p>A warmed route has already done that walk recently. The session is ready, the form is known, and the purchase takes seconds.</p>\n            <h2>What we keep warm</h2>\n            <p>\n              We watch which stores your agents use and keep those routes ready around the clock. Everything else stays reachable, only slower on the first call. You do not configure any of it; the call is the same either way.\n            </p>\n            <ul>\n              <li>The stores your agents bought from in the last week.</li>\n              <li>The stores your customers search most, even before a first purchase.</li>\n              <li>Every route the monitoring shows as degraded, until it recovers.</li>\n            </ul>\n            <h2>What it looks like in code</h2>\n            <p>\n              Nothing changes. <code>commerce.buy</code> picks the warm route when there is one and tells you which it took:\n            </p>\n            <pre>\n              <code>{`const order = await agentcard.commerce.buy({\\n  query: \"USB-C charger, 65W\",\\n  maxPrice: 40,\\n});\\n\\norder.route; // \"warm\"`}</code>\n            </pre>\n            <h3>When a route goes cold</h3>\n            <p>\n              If a store changes its checkout, the route is re-learned within minutes. Until it is, the status table shows the store as degraded and the call falls back to the slower walk. Read more in the <a href=\"https://docs.agentcard.sh\">docs</a>.\n            </p>\n            <blockquote>A purchase your agent makes should feel like one a person makes: quick, and finished.</blockquote>\n          </Prose>\n        </div>\n        <SiteSection aria-label=\"Related posts\" width=\"medium\">\n          <Eyebrow className=\"mb-3.5\">Related posts</Eyebrow>\n          <ul className=\"m-0 grid list-none grid-cols-1 gap-5 p-0 sm:grid-cols-2\">\n            {RELATED.map((post) => (\n              <li key={post.slug} className=\"flex\">\n                <Window name={`${post.slug}.post`} className=\"relative w-full\" bodyClassName=\"flex flex-col\">\n                  <article className=\"flex flex-1 flex-col px-6 pt-6 pb-6\">\n                    <p className=\"font-mono text-caption leading-body text-fg-muted\">\n                      <time dateTime={post.dateTime}>{post.date}</time>\n                    </p>\n                    <h2 className=\"mt-2 font-display text-h4 leading-snug font-medium tracking-tight text-balance\">\n                      <a href={`/blog/${post.slug}`} className=\"rounded-chip outline-none after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring\">\n                        {post.title}\n                      </a>\n                    </h2>\n                    <p className=\"mt-2 flex-1 text-body leading-relaxed text-fg-muted\">{post.excerpt}</p>\n                    <Badge variant=\"chip\" className=\"mt-5\">\n                      {post.tag}\n                    </Badge>\n                  </article>\n                </Window>\n              </li>\n            ))}\n          </ul>\n        </SiteSection>\n        <SiteSection aria-label=\"Get started\" className=\"pb-18 md:pb-30\">\n          <Cta\n            title=\"Give your agent a checkout\"\n            description=\"One endpoint, every online store. Start free: your first purchase can go through today.\"\n            actions={\n              <>\n                <Button asChild>\n                  <a href={SIGNUP}>Get started</a>\n                </Button>\n                <Button asChild variant=\"secondary\">\n                  <a href={DOCS}>Read the docs</a>\n                </Button>\n              </>\n            }\n          />\n        </SiteSection>\n      </main>\n      <SiteFooter description=\"The open router for commerce. Buy from any online store from a single endpoint.\" legal={<span>© 2026 Agentcard, Inc.</span>} groups={FOOTER} />\n    </div>\n  );\n}\n"
+    }
+  ]
+}

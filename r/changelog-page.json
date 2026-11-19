@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "name": "changelog-page",
+  "useFor": "Use as a starting point for release notes. Replace the sample days and entries; keep each entry to short bullets.",
+  "constraints": [
+    "Tags in caps",
+    "Cards around each day",
+    "Long paragraphs instead of bullets"
+  ],
+  "documentation": "Composed from `SiteHeader`, `PageHeader`, `UpdatesFeed`, `Button` and `SiteFooter`.",
+  "source": "Extension in the opencommerce site's voice; the structure from agentcard.sh/updates",
+  "exports": [
+    "ChangelogPage"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/changelog-page",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/changelog-page.md",
+  "examples": [
+    {
+      "path": "examples/changelog-page.tsx",
+      "content": "import { ChangelogPage } from \"@/components/blocks/changelog-page\";\n\nexport function Block() {\n  return <ChangelogPage />;\n}\n",
+      "exports": [
+        "Block"
+      ],
+      "requires": [
+        "changelog-page"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Block",
+          "url": "https://opencommerce-ds.vercel.app/preview/changelog-page/Block"
+        }
+      ]
+    }
+  ],
+  "type": "block",
+  "title": "Changelog page",
+  "description": "Changelog template with the header, the page's opening, dated entries grouped by change type, a key to older entries and the footer.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "page-header",
+    "site-footer",
+    "site-header",
+    "updates-feed",
+    "button"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/blocks/changelog-page.tsx",
+      "content": "import { PageHeader } from \"@/components/site/page-header\";\nimport { SiteFooter } from \"@/components/site/site-footer\";\nimport { SiteHeader } from \"@/components/site/site-header\";\nimport { UpdatesFeed, type UpdateDay } from \"@/components/site/updates-feed\";\nimport { Button } from \"@/components/ui/button\";\n\n// A changelog in the home page's voice: the glass header, the page's opening on the 800px column, one row per day on\n// hairlines (the date in the platform mono at the left, the day's changes grouped under Added, Improved and Fixed at\n// the right), a key to the older entries, and the footer. Sample entries; replace them with your own.\n\nconst SIGNUP = \"https://app.agentcard.sh\";\nconst DOCS = \"https://docs.agentcard.sh\";\n\nconst LINKS = [\n  { label: \"Home\", href: \"/\" },\n  { label: \"Features\", href: \"/features\" },\n  { label: \"Pricing\", href: \"/pricing\" },\n  { label: \"Changelog\", href: \"/changelog\", current: true },\n  { label: \"Docs\", href: DOCS },\n];\n\nconst FOOTER = [\n  { title: \"Product\", links: [{ label: \"Features\", href: \"/features\" }, { label: \"Pricing\", href: \"/pricing\" }, { label: \"Changelog\", href: \"/changelog\" }] },\n  { title: \"Developers\", links: [{ label: \"Docs\", href: DOCS }, { label: \"SDK\", href: \"https://www.npmjs.com/package/@agentcard/sdk\" }] },\n  { title: \"Company\", links: [{ label: \"About\", href: \"/about\" }, { label: \"Blog\", href: \"/blog\" }, { label: \"Contact\", href: \"/contact\" }] },\n];\n\nconst DAYS: UpdateDay[] = [\n  {\n    date: \"Thu Nov 12\",\n    dateTime: \"2026-11-12\",\n    entries: [\n      { tag: \"Added\", title: \"Spending limits\", body: \"Customers set a ceiling per order and per month; the agent never pays past it.\", items: [\"commerce.checkout returns limit_reached when an order would pass a ceiling.\", \"Limits show on each customer in the dashboard.\"] },\n      { tag: \"Improved\", items: [\"Warmed routes now cover the stores your customers search most, even before a first purchase.\"] },\n    ],\n  },\n  {\n    date: \"Tue Nov 3\",\n    dateTime: \"2026-11-03\",\n    entries: [\n      { tag: \"Added\", items: [\"Order webhooks for shipped, delivered and refunded.\", \"A track call that returns the carrier and tracking number.\"] },\n      { tag: \"Fixed\", items: [\"Search no longer returns items that are out of stock at checkout.\"] },\n    ],\n  },\n  {\n    date: \"Wed Oct 21\",\n    dateTime: \"2026-10-21\",\n    entries: [\n      { tag: \"Improved\", items: [\"Routes re-learn within minutes when a store changes its checkout.\", \"The status table filters as you type.\"] },\n      { tag: \"Fixed\", items: [\"Shipping addresses with a second line are passed through in full.\"] },\n    ],\n  },\n  {\n    date: \"Mon Oct 5\",\n    dateTime: \"2026-10-05\",\n    entries: [{ tag: \"Added\", items: [\"SDK tools for the common agent frameworks.\", \"A plain HTTP API for everything else.\"] }],\n  },\n];\n\nexport function ChangelogPage() {\n  return (\n    <div className=\"bg-surface text-fg\">\n      <SiteHeader href=\"/\" links={LINKS} spy={false} action={{ label: \"Get started\", href: SIGNUP }} />\n      <main>\n        <PageHeader eyebrow=\"Changelog\" title=\"What’s new\" lead=\"New stores, new calls and fixes, as they ship.\" rule={false} />\n        <div className=\"mx-auto w-(--ds-frame-column) max-w-(--ds-layout-medium) pt-8 pb-18 md:pb-30\">\n          <UpdatesFeed days={DAYS} className=\"border-t border-line\" />\n          <div className=\"mt-10 flex justify-center\">\n            <Button asChild variant=\"secondary\">\n              <a href=\"/changelog/page/2\">Older updates</a>\n            </Button>\n          </div>\n        </div>\n      </main>\n      <SiteFooter description=\"The open router for commerce. Buy from any online store from a single endpoint.\" legal={<span>© 2026 Agentcard, Inc.</span>} groups={FOOTER} />\n    </div>\n  );\n}\n"
+    }
+  ]
+}

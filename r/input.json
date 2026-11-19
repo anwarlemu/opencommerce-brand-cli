@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "name": "input",
+  "useFor": "Use inside Field for a label and validation message. Set an appropriate input type. Use variant=\"search\" for search or filtering and connect changes to the results.",
+  "constraints": [
+    "Pill-shaped fields",
+    "Gray filled inputs",
+    "Placeholder text as the only label",
+    "A glow or ring on focus (the edge turns blue)"
+  ],
+  "documentation": "",
+  "source": "opencommerce-agentcard-web src/components/monitoring.tsx (#merchant-filter, computed)",
+  "exports": [
+    "Input",
+    "inputVariants"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/input",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/input.md",
+  "examples": [
+    {
+      "path": "examples/input.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Field } from \"@/components/ui/field\";\nimport { Input } from \"@/components/ui/input\";\n\nexport function Site() {\n  return (\n    <div className=\"grid max-w-170 gap-4\">\n      <Field label=\"Your name\" htmlFor=\"input-name\">\n        <Input id=\"input-name\" autoComplete=\"name\" />\n      </Field>\n      <Field label=\"Work email\" htmlFor=\"input-email\">\n        <Input id=\"input-email\" type=\"email\" autoComplete=\"email\" />\n      </Field>\n      <div className=\"grid gap-4 md:grid-cols-2\">\n        <Field label=\"Company\" htmlFor=\"input-company\">\n          <Input id=\"input-company\" />\n        </Field>\n        <Field label=\"Website\" htmlFor=\"input-site\">\n          <Input id=\"input-site\" placeholder=\"acme.com\" />\n        </Field>\n      </div>\n    </div>\n  );\n}\n\nexport function States() {\n  const [email, setEmail] = useState(\"ada@\");\n  const [valid, setValid] = useState(false);\n  return (\n    <div className=\"grid max-w-170 gap-4\">\n      <Field label=\"Work email\" htmlFor=\"input-invalid\" error={valid ? undefined : \"Enter a valid work email address.\"} help=\"Email address accepted.\">\n        <Input id=\"input-invalid\" type=\"email\" value={email} required onChange={(event) => { setEmail(event.target.value); setValid(event.target.validity.valid); }} />\n      </Field>\n      <Field label=\"Card nickname\" htmlFor=\"input-disabled\" help=\"Set by your team admin.\">\n        <Input id=\"input-disabled\" defaultValue=\"Travel agent\" disabled />\n      </Field>\n    </div>\n  );\n}\n\nexport function Search() {\n  const [query, setQuery] = useState(\"\");\n  const guides = [\"Create a card\", \"Set spending limits\", \"Manage merchants\"].filter((guide) => guide.toLowerCase().includes(query.toLowerCase().trim()));\n  return (\n    <div className=\"max-w-80\">\n      <Input variant=\"search\" placeholder=\"Search the guides\" aria-label=\"Search the guides\" value={query} onChange={(event) => setQuery(event.target.value)} />\n      <ul aria-live=\"polite\" className=\"mt-3 text-body-sm text-fg-muted\">{guides.length ? guides.map((guide) => <li key={guide}>{guide}</li>) : <li>No guides match your search.</li>}</ul>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "States",
+        "Search"
+      ],
+      "requires": [
+        "input",
+        "field"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/input/Site"
+        },
+        {
+          "name": "States",
+          "url": "https://opencommerce-ds.vercel.app/preview/input/States"
+        },
+        {
+          "name": "Search",
+          "url": "https://opencommerce-ds.vercel.app/preview/input/Search"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Input",
+  "description": "Single-line text field with standard and search variants.",
+  "surface": "site",
+  "kinds": [
+    "input"
+  ],
+  "requires": [
+    "theme",
+    "field",
+    "utils"
+  ],
+  "packages": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/input.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { useFieldControl } from \"@/components/ui/field\";\nimport { cn } from \"@/lib/utils\";\n\n// The brand's field (monitoring.tsx, the merchant filter; computed): 36px, 8px corners, white on the 16 percent ink\n// edge, 14px Inter, 12px in, a faint placeholder. Focus turns the edge blue (160ms ease-out), with no glow; an invalid\n// field's edge is red. `search` is the same field with a drawn search mark 12px in.\nconst FIELD =\n  \"h-9 rounded-control border border-hairline px-3 font-sans text-body-sm leading-body transition-[border-color] duration-160 ease-out placeholder:text-fg-faint hover:border-line-field-hover focus-visible:border-line-brand aria-invalid:border-danger motion-reduce:transition-none\";\n\nconst inputVariants = cva(\n  \"flex w-full min-w-0 bg-surface text-fg outline-none disabled:pointer-events-none disabled:opacity-50\",\n  {\n    variants: {\n      variant: {\n        field: `${FIELD} file:border-0 file:bg-transparent file:font-sans file:text-body-sm file:text-fg`,\n        search: `${FIELD} pl-9 [&::-webkit-search-cancel-button]:hidden`,\n      },\n    },\n    defaultVariants: { variant: \"field\" },\n  },\n);\n\nfunction SearchIcon() {\n  return (\n    <svg aria-hidden viewBox=\"0 0 16 16\" className=\"pointer-events-none absolute top-1/2 left-3 size-3.75 -translate-y-1/2 fill-none stroke-current text-fg-muted [stroke-linecap:round] [stroke-width:1.5]\">\n      <circle cx=\"7\" cy=\"7\" r=\"4.75\" />\n      <path d=\"M10.5 10.5 14 14\" />\n    </svg>\n  );\n}\n\nfunction Input({ className, type, variant, ...props }: React.ComponentProps<\"input\"> & VariantProps<typeof inputVariants>) {\n  const input = <input type={variant === \"search\" ? (type ?? \"search\") : type} data-slot=\"input\" className={cn(inputVariants({ variant }), variant !== \"search\" && className)} {...useFieldControl(props)} />;\n  if (variant !== \"search\") return input;\n  return (\n    <div data-slot=\"search\" className={cn(\"relative w-full\", className)}>\n      <SearchIcon />\n      {input}\n    </div>\n  );\n}\n\nexport { Input, inputVariants };\n"
+    }
+  ]
+}

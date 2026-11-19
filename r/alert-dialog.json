@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "name": "alert-dialog",
+  "useFor": "Use to confirm an action that is hard to undo (cancel an order, revoke an API key). Say what will happen in the description. Put the white AlertDialogCancel before the AlertDialogAction; set variant=\"destructive\" on the action for something destructive. Set name for the title bar and size=\"sm\" for a short, centered question with an AlertDialogMedia mark.",
+  "constraints": [
+    "A confirmation for an action that can be undone",
+    "A close mark (it must be answered)",
+    "Vague actions such as OK and Yes",
+    "Two destructive actions in one dialog"
+  ],
+  "documentation": "",
+  "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar) and dialog.tsx",
+  "exports": [
+    "AlertDialog",
+    "AlertDialogAction",
+    "AlertDialogCancel",
+    "AlertDialogContent",
+    "AlertDialogDescription",
+    "AlertDialogFooter",
+    "AlertDialogHeader",
+    "AlertDialogMedia",
+    "AlertDialogOverlay",
+    "AlertDialogPortal",
+    "AlertDialogTitle",
+    "AlertDialogTrigger"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/alert-dialog",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/alert-dialog.md",
+  "examples": [
+    {
+      "path": "examples/alert-dialog.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { KeyRound } from \"lucide-react\";\n\nimport {\n  AlertDialog,\n  AlertDialogAction,\n  AlertDialogCancel,\n  AlertDialogContent,\n  AlertDialogDescription,\n  AlertDialogFooter,\n  AlertDialogHeader,\n  AlertDialogMedia,\n  AlertDialogTitle,\n  AlertDialogTrigger,\n} from \"@/components/ui/alert-dialog\";\nimport { Button } from \"@/components/ui/button\";\n\nfunction CancelOrder({ defaultOpen = false }: { defaultOpen?: boolean }) {\n  const [status, setStatus] = React.useState(\"Order ord_8KQ2 is placed and waiting on the merchant.\");\n  return (\n    <div className=\"grid justify-items-start gap-3\">\n      <AlertDialog defaultOpen={defaultOpen}>\n        <AlertDialogTrigger asChild>\n          <Button variant=\"secondary\">Cancel order</Button>\n        </AlertDialogTrigger>\n        <AlertDialogContent name=\"order.cancel\">\n          <AlertDialogHeader>\n            <AlertDialogTitle>Cancel this order?</AlertDialogTitle>\n            <AlertDialogDescription>The agent's purchase at Northwind Outfitters is refunded to the card it used, and the merchant is told to stop fulfillment. This cannot be undone.</AlertDialogDescription>\n          </AlertDialogHeader>\n          <AlertDialogFooter>\n            <AlertDialogCancel>Keep order</AlertDialogCancel>\n            <AlertDialogAction variant=\"destructive\" onClick={() => setStatus(\"Order ord_8KQ2 was canceled and refunded.\")}>\n              Cancel order\n            </AlertDialogAction>\n          </AlertDialogFooter>\n        </AlertDialogContent>\n      </AlertDialog>\n      <p role=\"status\" className=\"text-body-sm text-fg-muted\">\n        {status}\n      </p>\n    </div>\n  );\n}\n\nexport function Site() {\n  return <CancelOrder />;\n}\n\nexport function Small() {\n  const [revoked, setRevoked] = React.useState(false);\n  return (\n    <div className=\"grid justify-items-start gap-3\">\n      <AlertDialog>\n        <AlertDialogTrigger asChild>\n          <Button variant=\"secondary\" disabled={revoked}>\n            Revoke key\n          </Button>\n        </AlertDialogTrigger>\n        <AlertDialogContent size=\"sm\" name=\"key.revoke\">\n          <AlertDialogHeader>\n            <AlertDialogMedia>\n              <KeyRound strokeWidth={1.5} />\n            </AlertDialogMedia>\n            <AlertDialogTitle>Revoke sk_live_4f2a?</AlertDialogTitle>\n            <AlertDialogDescription>Agents using this key stop being able to check out at once.</AlertDialogDescription>\n          </AlertDialogHeader>\n          <AlertDialogFooter>\n            <AlertDialogCancel>Cancel</AlertDialogCancel>\n            <AlertDialogAction variant=\"destructive\" onClick={() => setRevoked(true)}>\n              Revoke\n            </AlertDialogAction>\n          </AlertDialogFooter>\n        </AlertDialogContent>\n      </AlertDialog>\n      <p role=\"status\" className=\"text-body-sm text-fg-muted\">\n        {revoked ? \"Key sk_live_4f2a revoked.\" : \"Key sk_live_4f2a is active.\"}\n      </p>\n    </div>\n  );\n}\n\nexport function Confirm() {\n  const [published, setPublished] = React.useState(false);\n  return (\n    <div className=\"grid justify-items-start gap-3\">\n      <AlertDialog>\n        <AlertDialogTrigger asChild>\n          <Button>Go live</Button>\n        </AlertDialogTrigger>\n        <AlertDialogContent name=\"agent.live\">\n          <AlertDialogHeader>\n            <AlertDialogTitle>Let the agent buy for real?</AlertDialogTitle>\n            <AlertDialogDescription>Checkouts will charge the card on file at every merchant on the Standard plan, with a 1% platform fee on each completed order.</AlertDialogDescription>\n          </AlertDialogHeader>\n          <AlertDialogFooter>\n            <AlertDialogCancel>Stay in test mode</AlertDialogCancel>\n            <AlertDialogAction onClick={() => setPublished(true)}>Go live</AlertDialogAction>\n          </AlertDialogFooter>\n        </AlertDialogContent>\n      </AlertDialog>\n      <p role=\"status\" className=\"text-body-sm text-fg-muted\">\n        {published ? \"Live: checkouts now charge real cards.\" : \"Test mode: no card is charged.\"}\n      </p>\n    </div>\n  );\n}\n\nexport function Open() {\n  return (\n    <div className=\"h-110\">\n      <CancelOrder defaultOpen />\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Small",
+        "Confirm",
+        "Open"
+      ],
+      "requires": [
+        "alert-dialog",
+        "button"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/alert-dialog/Site"
+        },
+        {
+          "name": "Small",
+          "url": "https://opencommerce-ds.vercel.app/preview/alert-dialog/Small"
+        },
+        {
+          "name": "Confirm",
+          "url": "https://opencommerce-ds.vercel.app/preview/alert-dialog/Confirm"
+        },
+        {
+          "name": "Open",
+          "url": "https://opencommerce-ds.vercel.app/preview/alert-dialog/Open"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Alert Dialog",
+  "description": "A confirmation in one of the brand's windows: a title bar, a title, a line, and the white Cancel beside the blue or red action.",
+  "surface": "site",
+  "kinds": [
+    "window",
+    "window-bar"
+  ],
+  "requires": [
+    "theme",
+    "button",
+    "window",
+    "surface",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-alert-dialog"
+  ],
+  "files": [
+    {
+      "path": "components/ui/alert-dialog.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as AlertDialogPrimitive from \"@radix-ui/react-alert-dialog\";\n\nimport { buttonVariants } from \"@/components/ui/button\";\nimport { WindowBar } from \"@/components/ui/window\";\nimport { usePortalContainer } from \"@/lib/surface\";\nimport { cn } from \"@/lib/utils\";\n\n// A confirmation is the dialog's window (dialog.tsx): white, a 16 percent ink edge, 12px corners, the 36px mist title bar\n// with its arrow and a file-like name, over the 40 percent ink scrim, popping in from 0.97 with a fade (200ms ease-out,\n// centered). It has no close mark: it must be answered, and a click outside does not dismiss it (Escape cancels). The\n// answers are keys at the right: the white Cancel, then the blue action, or the red action for something destructive.\nfunction AlertDialog(props: React.ComponentProps<typeof AlertDialogPrimitive.Root>) {\n  return <AlertDialogPrimitive.Root data-slot=\"alert-dialog\" {...props} />;\n}\n\nfunction AlertDialogTrigger(props: React.ComponentProps<typeof AlertDialogPrimitive.Trigger>) {\n  return <AlertDialogPrimitive.Trigger data-slot=\"alert-dialog-trigger\" {...props} />;\n}\n\nfunction AlertDialogPortal(props: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) {\n  const container = usePortalContainer();\n  return <AlertDialogPrimitive.Portal data-slot=\"alert-dialog-portal\" container={container} {...props} />;\n}\n\nfunction AlertDialogOverlay({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Overlay>) {\n  return <AlertDialogPrimitive.Overlay data-slot=\"alert-dialog-overlay\" className={cn(\"fixed inset-0 z-50 animate-fade-in bg-scrim motion-reduce:animate-none\", className)} {...props} />;\n}\n\nconst SIZES = { sm: \"max-w-sm\", default: \"max-w-lg\" } as const;\n\nfunction AlertDialogContent({\n  className,\n  children,\n  size = \"default\",\n  name = \"confirm\",\n  ...props\n}: React.ComponentProps<typeof AlertDialogPrimitive.Content> & {\n  size?: keyof typeof SIZES;\n  /** The title bar's label, file-like: `card.close`, `key.revoke`. */\n  name?: React.ReactNode;\n}) {\n  return (\n    <AlertDialogPortal>\n      <AlertDialogOverlay />\n      <AlertDialogPrimitive.Content\n        data-slot=\"alert-dialog-content\"\n        data-size={size}\n        className={cn(\n          \"group/alert-dialog fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] -translate-1/2 animate-pop-in flex-col overflow-hidden rounded-panel border border-line-window bg-surface text-fg shadow-floating outline-none [animation-duration:var(--ds-duration-base)] motion-reduce:animate-none\",\n          SIZES[size],\n          className,\n        )}\n        {...props}\n      >\n        <WindowBar name={name} />\n        <div className=\"grid min-h-0 gap-5 overflow-y-auto p-6\">{children}</div>\n      </AlertDialogPrimitive.Content>\n    </AlertDialogPortal>\n  );\n}\n\nfunction AlertDialogHeader({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"alert-dialog-header\" className={cn(\"grid gap-2 group-data-[size=sm]/alert-dialog:justify-items-center group-data-[size=sm]/alert-dialog:text-center\", className)} {...props} />;\n}\n\nfunction AlertDialogFooter({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"alert-dialog-footer\"\n      className={cn(\"flex flex-col-reverse gap-3 sm:flex-row sm:justify-end group-data-[size=sm]/alert-dialog:grid group-data-[size=sm]/alert-dialog:grid-cols-2\", className)}\n      {...props}\n    />\n  );\n}\n\n/** A 40px square above the title for the thing at stake: the mist with a 16 percent ink edge, the glyph in ink. */\nfunction AlertDialogMedia({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"alert-dialog-media\"\n      className={cn(\"mb-1 grid size-10 place-items-center rounded-control border border-line-window bg-subtle text-fg [&_svg:not([class*='size-'])]:size-4.5\", className)}\n      {...props}\n    />\n  );\n}\n\n// 24px display at 500, tracked tight, like the dialog's title.\nfunction AlertDialogTitle({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Title>) {\n  return <AlertDialogPrimitive.Title data-slot=\"alert-dialog-title\" className={cn(\"font-display text-h3 leading-display font-medium tracking-tight text-fg\", className)} {...props} />;\n}\n\nfunction AlertDialogDescription({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Description>) {\n  return <AlertDialogPrimitive.Description data-slot=\"alert-dialog-description\" className={cn(\"text-body-sm leading-relaxed text-pretty text-fg-muted\", className)} {...props} />;\n}\n\nconst DESTRUCTIVE = \"border-danger bg-danger text-white hover:bg-danger/90\";\n\nfunction AlertDialogAction({ className, variant = \"default\", ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Action> & { variant?: \"default\" | \"destructive\" }) {\n  return <AlertDialogPrimitive.Action data-slot=\"alert-dialog-action\" className={cn(buttonVariants({ variant: \"primary\" }), variant === \"destructive\" && DESTRUCTIVE, className)} {...props} />;\n}\n\nfunction AlertDialogCancel({ className, ...props }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel>) {\n  return <AlertDialogPrimitive.Cancel data-slot=\"alert-dialog-cancel\" className={cn(buttonVariants({ variant: \"secondary\" }), className)} {...props} />;\n}\n\nexport {\n  AlertDialog,\n  AlertDialogAction,\n  AlertDialogCancel,\n  AlertDialogContent,\n  AlertDialogDescription,\n  AlertDialogFooter,\n  AlertDialogHeader,\n  AlertDialogMedia,\n  AlertDialogOverlay,\n  AlertDialogPortal,\n  AlertDialogTitle,\n  AlertDialogTrigger,\n};\n"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "name": "about-page",
+  "useFor": "Use as a starting point for company pages. Replace the sample people, links and content.",
+  "constraints": [
+    "Photos in color beside gray ones",
+    "A colored window bar"
+  ],
+  "documentation": "",
+  "source": "Extension in the opencommerce site's voice (opencommerce-agentcard-web src/components); the structure from agentcard.sh /about",
+  "exports": [
+    "AboutPage"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/about-page",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/about-page.md",
+  "examples": [
+    {
+      "path": "examples/about-page.tsx",
+      "content": "import { AboutPage } from \"@/components/blocks/about-page\";\n\nexport function Block() {\n  return <AboutPage />;\n}\n",
+      "exports": [
+        "Block"
+      ],
+      "requires": [
+        "about-page"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Block",
+          "url": "https://opencommerce-ds.vercel.app/preview/about-page/Block"
+        }
+      ]
+    }
+  ],
+  "type": "block",
+  "title": "About page",
+  "description": "About page template with the header, the page's opening, team directories and the footer.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "page-header",
+    "section",
+    "site-footer",
+    "site-header",
+    "team-directory"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/blocks/about-page.tsx",
+      "content": "import { PageHeader } from \"@/components/site/page-header\";\nimport { Eyebrow } from \"@/components/site/section\";\nimport { SiteFooter } from \"@/components/site/site-footer\";\nimport { SiteHeader } from \"@/components/site/site-header\";\nimport { TeamDirectory } from \"@/components/site/team-directory\";\n\n// An about page in the home page's voice: the glass header, the page's opening on the 800px column, the team and the\n// investors in directory windows, and the footer with its outlined wordmark. Sample people; replace them with your own.\n\nconst SIGNUP = \"https://app.agentcard.sh\";\n\nconst LINKS = [\n  { label: \"Home\", href: \"/\" },\n  { label: \"About\", href: \"/about\", current: true },\n  { label: \"Pricing\", href: \"/pricing\" },\n  { label: \"Docs\", href: \"https://docs.agentcard.sh\" },\n];\n\nconst FOOTER = [\n  { title: \"Product\", links: [{ label: \"Features\", href: \"/#features\" }, { label: \"Monitoring\", href: \"/#monitoring\" }, { label: \"Pricing\", href: \"/pricing\" }] },\n  { title: \"Developers\", links: [{ label: \"Docs\", href: \"https://docs.agentcard.sh\" }, { label: \"SDK\", href: \"https://www.npmjs.com/package/@agentcard/sdk\" }] },\n  { title: \"Company\", links: [{ label: \"About\", href: \"/about\" }, { label: \"Agentcard\", href: \"https://agentcard.sh\" }] },\n];\n\nfunction Initials({ name }: { name: string }) {\n  const letters = name\n    .split(\" \")\n    .map((w) => w[0])\n    .join(\"\")\n    .slice(0, 2);\n  return (\n    <span role=\"img\" aria-label={`Photo of ${name}`} className=\"flex items-center justify-center bg-tint font-display text-body-sm text-fg-brand\">\n      {letters}\n    </span>\n  );\n}\n\nconst person = (name: string, role: string) => ({ name, role, photo: <Initials name={name} /> });\n\nexport function AboutPage() {\n  return (\n    <div className=\"bg-surface text-fg\">\n      <SiteHeader href=\"/\" links={LINKS} spy={false} action={{ label: \"Get started\", href: SIGNUP }} />\n      <main>\n        <PageHeader eyebrow=\"The company\" title=\"About\" lead=\"We are building opencommerce so an agent can buy from any store on the web through one endpoint, the way a person would.\" />\n        <div className=\"mx-auto grid w-(--ds-frame-column) max-w-(--ds-layout-medium) gap-16 pt-16 pb-18 md:pb-30\">\n          <section aria-label=\"Team\">\n            <Eyebrow className=\"mb-3.5\">Team</Eyebrow>\n            <TeamDirectory name=\"team.dir\" columns={2} people={[person(\"Ada Okafor\", \"CEO & Co-Founder\"), person(\"Luis Romero\", \"CTO & Co-Founder\"), person(\"Mara Lindqvist\", \"Member of Technical Staff\"), person(\"Noor Haddad\", \"Member of Marketing Staff\")]} />\n          </section>\n          <section aria-label=\"Investors\">\n            <Eyebrow className=\"mb-3.5\">Investors</Eyebrow>\n            <TeamDirectory\n              name=\"investors.dir\"\n              columns={3}\n              people={[person(\"Priya Raman\", \"Co-founder, a fund\"), person(\"Tom Becker\", \"CEO, a commerce platform\"), person(\"Elena Ruiz\", \"CTO, a CRM\"), person(\"Sam Wu\", \"CEO, an auth company\"), person(\"Jonas Berg\", \"CEO, a cloud\"), person(\"Ines Duarte\", \"Board, an AI lab\")]}\n            />\n          </section>\n        </div>\n      </main>\n      <SiteFooter description=\"The open router for commerce. Buy from any online store from a single endpoint.\" legal={<span>© 2026 Agentcard, Inc.</span>} groups={FOOTER} />\n    </div>\n  );\n}\n"
+    }
+  ]
+}

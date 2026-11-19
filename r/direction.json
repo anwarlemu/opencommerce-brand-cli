@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "name": "direction",
+  "useFor": "Wrap a right-to-left region (Arabic or Hebrew content) in DirectionProvider with dir=\"rtl\", and set dir on the element too, so menus, sliders and tabs flip.",
+  "constraints": [
+    "Mirroring a layout with CSS alone",
+    "Mixing directions inside one form"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (no visible part)",
+  "exports": [
+    "DirectionProvider",
+    "useDirection"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/direction",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/direction.md",
+  "examples": [
+    {
+      "path": "examples/direction.tsx",
+      "content": "\"use client\";\n\nimport { DirectionProvider } from \"@/components/ui/direction\";\nimport { Slider } from \"@/components/ui/slider\";\nimport { ToggleGroup, ToggleGroupItem } from \"@/components/ui/toggle-group\";\n\nexport function Site() {\n  return (\n    <DirectionProvider dir=\"rtl\">\n      <div dir=\"rtl\" className=\"grid max-w-110 gap-4 font-sans text-body-sm text-fg\">\n        <p>الطلبات</p>\n        <ToggleGroup type=\"single\" defaultValue=\"live\" aria-label=\"الحالة\">\n          <ToggleGroupItem value=\"live\">مباشر</ToggleGroupItem>\n          <ToggleGroupItem value=\"failed\">فشل</ToggleGroupItem>\n          <ToggleGroupItem value=\"all\">الكل</ToggleGroupItem>\n        </ToggleGroup>\n        <Slider defaultValue={[30]} aria-label=\"الميزانية\" />\n      </div>\n    </DirectionProvider>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "direction",
+        "slider",
+        "toggle-group"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/direction/Site"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Direction",
+  "description": "Sets left-to-right or right-to-left reading for every component inside it.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme"
+  ],
+  "packages": [
+    "@radix-ui/react-direction"
+  ],
+  "files": [
+    {
+      "path": "components/ui/direction.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as DirectionPrimitive from \"@radix-ui/react-direction\";\n\n// Sets the reading direction (ltr or rtl) for every Radix-based component inside it, so menus, sliders and tabs flip\n// for right-to-left text. It renders nothing of its own; set dir on the element you wrap too.\nfunction DirectionProvider({ dir, direction, children }: React.ComponentProps<typeof DirectionPrimitive.DirectionProvider> & { direction?: React.ComponentProps<typeof DirectionPrimitive.DirectionProvider>[\"dir\"] }) {\n  return <DirectionPrimitive.DirectionProvider dir={direction ?? dir}>{children}</DirectionPrimitive.DirectionProvider>;\n}\n\nconst useDirection = DirectionPrimitive.useDirection;\n\nexport { DirectionProvider, useDirection };\n"
+    }
+  ]
+}

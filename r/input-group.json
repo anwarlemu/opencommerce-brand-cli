@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "name": "input-group",
+  "useFor": "Use when something belongs inside the field: a search mark, a unit or domain (segment), a copy or clear key, a count. Put InputGroupInput or InputGroupTextarea inside InputGroup and InputGroupAddon at either end (inline-start, inline-end) or above or below a textarea (block-start, block-end).",
+  "constraints": [
+    "A second border around the inner control",
+    "A glow on focus",
+    "Addons that are not clickable but look like keys"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (the input, the search field and the merchant filter in monitoring.live)",
+  "exports": [
+    "InputGroup",
+    "InputGroupAddon",
+    "InputGroupButton",
+    "InputGroupInput",
+    "InputGroupText",
+    "InputGroupTextarea"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/input-group",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/input-group.md",
+  "examples": [
+    {
+      "path": "examples/input-group.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { Check, Copy, Search, X } from \"lucide-react\";\n\nimport { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGroupText, InputGroupTextarea } from \"@/components/ui/input-group\";\nimport { Label } from \"@/components/ui/label\";\n\nexport function Site() {\n  const [query, setQuery] = React.useState(\"\");\n  return (\n    <div className=\"grid w-full max-w-100 gap-4\">\n      <InputGroup>\n        <InputGroupAddon>\n          <Search strokeWidth={1.5} />\n        </InputGroupAddon>\n        <InputGroupInput type=\"search\" placeholder=\"Filter merchants...\" value={query} onChange={(e) => setQuery(e.target.value)} aria-label=\"Filter merchants\" />\n        {query && (\n          <InputGroupAddon align=\"inline-end\">\n            <InputGroupButton size=\"icon-xs\" aria-label=\"Clear\" onClick={() => setQuery(\"\")}>\n              <X />\n            </InputGroupButton>\n          </InputGroupAddon>\n        )}\n      </InputGroup>\n      <div className=\"grid gap-1.5\">\n        <Label htmlFor=\"store-domain\">Store domain</Label>\n        <InputGroup>\n          <InputGroupAddon variant=\"segment\">https://</InputGroupAddon>\n          <InputGroupInput id=\"store-domain\" placeholder=\"acme\" />\n          <InputGroupAddon variant=\"segment\" align=\"inline-end\">\n            .myshopify.com\n          </InputGroupAddon>\n        </InputGroup>\n      </div>\n    </div>\n  );\n}\n\nexport function WithButton() {\n  const [copied, setCopied] = React.useState(false);\n  return (\n    <div className=\"grid w-full max-w-100 gap-4\">\n      <InputGroup>\n        <InputGroupInput readOnly value=\"oc_live_7f3k2v9m1q\" aria-label=\"API key\" className=\"font-mono\" />\n        <InputGroupAddon align=\"inline-end\">\n          <InputGroupButton size=\"xs\" onClick={() => setCopied(true)}>\n            {copied ? <Check /> : <Copy />}\n            {copied ? \"Copied\" : \"Copy\"}\n          </InputGroupButton>\n        </InputGroupAddon>\n      </InputGroup>\n      <InputGroup>\n        <InputGroupAddon>\n          <InputGroupText>$</InputGroupText>\n        </InputGroupAddon>\n        <InputGroupInput inputMode=\"decimal\" placeholder=\"0.00\" aria-label=\"Budget\" />\n        <InputGroupAddon align=\"inline-end\">\n          <InputGroupText className=\"font-mono text-caption\">USD</InputGroupText>\n        </InputGroupAddon>\n      </InputGroup>\n    </div>\n  );\n}\n\nexport function Textarea() {\n  const [note, setNote] = React.useState(\"\");\n  return (\n    <InputGroup className=\"max-w-110\">\n      <InputGroupTextarea placeholder=\"Tell the agent what to buy...\" value={note} onChange={(e) => setNote(e.target.value)} aria-label=\"Instructions\" />\n      <InputGroupAddon align=\"block-end\" className=\"justify-between\">\n        <InputGroupText className=\"font-mono text-caption\">{note.length}/500</InputGroupText>\n        <InputGroupButton variant=\"primary\" size=\"sm\" disabled={!note}>\n          Send\n        </InputGroupButton>\n      </InputGroupAddon>\n    </InputGroup>\n  );\n}\n\nexport function States() {\n  return (\n    <div className=\"grid w-full max-w-100 gap-3\">\n      <InputGroup>\n        <InputGroupInput defaultValue=\"not-a-domain\" aria-invalid aria-label=\"Webhook URL\" />\n        <InputGroupAddon align=\"inline-end\">\n          <X className=\"text-danger\" strokeWidth={1.75} />\n        </InputGroupAddon>\n      </InputGroup>\n      <InputGroup>\n        <InputGroupInput disabled placeholder=\"Disabled\" aria-label=\"Disabled\" />\n      </InputGroup>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "WithButton",
+        "Textarea",
+        "States"
+      ],
+      "requires": [
+        "input-group",
+        "label"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/input-group/Site"
+        },
+        {
+          "name": "WithButton",
+          "url": "https://opencommerce-ds.vercel.app/preview/input-group/WithButton"
+        },
+        {
+          "name": "Textarea",
+          "url": "https://opencommerce-ds.vercel.app/preview/input-group/Textarea"
+        },
+        {
+          "name": "States",
+          "url": "https://opencommerce-ds.vercel.app/preview/input-group/States"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Input Group",
+  "description": "The brand's field with glyphs, text, keys or a mist mono segment inside its edge.",
+  "surface": "site",
+  "kinds": [
+    "input"
+  ],
+  "requires": [
+    "theme",
+    "button",
+    "utils"
+  ],
+  "packages": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/input-group.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { cn } from \"@/lib/utils\";\n\n// The brand's field with things inside it (extrapolated from the input, the search field and the merchant filter): the\n// field's 36px, 8px corners and 16 percent ink edge around a borderless control, with addons at either end: a muted\n// glyph or text, a small ghost key, or a `segment`, the mist strip with a hairline divider and the platform mono (a\n// unit, a scheme, `.myshopify.com`). The whole group takes the blue edge on focus and the red edge when invalid, with\n// no glow. Addons can also sit above or below a textarea (block-start, block-end).\nfunction InputGroup({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"input-group\"\n      role=\"group\"\n      className={cn(\n        \"group/input-group relative flex h-9 w-full min-w-0 items-center overflow-hidden rounded-control border border-hairline bg-surface transition-[border-color] duration-160 ease-out hover:border-line-field-hover motion-reduce:transition-none\",\n        \"has-[[data-slot=input-group-control]:focus-visible]:border-line-brand\",\n        \"has-[[data-slot][aria-invalid=true]]:border-danger\",\n        \"has-[[data-slot=input-group-control]:read-only]:bg-subtle has-[[data-slot=input-group-control]:disabled]:opacity-50\",\n        \"has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col has-[>textarea]:h-auto\",\n        \"has-[>[data-align=inline-start]]:[&>input]:pl-2 has-[>[data-align=inline-end]]:[&>input]:pr-2 has-[>[data-align=block-start]]:[&>textarea]:pt-1 has-[>[data-align=block-end]]:[&>textarea]:pb-1\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nconst inputGroupAddonVariants = cva(\n  \"flex h-auto shrink-0 cursor-text items-center justify-center gap-2 font-sans text-body-sm leading-body text-fg-muted select-none group-has-[[data-slot=input-group-control]:disabled]/input-group:cursor-not-allowed [&>kbd]:rounded-sm [&>svg:not([class*='size-'])]:size-3.75\",\n  {\n    variants: {\n      align: {\n        \"inline-start\": \"order-first pl-3 has-[>button]:pl-1\",\n        \"inline-end\": \"order-last pr-3 has-[>button]:pr-1\",\n        \"block-start\": \"order-first w-full justify-start px-3 pt-2\",\n        \"block-end\": \"order-last w-full justify-start px-3 pb-2\",\n      },\n      variant: {\n        plain: \"\",\n        segment: \"self-stretch border-line bg-subtle px-3 font-mono text-caption\",\n      },\n    },\n    compoundVariants: [\n      { variant: \"segment\", align: \"inline-end\", className: \"border-l pr-3\" },\n      { variant: \"segment\", align: \"inline-start\", className: \"border-r pl-3\" },\n    ],\n    defaultVariants: { align: \"inline-start\", variant: \"plain\" },\n  },\n);\n\nfunction InputGroupAddon({ className, align = \"inline-start\", variant = \"plain\", ...props }: React.ComponentProps<\"div\"> & VariantProps<typeof inputGroupAddonVariants>) {\n  return (\n    <div\n      role=\"group\"\n      data-slot=\"input-group-addon\"\n      data-align={align}\n      data-variant={variant}\n      className={cn(inputGroupAddonVariants({ align, variant }), className)}\n      onClick={(e) => {\n        // A click on the addon (not on a button in it) focuses the control, as a click inside a field would.\n        if ((e.target as HTMLElement).closest(\"button\")) return;\n        e.currentTarget.parentElement?.querySelector<HTMLElement>(\"input, textarea\")?.focus();\n      }}\n      {...props}\n    />\n  );\n}\n\nconst inputGroupButtonVariants = cva(\"\", {\n  variants: {\n    size: {\n      xs: \"h-6.5 gap-1 rounded-sm px-2 text-caption [&>svg:not([class*='size-'])]:size-3.5\",\n      sm: \"h-7 gap-1.5 rounded-sm px-2.5 text-body-sm\",\n      \"icon-xs\": \"size-6.5 rounded-sm p-0 [&>svg:not([class*='size-'])]:size-3.5\",\n      \"icon-sm\": \"size-7 rounded-sm p-0 [&>svg:not([class*='size-'])]:size-4\",\n    },\n  },\n  defaultVariants: { size: \"xs\" },\n});\n\nfunction InputGroupButton({ className, type = \"button\", variant = \"ghost\", size = \"xs\", ...props }: Omit<React.ComponentProps<typeof Button>, \"size\"> & VariantProps<typeof inputGroupButtonVariants>) {\n  return <Button type={type} data-size={size} variant={variant} className={cn(inputGroupButtonVariants({ size }), className)} {...props} />;\n}\n\nfunction InputGroupText({ className, ...props }: React.ComponentProps<\"span\">) {\n  return <span className={cn(\"flex items-center gap-2 font-sans text-body-sm leading-body text-fg-muted [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-3.75\", className)} {...props} />;\n}\n\nfunction InputGroupInput({ className, ...props }: React.ComponentProps<\"input\">) {\n  return (\n    <input\n      data-slot=\"input-group-control\"\n      className={cn(\n        \"h-full min-w-0 flex-1 bg-transparent px-3 font-sans text-body-sm leading-body text-fg outline-none placeholder:text-fg-faint read-only:text-fg-muted disabled:cursor-not-allowed [&::-webkit-search-cancel-button]:hidden\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nfunction InputGroupTextarea({ className, ...props }: React.ComponentProps<\"textarea\">) {\n  return (\n    <textarea\n      data-slot=\"input-group-control\"\n      className={cn(\n        \"field-sizing-content flex min-h-16 w-full min-w-0 flex-1 resize-none bg-transparent px-3 py-2 font-sans text-body-sm leading-body text-fg outline-none placeholder:text-fg-faint read-only:text-fg-muted disabled:cursor-not-allowed\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nexport { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput, InputGroupText, InputGroupTextarea };\n"
+    }
+  ]
+}

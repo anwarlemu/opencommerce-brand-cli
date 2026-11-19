@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "name": "breadcrumb",
+  "useFor": "Use on pages two or more levels deep (Orders, then an order, then a refund). Link every ancestor and end with BreadcrumbPage. For a long trail, fold the middle into a BreadcrumbEllipsis that opens a dropdown of the hidden steps.",
+  "constraints": [
+    "A breadcrumb on a top-level page",
+    "The current page as a link",
+    "Breadcrumbs as the only navigation"
+  ],
+  "documentation": "",
+  "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-link)",
+  "exports": [
+    "Breadcrumb",
+    "BreadcrumbEllipsis",
+    "BreadcrumbItem",
+    "BreadcrumbLink",
+    "BreadcrumbList",
+    "BreadcrumbPage",
+    "BreadcrumbSeparator"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/breadcrumb",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/breadcrumb.md",
+  "examples": [
+    {
+      "path": "examples/breadcrumb.tsx",
+      "content": "\"use client\";\n\nimport { ChevronDown, Slash } from \"lucide-react\";\n\nimport { Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from \"@/components/ui/breadcrumb\";\nimport { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from \"@/components/ui/dropdown-menu\";\n\nexport function Site() {\n  return (\n    <Breadcrumb>\n      <BreadcrumbList>\n        <BreadcrumbItem>\n          <BreadcrumbLink href=\"#orders\">Orders</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbLink href=\"#order\">ord_8KQ2</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbPage>Refund</BreadcrumbPage>\n        </BreadcrumbItem>\n      </BreadcrumbList>\n    </Breadcrumb>\n  );\n}\n\nexport function Collapsed() {\n  return (\n    <Breadcrumb>\n      <BreadcrumbList>\n        <BreadcrumbItem>\n          <BreadcrumbLink href=\"#docs\">Docs</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <DropdownMenu modal={false}>\n            <DropdownMenuTrigger className=\"flex items-center gap-1 rounded-chip outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-focus-ring\" aria-label=\"Show hidden steps\">\n              <BreadcrumbEllipsis />\n            </DropdownMenuTrigger>\n            <DropdownMenuContent align=\"start\">\n              <DropdownMenuItem asChild>\n                <a href=\"#api\">API reference</a>\n              </DropdownMenuItem>\n              <DropdownMenuItem asChild>\n                <a href=\"#checkout\">Checkout</a>\n              </DropdownMenuItem>\n            </DropdownMenuContent>\n          </DropdownMenu>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbLink href=\"#errors\">Errors</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator />\n        <BreadcrumbItem>\n          <BreadcrumbPage>card_declined</BreadcrumbPage>\n        </BreadcrumbItem>\n      </BreadcrumbList>\n    </Breadcrumb>\n  );\n}\n\nexport function CustomSeparator() {\n  return (\n    <Breadcrumb>\n      <BreadcrumbList>\n        <BreadcrumbItem>\n          <BreadcrumbLink href=\"#merchants\">Merchants</BreadcrumbLink>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator>\n          <Slash strokeWidth={1.5} />\n        </BreadcrumbSeparator>\n        <BreadcrumbItem>\n          <DropdownMenu modal={false}>\n            <DropdownMenuTrigger className=\"flex items-center gap-1 rounded-chip text-fg-muted outline-none hover:text-fg focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-focus-ring\">\n              Northwind Outfitters\n              <ChevronDown strokeWidth={1.5} className=\"size-3.5\" />\n            </DropdownMenuTrigger>\n            <DropdownMenuContent align=\"start\">\n              <DropdownMenuItem>Northwind Outfitters</DropdownMenuItem>\n              <DropdownMenuItem>Contoso Coffee</DropdownMenuItem>\n              <DropdownMenuItem>Fabrikam Home</DropdownMenuItem>\n            </DropdownMenuContent>\n          </DropdownMenu>\n        </BreadcrumbItem>\n        <BreadcrumbSeparator>\n          <Slash strokeWidth={1.5} />\n        </BreadcrumbSeparator>\n        <BreadcrumbItem>\n          <BreadcrumbPage>Checkout settings</BreadcrumbPage>\n        </BreadcrumbItem>\n      </BreadcrumbList>\n    </Breadcrumb>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Collapsed",
+        "CustomSeparator"
+      ],
+      "requires": [
+        "breadcrumb",
+        "dropdown-menu"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/breadcrumb/Site"
+        },
+        {
+          "name": "Collapsed",
+          "url": "https://opencommerce-ds.vercel.app/preview/breadcrumb/Collapsed"
+        },
+        {
+          "name": "CustomSeparator",
+          "url": "https://opencommerce-ds.vercel.app/preview/breadcrumb/CustomSeparator"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Breadcrumb",
+  "description": "Where a page sits: muted ancestors, the page in ink, faint chevrons between them.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-slot",
+    "lucide-react"
+  ],
+  "files": [
+    {
+      "path": "components/ui/breadcrumb.tsx",
+      "content": "import * as React from \"react\";\nimport { Slot } from \"@radix-ui/react-slot\";\nimport { ChevronRight, MoreHorizontal } from \"lucide-react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// Where a page sits, drawn from the docs' trail and the header's links: 14px Inter, ancestors at 64 percent ink that\n// turn ink under the pointer (150ms, color only), the current page in ink, separated by a faint 14px chevron. A long\n// trail folds its middle into an ellipsis that can open a menu of the hidden steps.\nfunction Breadcrumb(props: React.ComponentProps<\"nav\">) {\n  return <nav data-slot=\"breadcrumb\" aria-label=\"Breadcrumb\" {...props} />;\n}\n\nfunction BreadcrumbList({ className, ...props }: React.ComponentProps<\"ol\">) {\n  return <ol data-slot=\"breadcrumb-list\" className={cn(\"flex flex-wrap items-center gap-1.5 font-sans text-body-sm leading-snug break-words text-fg-muted sm:gap-2\", className)} {...props} />;\n}\n\nfunction BreadcrumbItem({ className, ...props }: React.ComponentProps<\"li\">) {\n  return <li data-slot=\"breadcrumb-item\" className={cn(\"inline-flex items-center gap-1.5\", className)} {...props} />;\n}\n\nfunction BreadcrumbLink({ asChild, className, ...props }: React.ComponentProps<\"a\"> & { asChild?: boolean }) {\n  const Comp = asChild ? Slot : \"a\";\n  return (\n    <Comp\n      data-slot=\"breadcrumb-link\"\n      className={cn(\"rounded-chip text-fg-muted no-underline outline-none transition-colors duration-150 ease-out hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring motion-reduce:transition-none\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction BreadcrumbPage({ className, ...props }: React.ComponentProps<\"span\">) {\n  return <span data-slot=\"breadcrumb-page\" role=\"link\" aria-disabled=\"true\" aria-current=\"page\" className={cn(\"text-fg\", className)} {...props} />;\n}\n\nfunction BreadcrumbSeparator({ children, className, ...props }: React.ComponentProps<\"li\">) {\n  return (\n    <li data-slot=\"breadcrumb-separator\" role=\"presentation\" aria-hidden=\"true\" className={cn(\"text-fg-faint [&>svg]:size-3.5\", className)} {...props}>\n      {children ?? <ChevronRight strokeWidth={1.5} />}\n    </li>\n  );\n}\n\nfunction BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<\"span\">) {\n  return (\n    <span data-slot=\"breadcrumb-ellipsis\" role=\"presentation\" aria-hidden=\"true\" className={cn(\"flex size-6 items-center justify-center [&>svg]:size-4\", className)} {...props}>\n      <MoreHorizontal strokeWidth={1.5} />\n      <span className=\"sr-only\">More</span>\n    </span>\n  );\n}\n\nexport { Breadcrumb, BreadcrumbEllipsis, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator };\n"
+    }
+  ]
+}

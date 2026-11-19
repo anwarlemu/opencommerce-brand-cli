@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "avatar",
+  "useFor": "Use beside a person’s name or role. Provide alt text on AvatarImage. Use size=\"lg\" for larger profiles.",
+  "constraints": [
+    "Round avatars",
+    "Colored rings for status",
+    "Overlapping avatar stacks"
+  ],
+  "documentation": "",
+  "source": "Extension from opencommerce-agentcard-web src/components/monitoring.tsx (the merchant logo tile)",
+  "exports": [
+    "Avatar",
+    "AvatarFallback",
+    "AvatarImage"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/avatar",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/avatar.md",
+  "examples": [
+    {
+      "path": "examples/avatar.tsx",
+      "content": "import { Avatar, AvatarFallback } from \"@/components/ui/avatar\";\nimport { Window } from \"@/components/ui/window\";\n\nconst FOUNDERS = [\n  { name: \"Ada Park\", role: \"CEO & Co-Founder\", initials: \"AP\" },\n  { name: \"Jonah Reyes\", role: \"CTO & Co-Founder\", initials: \"JR\" },\n];\n\nconst ANGELS = [\n  { name: \"Mia Chen\", role: \"Founder, Ledgerline\", initials: \"MC\" },\n  { name: \"Sam Okafor\", role: \"Partner, North Fund\", initials: \"SO\" },\n  { name: \"Lena Ruiz\", role: \"Angel investor\", initials: \"LR\" },\n];\n\nfunction Person({ person, size }: { person: { name: string; role: string; initials: string }; size?: \"md\" | \"lg\" }) {\n  return (\n    <li className=\"flex items-center gap-3.5 p-4\">\n      <Avatar size={size}>\n        <AvatarFallback>{person.initials}</AvatarFallback>\n      </Avatar>\n      <span className=\"grid min-w-0 gap-1\">\n        <b className=\"font-display text-body leading-snug font-medium\">{person.name}</b>\n        <span className=\"font-display text-micro [letter-spacing:0.04em] text-fg-muted\">{person.role}</span>\n      </span>\n    </li>\n  );\n}\n\nexport function Site() {\n  return (\n    <div className=\"grid w-full max-w-170 gap-6\">\n      <Window name=\"team.dir\" tone=\"blue\">\n        <ul className=\"grid gap-px bg-line sm:grid-cols-2 [&>li]:bg-surface\">\n          {FOUNDERS.map((person) => (\n            <Person key={person.name} person={person} size=\"lg\" />\n          ))}\n        </ul>\n      </Window>\n      <Window name=\"angels.dir\">\n        <ul className=\"grid gap-px bg-line sm:grid-cols-3 [&>li]:bg-surface\">\n          {ANGELS.map((person) => (\n            <Person key={person.name} person={person} />\n          ))}\n        </ul>\n      </Window>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "avatar",
+        "window"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/avatar/Site"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Avatar",
+  "description": "A square photo or store mark with 6px corners and an initials fallback.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-avatar"
+  ],
+  "files": [
+    {
+      "path": "components/ui/avatar.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as AvatarPrimitive from \"@radix-ui/react-avatar\";\n\nimport { cn } from \"@/lib/utils\";\n\n// A person or a store: a square with 6px corners on the 9 percent ink edge (the merchant tiles' shape), 40px in a list,\n// 64px (`lg`) for the people a page leads with. Until the photo loads, or without one, their initials in the display\n// face, blue on the pale blue.\nconst SIZES = { md: \"size-10 text-caption\", lg: \"size-16 text-body\" } as const;\n\nfunction Avatar({ className, size = \"md\", ...props }: React.ComponentProps<typeof AvatarPrimitive.Root> & { size?: keyof typeof SIZES }) {\n  return <AvatarPrimitive.Root data-slot=\"avatar\" className={cn(\"relative flex shrink-0 overflow-hidden rounded-card border border-line\", SIZES[size], className)} {...props} />;\n}\n\nfunction AvatarImage({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Image>) {\n  return <AvatarPrimitive.Image data-slot=\"avatar-image\" className={cn(\"aspect-square size-full object-cover\", className)} {...props} />;\n}\n\nfunction AvatarFallback({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {\n  return <AvatarPrimitive.Fallback data-slot=\"avatar-fallback\" className={cn(\"flex size-full items-center justify-center bg-blue-5 font-display leading-none text-fg-brand\", className)} {...props} />;\n}\n\nexport { Avatar, AvatarFallback, AvatarImage };\n"
+    }
+  ]
+}

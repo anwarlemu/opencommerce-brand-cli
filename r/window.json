@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "name": "window",
+  "useFor": "Use for the things a page shows off: code (agent.ts), plans (free.plan), a live table (monitoring.live), a feature's picture. Name the bar like a file. Use dark for code that runs.",
+  "constraints": [
+    "A window bar on every card of a page",
+    "Colored or blue bars on the page's main windows",
+    "Rounded corners other than 12px",
+    "A heavy or offset shadow"
+  ],
+  "documentation": "`Window` takes `name` (the bar's file name), `actions` (replaces the [*], for a Copy key), `dark` (the body on ink, for\ncode that runs), `raised` (the firmer drop of a small card set on a picture), `tone` and `bodyClassName`. The bar is\nmist with the name in the 11.5px platform mono at 64 percent ink, a dimmed arrow at the left and the drawn [*] in blue\nat the right. `tone` keeps other bars for special cases: `sky`, `blue` and five pale tints. `WindowBar` and\n`WindowMark` are exported for bars on other surfaces (a dialog, a command menu).",
+  "source": "opencommerce-agentcard-web src/app/globals.css (.win, .win-bar, .win-mark), src/components/window.tsx",
+  "exports": [
+    "Window",
+    "WindowBar",
+    "WindowMark",
+    "windowBarVariants"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/window",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/window.md",
+  "examples": [
+    {
+      "path": "examples/window.tsx",
+      "content": "import { Window } from \"@/components/ui/window\";\n\nexport function Site() {\n  return (\n    <div className=\"grid gap-5 sm:grid-cols-2 sm:gap-6\">\n      <Window name=\"free.plan\" bodyClassName=\"grid gap-3 p-6\">\n        <h3 className=\"font-display text-h4 leading-snug font-medium tracking-tight\">Free</h3>\n        <p className=\"flex items-baseline gap-2\">\n          <span className=\"font-display text-h2 leading-tight font-medium tracking-hero\">$0</span>\n          <span className=\"text-body-sm text-fg-muted\">while you build</span>\n        </p>\n        <p className=\"text-body-sm leading-relaxed text-fg-muted\">Everything you need to wire up your agent and make its first purchases.</p>\n      </Window>\n      <Window name=\"monitoring.live\" bodyClassName=\"grid gap-2 p-6\">\n        <p className=\"flex items-center gap-2 text-body-sm text-fg-muted\">\n          <span aria-hidden className=\"size-2 rounded-pill bg-brand\" />\n          Live\n        </p>\n        <p className=\"text-body-sm leading-relaxed text-fg-muted\">Every route is exercised around the clock.</p>\n      </Window>\n      <Window name=\"step-1.ts\" dark className=\"sm:col-span-2\" bodyClassName=\"px-6 py-4 font-mono text-snippet leading-code\">\n        <span className=\"text-fg-code-key\">npm install</span> <span className=\"text-fg-code-string\">@agentcard/sdk</span>\n      </Window>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "window"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/window/Site"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Window",
+  "description": "A white card with a quiet title bar: file name centered, the [*] mark or an action at the right.",
+  "surface": "site",
+  "kinds": [
+    "window",
+    "window-bar",
+    "card"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/window.tsx",
+      "content": "import * as React from \"react\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The brand's window (globals.css .win, .win-bar, .win-mark; computed): a plain white card on a 16 percent ink edge with\n// 12px corners and the soft drop, under a quiet 36px title bar. The bar is mist (ink at 2.5 percent) over a 9 percent\n// rule, set in the 11.5px platform mono at 64 percent ink: a dimmed arrow at the left, the file name centered, and the\n// drawn [*] in blue at the right (or an action, such as Copy). `dark` puts the body on ink for code that runs. The other\n// tones are kept for pages that need them: `sky` (a sky bar with blue marks), `blue` (white marks on the blue, for the\n// one window that matters) and five pale tints for a grid of apps.\nconst windowBarVariants = cva(\n  \"grid min-h-9 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b pr-3 pl-3.5 font-mono text-bar leading-body\",\n  {\n    variants: {\n      tone: {\n        mist: \"border-line bg-window-bar text-fg-muted\",\n        sky: \"border-line bg-sky text-fg-brand\",\n        blue: \"border-line-brand-edge bg-brand text-on-brand\",\n        sage: \"border-line bg-tint-sage text-fg\",\n        rose: \"border-line bg-tint-rose text-fg\",\n        teal: \"border-line bg-tint-teal text-fg\",\n        peach: \"border-line bg-tint-peach text-fg\",\n        butter: \"border-line bg-tint-butter text-fg\",\n      },\n    },\n    defaultVariants: { tone: \"mist\" },\n  },\n);\n\ntype Tone = NonNullable<VariantProps<typeof windowBarVariants>[\"tone\"]>;\n\n/** The [*] mark at the right of a window bar: an asterisk drawn in three strokes between brackets, in the bar's blue. */\nfunction WindowMark({ className }: { className?: string }) {\n  return (\n    <span aria-hidden className={cn(\"inline-flex items-center gap-px text-caption leading-none text-window-bar-fg\", className)}>\n      [\n      <svg viewBox=\"0 0 12 12\" className=\"size-[0.8em] fill-none stroke-current [stroke-linecap:square] [stroke-width:1.6]\">\n        <path d=\"M6 .5v11M1.24 3.25l9.52 5.5M1.24 8.75l9.52-5.5\" />\n      </svg>\n      ]\n    </span>\n  );\n}\n\nfunction WindowBar({ name, tone, actions, className, ...props }: Omit<React.ComponentProps<\"div\">, \"children\"> & { name: React.ReactNode; tone?: Tone; actions?: React.ReactNode }) {\n  const onColor = tone === \"blue\" || tone === \"sky\";\n  return (\n    <div data-slot=\"window-bar\" className={cn(windowBarVariants({ tone }), className)} {...props}>\n      <span aria-hidden className=\"justify-self-start opacity-60\">\n        ↳\n      </span>\n      <span className=\"min-w-0 truncate text-center\">{name}</span>\n      <span className=\"flex min-w-0 items-center justify-self-end\">{actions ?? <WindowMark className={onColor ? \"text-current\" : undefined} />}</span>\n    </div>\n  );\n}\n\n/**\n * A window: the bar, then its body. `name` is the bar's file name (agent.ts, standard.plan); `tone` its bar; `dark`\n * puts the body on ink (code that runs); `actions` replaces the [*] (a Copy key). `raised` gives the firmer drop of a\n * card set on a picture.\n */\nfunction Window({ name, tone, actions, raised = false, dark = false, className, bodyClassName, children, ...props }: React.ComponentProps<\"div\"> & { name: React.ReactNode; tone?: Tone; actions?: React.ReactNode; raised?: boolean; dark?: boolean; bodyClassName?: string }) {\n  return (\n    <div\n      data-slot=\"window\"\n      className={cn(\"flex flex-col overflow-hidden rounded-panel border border-line-window bg-surface text-fg\", raised ? \"shadow-raised\" : \"shadow-card\", className)}\n      {...props}\n    >\n      <WindowBar name={name} tone={tone} actions={actions} />\n      <div className={cn(\"min-h-0 flex-1\", dark ? \"bg-code text-fg-code\" : \"bg-surface\", bodyClassName)}>{children}</div>\n    </div>\n  );\n}\n\nexport { Window, WindowBar, WindowMark, windowBarVariants };\n"
+    }
+  ]
+}

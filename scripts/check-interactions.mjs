@@ -266,6 +266,15 @@ export async function checkInteractions(page, base) {
   await demo.getByRole('button', { name: 'View card' }).click();
   await demo.getByRole('status').filter({ hasText: 'Travel agent · Active' }).waitFor();
 
+  // The header lights only the page you are on: none on a page outside its links (legal, 404).
+  for (const [component, lit] of [['legal-page', null], ['not-found-page', null], ['features-page', 'Features'], ['pricing-page', 'Pricing']]) {
+    await page.goto(`${base}/preview/${component}/Block`);
+    await page.locator('[data-preview-ready]').waitFor();
+    const current = page.locator('[data-slot="nav-dock"] a[aria-current]');
+    assert.equal(await current.count(), lit ? 1 : 0, `${component}: lit links`);
+    if (lit) assert.equal((await current.innerText()).trim(), lit, `${component}: lit link`);
+    assert.equal(await page.locator('[data-slot="nav-dock"] [aria-hidden] > div').count(), lit ? 1 : 0, `${component}: pill`);
+  }
   // Exercise a real click through the sandbox without contacting the external service.
   demo = await open('site-header');
   const action = demo.getByRole('link', { name: 'Get started' }).first();

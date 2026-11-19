@@ -12,7 +12,8 @@ import { cn } from "@/lib/utils";
 // piece and nothing is laid out again. The copy is decoration: hidden from readers, never focused or clicked.
 //
 // With `spy` (the default), the pill follows the section you are reading: the last linked section whose top has passed
-// under the header. Links that leave the page never take the pill. Without `spy`, the link marked `current` takes it.
+// under the header. Links that leave the page never take the pill. Without `spy`, the link marked `current` takes it,
+// and with none marked no pill shows.
 // The glass is its own layer behind the links: a backdrop blur that holds moving content rebuilds every frame.
 
 type DockLink = { label: string; href: string; current?: boolean };
@@ -35,7 +36,9 @@ type NavDockProps = Omit<React.ComponentProps<"nav">, "children"> & {
 };
 
 function NavDock({ links, spy = true, spyLine = 120, label = "Main", className, ...props }: NavDockProps) {
-  const initial = links.find((l) => l.current)?.href ?? links[0]?.href ?? "";
+  // Spying, the page starts at its first section. Not spying, only a link marked current is lit: a page that is none
+  // of the links (a legal page, a 404) lights none.
+  const initial = links.find((l) => l.current)?.href ?? (spy ? (links[0]?.href ?? "") : "");
   const [active, setActive] = React.useState(initial);
   const [pill, setPill] = React.useState<{ x: number; w: number; tray: number } | null>(null);
   const tray = React.useRef<HTMLDivElement>(null);

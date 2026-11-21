@@ -9,3 +9,5 @@ use_for: "Use in a tool where people work for a long time and expect desktop men
 never: [A menubar as site navigation (use navigation menu), More than five menus, Menus with a single item]
 source: "Extension from opencommerce-agentcard-web src/app/globals.css (.btn-secondary, .nav-tray) and dropdown-menu.tsx"
 ---
+
+Rows scroll inside the panel when it runs out of room and fade at an edge with more past them (fade-y); the panel keeps its drop.

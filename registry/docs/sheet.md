@@ -9,3 +9,5 @@ use_for: "Use for item details, activity logs or longer forms. Choose right, lef
 never: [Sheets for a quick confirmation (use a dialog), Full-screen sheets on desktop, Two sheets at once]
 source: "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar)"
 ---
+
+SheetBody scrolls and fades at an edge with more past it (fade-y).

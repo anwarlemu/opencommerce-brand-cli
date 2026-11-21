@@ -145,7 +145,7 @@ function CodeWindow({ title, code, children, language, copy = false, dark = fals
       <pre
         tabIndex={0}
         className={cn(
-          "m-0 min-h-0 flex-1 overflow-auto px-3 py-4 font-mono text-snippet leading-code outline-none [tab-size:2] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring",
+          "m-0 min-h-0 flex-1 overflow-auto fade-y px-3 py-4 font-mono text-snippet leading-code outline-none [tab-size:2] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring",
           dark ? "bg-code text-fg-code" : "bg-surface text-fg",
           preClassName,
         )}

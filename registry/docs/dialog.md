@@ -9,3 +9,5 @@ use_for: "Use for a short form or confirmation. Provide a title and description.
 never: [Dialogs for long reading, A dialog opened from another dialog, Sliding in from an edge (use a sheet)]
 source: "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar, .win-mark)"
 ---
+
+A long body scrolls under the window bar and fades at an edge with more past it (fade-y).

@@ -9,3 +9,5 @@ use_for: "Use on phones for a short task or a choice that belongs to the page un
 never: [A drawer on desktop for a long form (use a sheet or dialog), Content that needs the full height of the screen, A drawer opened from another drawer]
 source: "Extension from opencommerce-agentcard-web src/app/globals.css (.win) and sheet.tsx"
 ---
+
+The content scrolls and fades at an edge with more past it (fade-y).

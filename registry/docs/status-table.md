@@ -13,3 +13,5 @@ source: "opencommerce-agentcard-web src/components/monitoring.tsx"
 `StatusTable` props: `rows` ({ name, logo, values, days }[]), `columns` ({ label, mono, muted }[]), `name` (the
 window's name, default "monitoring.live"), `nameLabel`, `daysLabel`, `live`, `filterLabel`, `filterPlaceholder`,
 `note`, plus div props. `days` is "up" | "degraded" | "down", oldest first. On a phone each row stacks.
+
+The wide table scrolls sideways and fades at the side with more past it (fade-x).

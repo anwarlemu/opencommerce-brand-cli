@@ -13,7 +13,9 @@ import { cn } from "@/lib/utils";
 // ink edge, a soft drop, rows that wash when highlighted with no transition. A menu grows from its trigger (scale 0.97
 // and a fade, 160ms ease-out) and closes at once. Reduced motion keeps the fade.
 const PANEL =
-  "z-50 flex max-h-(--radix-menubar-content-available-height) max-w-(--radix-menubar-content-available-width) origin-(--radix-menubar-content-transform-origin) animate-pop-in flex-col gap-0.5 overflow-y-auto overscroll-contain rounded-control border border-line bg-surface p-1 text-fg shadow-floating outline-none motion-reduce:animate-none";
+  "z-50 flex max-h-(--radix-menubar-content-available-height) max-w-(--radix-menubar-content-available-width) origin-(--radix-menubar-content-transform-origin) animate-pop-in flex-col overflow-hidden rounded-control border border-line bg-surface text-fg shadow-floating outline-none motion-reduce:animate-none";
+// The rows scroll inside the panel (so its drop stays) and fade at an edge with more past it.
+const LIST = "flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain fade-y p-1";
 const ROW =
   "relative flex w-full cursor-default items-center gap-2 rounded-menu px-2.5 py-2 font-sans text-body-sm leading-snug text-fg-muted outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-40 data-[highlighted]:bg-wash-hover data-[highlighted]:text-fg data-[inset]:pl-8 [&_svg]:size-3.5 [&_svg]:shrink-0";
 const DANGER = "text-danger data-[highlighted]:bg-danger/6 data-[highlighted]:text-danger";
@@ -56,7 +58,7 @@ function MenubarTrigger({ className, ...props }: React.ComponentProps<typeof Men
   );
 }
 
-function MenubarContent({ className, align = "start", alignOffset = -4, sideOffset = 8, collisionPadding = 8, ...props }: React.ComponentProps<typeof MenubarPrimitive.Content>) {
+function MenubarContent({ className, align = "start", alignOffset = -4, sideOffset = 8, collisionPadding = 8, children, ...props }: React.ComponentProps<typeof MenubarPrimitive.Content>) {
   return (
     <MenubarPortal>
       <MenubarPrimitive.Content
@@ -67,7 +69,9 @@ function MenubarContent({ className, align = "start", alignOffset = -4, sideOffs
         collisionPadding={collisionPadding}
         className={cn(PANEL, "min-w-[min(12rem,var(--radix-menubar-content-available-width))]", className)}
         {...props}
-      />
+      >
+        <div data-slot="menubar-list" className={LIST}>{children}</div>
+      </MenubarPrimitive.Content>
     </MenubarPortal>
   );
 }
@@ -119,10 +123,12 @@ function MenubarSubTrigger({ className, inset, children, ...props }: React.Compo
   );
 }
 
-function MenubarSubContent({ className, collisionPadding = 8, ...props }: React.ComponentProps<typeof MenubarPrimitive.SubContent>) {
+function MenubarSubContent({ className, collisionPadding = 8, children, ...props }: React.ComponentProps<typeof MenubarPrimitive.SubContent>) {
   return (
     <MenubarPortal>
-      <MenubarPrimitive.SubContent data-slot="menubar-sub-content" collisionPadding={collisionPadding} className={cn(PANEL, "min-w-[min(10rem,var(--radix-menubar-content-available-width))]", className)} {...props} />
+      <MenubarPrimitive.SubContent data-slot="menubar-sub-content" collisionPadding={collisionPadding} className={cn(PANEL, "min-w-[min(10rem,var(--radix-menubar-content-available-width))]", className)} {...props}>
+        <div data-slot="menubar-list" className={LIST}>{children}</div>
+      </MenubarPrimitive.SubContent>
     </MenubarPortal>
   );
 }

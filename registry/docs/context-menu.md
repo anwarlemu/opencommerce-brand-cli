@@ -9,3 +9,5 @@ use_for: "Use for shortcuts on an item in a list or table (copy an order ID, ret
 never: [The only way to reach an action, More than one level of submenu, A context menu on text people want to select]
 source: "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-tray) and dropdown-menu.tsx"
 ---
+
+Rows scroll inside the panel when it runs out of room and fade at an edge with more past them (fade-y); the panel keeps its drop.

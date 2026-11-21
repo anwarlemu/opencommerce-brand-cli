@@ -8,3 +8,5 @@ use_for: "Use to hold a conversation that grows: MessageScroller with MessageScr
 never: [Scrolling the page instead of the conversation, Sliding the jump key in, Auto-scrolling while the reader is reading older messages]
 source: "Extrapolated from opencommerce (the secondary key and floating drop)"
 ---
+
+The thread fades at an edge with more past it (fade-y).

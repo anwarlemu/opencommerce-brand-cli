@@ -143,7 +143,10 @@ export async function checkOverlays(page, base) {
   await page.getByRole('button', { name: 'Card actions' }).click();
   const menu = page.getByRole('menu');
   await fits(menu);
-  assert.ok(await menu.evaluate(el => el.scrollHeight > el.clientHeight), 'A menu scrolls when its content exceeds a short viewport');
+  // The rows scroll inside the panel (which keeps its drop) and fade at the edge with more past them.
+  const rows = menu.locator('[data-slot="dropdown-menu-list"]');
+  assert.ok(await rows.evaluate(el => el.scrollHeight > el.clientHeight), 'A menu scrolls when its content exceeds a short viewport');
+  assert.equal(await rows.evaluate(el => getComputedStyle(el).getPropertyValue('--fade-end').trim()), '24px', 'A scrolling menu fades at the bottom');
   await page.getByRole('menuitem', { name: 'Close card Hold 2s' }).scrollIntoViewIfNeeded();
   await page.locator('body').press('Escape');
   console.log('PASS: long menu content remains reachable in a short viewport.');

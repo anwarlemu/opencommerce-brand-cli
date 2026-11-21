@@ -66,7 +66,7 @@ function Marquee({ items, label, duration = 100, className, ...props }: MarqueeP
       onPointerLeave={play}
       className={cn(
         "w-full text-[color-mix(in_srgb,var(--ds-color-ink)_45%,transparent)] [mask-image:linear-gradient(to_right,transparent,var(--ds-color-ink)_14%,var(--ds-color-ink)_86%,transparent)]",
-        reduce ? "overflow-x-auto" : "overflow-hidden",
+        reduce ? "overflow-x-auto fade-x" : "overflow-hidden",
         className,
       )}
       {...props}

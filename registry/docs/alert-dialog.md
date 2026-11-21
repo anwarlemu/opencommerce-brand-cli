@@ -9,3 +9,5 @@ use_for: "Use to confirm an action that is hard to undo (cancel an order, revoke
 never: [A confirmation for an action that can be undone, A close mark (it must be answered), Vague actions such as OK and Yes, Two destructive actions in one dialog]
 source: "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar) and dialog.tsx"
 ---
+
+A long body scrolls under the window bar and fades at an edge with more past it (fade-y).

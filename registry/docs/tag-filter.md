@@ -9,3 +9,5 @@ use_for: "Connect onAddTag and onRemoveTag to the filter state, then apply those
 never: [Filters that hide which tags are on, Colored tags per category]
 source: "Extension from opencommerce-agentcard-web src/components/pricing.tsx (the plan chip), monitoring.tsx (#merchant-filter)"
 ---
+
+The tag list fades at an edge with more past it (fade-y).

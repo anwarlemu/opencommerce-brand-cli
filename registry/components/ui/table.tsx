@@ -5,19 +5,15 @@ import { cn } from "@/lib/utils";
 // The brand's table (monitoring.tsx, the live merchant table; computed): a white frame with 12px corners on the 16
 // percent ink edge and the window's soft drop; the head's labels in 12px Inter at 64 percent ink, normal weight, on a 9
 // percent rule; 14px Inter rows, each on a 9 percent rule, that take the mist under the pointer (160ms). Figures read best
-// in the mono (font-mono and the 13px code size on the cell). It scrolls sideways inside its frame when too wide, never the page. On a
+// in the mono (font-mono and the 13px code size on the cell). It scrolls sideways inside its frame when too wide, never the page, and fades at an edge with more past it. On a
 // phone (below 640px) each row stacks: the first cell as its title, then each other cell under its column's name (pass
 // `label` to TableCell), the head kept for screen readers.
 function Table({ className, label = "Table", ...props }: React.ComponentProps<"table"> & { label?: string }) {
   return (
-    <div
-      data-slot="table-container"
-      role="region"
-      aria-label={label}
-      tabIndex={0}
-      className="relative w-full overflow-x-auto rounded-panel border border-line-window bg-surface shadow-card outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring"
-    >
-      <table data-slot="table" className={cn("w-full caption-bottom border-collapse text-left text-body-sm leading-normal text-fg max-sm:block", className)} {...props} />
+    <div data-slot="table-frame" className="relative w-full overflow-hidden rounded-panel border border-line-window bg-surface shadow-card has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-solid has-focus-visible:outline-focus-ring">
+      <div data-slot="table-container" role="region" aria-label={label} tabIndex={0} className="w-full overflow-x-auto fade-x outline-none">
+        <table data-slot="table" className={cn("w-full caption-bottom border-collapse text-left text-body-sm leading-normal text-fg max-sm:block", className)} {...props} />
+      </div>
     </div>
   );
 }

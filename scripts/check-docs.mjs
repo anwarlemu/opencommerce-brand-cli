@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { chromium } from 'playwright-core';
 import { checkOverlays } from './check-overlays.mjs';
 import { checkInteractions } from './check-interactions.mjs';
+import { checkFades } from './check-fades.mjs';
 
 const base = process.env.DOCS_URL ?? 'http://localhost:4645';
 const browser = await chromium.launch();
@@ -102,6 +103,7 @@ try {
   assert.equal(await page.getByRole('button', { name: 'Open the library' }).getAttribute('aria-expanded'), 'false');
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   console.log('PASS: the mobile rail closes after choosing an item, without horizontal overflow.');
+  await checkFades(page, base);
   await checkOverlays(page, base);
   await checkInteractions(page, base);
   assert.deepEqual(errors, [], 'Browser errors');

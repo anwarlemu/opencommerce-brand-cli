@@ -9,3 +9,5 @@ never: [A combobox for under seven options (use Select), Animating the highlight
 source: "Extrapolated from opencommerce (the select field and the command palette)"
 kinds: [input]
 ---
+
+The list fades at an edge with more past it (fade-y), so no row is cut off under the input.

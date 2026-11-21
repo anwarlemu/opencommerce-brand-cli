@@ -56,7 +56,7 @@ function AlertDialogContent({
         {...props}
       >
         <WindowBar name={name} />
-        <div className="grid min-h-0 gap-5 overflow-y-auto p-6">{children}</div>
+        <div className="grid min-h-0 gap-5 overflow-y-auto fade-y p-6">{children}</div>
       </AlertDialogPrimitive.Content>
     </AlertDialogPortal>
   );

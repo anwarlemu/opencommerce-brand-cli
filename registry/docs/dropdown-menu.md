@@ -9,3 +9,5 @@ use_for: "Use for actions on an item or a compact navigation menu. Set variant=\
 never: [Menus for navigation that should be visible, More than one level of submenu, A destructive row that fires on one click]
 source: "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-tray, .nav-link)"
 ---
+
+Rows scroll inside the panel when it runs out of room and fade at an edge with more past them (fade-y); the panel keeps its drop.

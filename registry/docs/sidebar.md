@@ -9,3 +9,5 @@ use_for: "Use for an app's main navigation (an order console, a developer dashbo
 never: [More than seven top-level rows, Nested rows two levels deep, A sidebar on a marketing page, Icons without labels when expanded]
 source: "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-link, .win)"
 ---
+
+SidebarContent scrolls and fades at an edge with more past it (fade-y), so no item is cut off under the header.

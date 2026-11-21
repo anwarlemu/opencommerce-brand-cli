@@ -17,3 +17,5 @@ height, or `text-caption leading-snug` for a tighter hero card). It also exports
 
 Three voices only: keywords in the blue, strings in the deep blue (sky on ink), comments faint. Long lines wrap and hang
 two columns past their own indent, so the structure still reads on a phone.
+
+The code fades at an edge with more past it when it scrolls (fade-y).

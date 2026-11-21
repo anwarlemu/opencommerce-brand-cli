@@ -9,3 +9,5 @@ use_for: "Use when you need shadcn's composable code block: a header with CodeBl
 never: [A full syntax theme with many colors, Code in a proportional face, A dark bar over light code, Corners other than 12px]
 source: "opencommerce-agentcard-web src/components/code-block.tsx; code-window.tsx (the same window, bar, tokenizer and colors)"
 ---
+
+Wrapped code fades at the top or bottom when it scrolls (fade-y); with wrap={false} long lines fade at the side (fade-x).

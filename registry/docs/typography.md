@@ -9,3 +9,5 @@ use_for: "Use for text a page writes by hand, outside Prose: headings with Typog
 never: [Bold or caps headings, Tracking body text, Headings in Inter]
 source: "opencommerce-agentcard-web src/app/globals.css (h1 to h3, .lead, .mono); prose.tsx"
 ---
+
+TypographyTable scrolls sideways when too wide and fades at the side with more past it (fade-x).

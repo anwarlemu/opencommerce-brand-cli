@@ -125,7 +125,7 @@ function StatusTable({
         {shown.length === 0 && <li className="px-4 py-10 text-center text-body-sm text-fg-muted">{empty}</li>}
       </ul>
 
-      <div className="overflow-x-auto max-md:hidden">
+      <div className="overflow-x-auto fade-x max-md:hidden">
         <table className="w-full min-w-190 border-collapse text-body-sm">
           <thead>
             <tr className="border-b border-line text-left text-caption text-fg-muted">

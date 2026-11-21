@@ -204,7 +204,59 @@ const motion = `@theme {
 	}
 }
 `;
-const themeCss = `${header}@theme inline {\n${theme.join('\n')}\n}\n\n${motion}`;
+// Scroll edges fade, never cut content off: an edge with more content past it fades over 24px. The fade grows with the
+// first and last 24px of scroll (tied to the scroll, not to time, so it has no duration or easing), so a list at rest
+// shows its first row in full and a list that does not scroll has no fade. Browsers without scroll timelines get a short
+// fixed fade. fade-y on a box that scrolls down, fade-x on one that scrolls sideways; mask colors only need to be opaque.
+const fadeMask = (direction) => `mask-image: linear-gradient(to ${direction}, transparent, black var(--fade-start), black calc(100% - var(--fade-end)), transparent);`;
+const fadeUtility = (name, direction, axis) => `@utility ${name} {
+	${fadeMask(direction)}
+
+	@supports (animation-timeline: scroll()) {
+		animation: fade-start linear both, fade-end linear both;
+		animation-range: 0px 24px, calc(100% - 24px) 100%;
+		animation-timeline: scroll(self ${axis}), scroll(self ${axis});
+	}
+
+	@supports not (animation-timeline: scroll()) {
+		--fade-start: 8px;
+		--fade-end: 8px;
+	}
+}
+`;
+const fade = `@property --fade-start {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+}
+
+@property --fade-end {
+	syntax: "<length>";
+	inherits: false;
+	initial-value: 0px;
+}
+
+@keyframes fade-start {
+	from {
+		--fade-start: 0px;
+	}
+	to {
+		--fade-start: 24px;
+	}
+}
+
+@keyframes fade-end {
+	from {
+		--fade-end: 24px;
+	}
+	to {
+		--fade-end: 0px;
+	}
+}
+
+${fadeUtility('fade-y', 'bottom', 'block')}
+${fadeUtility('fade-x', 'right', 'inline')}`;
+const themeCss = `${header}@theme inline {\n${theme.join('\n')}\n}\n\n${motion}\n${fade}`;
 const fonts = `${header}@import url("${brand.fonts.css}");\n`;
 
 mkdirSync(new URL('../build', import.meta.url), { recursive: true });

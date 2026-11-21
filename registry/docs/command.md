@@ -9,3 +9,5 @@ use_for: "Use Command for an inline list and CommandDialog for a palette. Connec
 never: [Animating the palette open, A drop shadow on the panel, Rows without keyboard support, Icons in every row instead of a title and a line]
 source: "Extension from opencommerce-agentcard-web src/app/globals.css (.win, .win-bar, .code)"
 ---
+
+The list fades at an edge with more past it (fade-y), so no row is cut off under the input.

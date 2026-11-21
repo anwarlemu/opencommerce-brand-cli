@@ -9,3 +9,5 @@ never: [A free-text date field without a picker, A picker that stays open after 
 source: "Extrapolated from opencommerce (the select field and the floating panel)"
 kinds: [input]
 ---
+
+The presets fade at an edge with more past them (fade-x on phones, fade-y beside the calendar).

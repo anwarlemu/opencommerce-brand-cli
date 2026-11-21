@@ -9,3 +9,5 @@ use_for: "Use for live records (merchants, routes, orders) or a plan comparison.
 never: [Zebra stripes, Bold or caps headers, Rules between columns, Tables nested in a card (the table is its own frame; inside a Window drop its frame with your own classes)]
 source: "opencommerce-agentcard-web src/components/monitoring.tsx (the merchant table)"
 ---
+
+A wide table scrolls sideways inside its frame and fades at an edge with more past it (fade-x).

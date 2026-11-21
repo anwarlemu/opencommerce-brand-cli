@@ -59,7 +59,7 @@ function TypographyInlineCode({ className, ...props }: React.ComponentProps<"cod
 /** A small table in running text: a mist head on hairlines, 14px rows. */
 function TypographyTable({ className, ...props }: React.ComponentProps<"table">) {
   return (
-    <div className="my-4.5 w-full overflow-x-auto">
+    <div className="my-4.5 w-full overflow-x-auto fade-x">
       <table
         className={cn(
           "w-full border-collapse text-body-sm leading-relaxed [&_td]:border-b [&_td]:border-line [&_td]:px-3 [&_td]:py-2.5 [&_td]:align-top [&_th]:border-b [&_th]:border-line [&_th]:bg-subtle [&_th]:px-3 [&_th]:py-2.5 [&_th]:text-left [&_th]:font-normal [&_th]:text-fg-muted",

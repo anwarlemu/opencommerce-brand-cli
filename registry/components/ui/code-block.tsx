@@ -134,7 +134,7 @@ function CodeBlockContent({ className, children, style, code, language, wrap = t
       className={cn(
         "m-0 min-h-0 min-w-0 flex-1 overflow-auto py-4 font-mono text-snippet leading-code outline-none [scrollbar-width:thin] [tab-size:2] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring group-data-[size=sm]/code-block:py-3",
         dark ? "bg-code text-fg-code" : "bg-surface text-fg",
-        wrap ? "whitespace-pre-wrap [overflow-wrap:anywhere]" : "whitespace-pre",
+        wrap ? "fade-y whitespace-pre-wrap [overflow-wrap:anywhere]" : "fade-x whitespace-pre",
         className,
       )}
       {...props}

@@ -8,3 +8,5 @@ use_for: "Use for files sent with a message or attached to an order: receipts, i
 never: [Thumbnails for every file type, Progress bars inside the card, Red fills for errors]
 source: "Extrapolated from opencommerce (card.tsx small card, the merchant tiles, mono figures)"
 ---
+
+AttachmentGroup fades at the side with more past it (fade-x).

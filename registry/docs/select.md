@@ -13,3 +13,5 @@ source: "Extension from opencommerce-agentcard-web src/components/monitoring.tsx
 The field matches the input: 36px, 8px corners, the 16 percent ink edge, 14px Inter and a drawn chevron. Its menu fits the trigger and viewport and wraps long option labels.
 
 For controlled forms, reset `value` from the form's `onReset` handler. `Field` displays your current error; validation and submitting to a backend belong to the form. A disabled item cannot be chosen. Prefer a segmented control when a small set of choices should remain visible.
+
+Long lists fade at an edge with more past them (fade-y on the viewport).

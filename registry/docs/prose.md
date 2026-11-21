@@ -16,3 +16,5 @@ source: "Extension in the opencommerce site's voice (its type, hairlines, code a
 
 The brand's tables set headers and `strong` in 700 and its h3 in 600; here they are medium (500), as the brand's rules
 say nothing is bold.
+
+Code blocks scroll sideways and fade at the side with more past them (fade-x); Prose wraps each one so its drop stays.

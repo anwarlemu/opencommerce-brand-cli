@@ -30,12 +30,25 @@ const BODY = [
   "[&_td]:border-b [&_td]:border-line [&_td]:px-3 [&_td]:py-2.5 [&_td]:align-top",
   // Code: the pale blue chip inline, ink for blocks.
   "[&_:not(pre)>code]:rounded-chip [&_:not(pre)>code]:bg-tint [&_:not(pre)>code]:px-1.5 [&_:not(pre)>code]:py-px [&_:not(pre)>code]:font-mono [&_:not(pre)>code]:text-snippet [&_:not(pre)>code]:text-fg-brand [&_:not(pre)>code]:[overflow-wrap:anywhere]",
-  "[&_pre]:overflow-x-auto [&_pre]:rounded-panel [&_pre]:bg-code [&_pre]:px-5 [&_pre]:py-4 [&_pre]:font-mono [&_pre]:text-snippet [&_pre]:leading-code [&_pre]:text-fg-code [&_pre]:shadow-code",
+  // A block scrolls sideways and fades at the side with more past it (fade-x); its drop sits on the wrapper Prose adds,
+  // since the fade's mask would hide a shadow on the block itself.
+  "[&_pre]:overflow-x-auto [&_pre]:fade-x [&_pre]:rounded-panel [&_pre]:bg-code [&_pre]:px-5 [&_pre]:py-4 [&_pre]:font-mono [&_pre]:text-snippet [&_pre]:leading-code [&_pre]:text-fg-code",
+  "[&_[data-slot=prose-code]]:rounded-panel [&_[data-slot=prose-code]]:shadow-code",
   // Quotes, rules and figures.
   "[&_blockquote]:border-l-2 [&_blockquote]:border-brand [&_blockquote]:pl-4 [&_blockquote]:text-fg-muted",
   "[&_hr]:my-11 [&_hr]:border-0 [&_hr]:border-t [&_hr]:border-line",
   "[&_img]:h-auto [&_img]:max-w-full [&_figcaption]:mt-2 [&_figcaption]:text-body-sm [&_figcaption]:text-fg-muted",
 ].join(" ");
+
+/** Wraps each code block (a pre, at any depth of plain elements) so its drop survives the fade's mask. */
+function wrapCode(nodes: React.ReactNode): React.ReactNode {
+  return React.Children.map(nodes, (child) => {
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) return child;
+    if (child.type === "pre") return <div data-slot="prose-code">{child}</div>;
+    if (typeof child.type === "string" && child.props.children) return React.cloneElement(child, undefined, wrapCode(child.props.children));
+    return child;
+  });
+}
 
 type ProseProps = React.ComponentProps<"article"> & {
   /** The small label over the title (Legal, Changelog). */
@@ -61,7 +74,7 @@ function Prose({ eyebrow, title, meta, wide = false, className, bodyClassName, c
           {meta ? <p className="mt-3 font-mono text-caption leading-body text-fg-muted">{meta}</p> : null}
         </header>
       ) : null}
-      <div className={cn(BODY, head && "mt-8.5", bodyClassName)}>{children}</div>
+      <div className={cn(BODY, head && "mt-8.5", bodyClassName)}>{wrapCode(children)}</div>
     </article>
   );
 }

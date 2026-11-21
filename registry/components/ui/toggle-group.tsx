@@ -27,7 +27,7 @@ function ToggleGroup({
   children,
   ...props
 }: React.ComponentProps<typeof ToggleGroupPrimitive.Root> & VariantProps<typeof toggleVariants> & { spacing?: number; orientation?: "horizontal" | "vertical" }) {
-  return (
+  const group = (
     <ToggleGroupPrimitive.Root
       data-slot="toggle-group"
       data-variant={variant}
@@ -38,13 +38,20 @@ function ToggleGroup({
       style={{ "--gap": spacing } as React.CSSProperties}
       className={cn(
         "group/toggle-group flex w-fit max-w-full items-center gap-[calc(var(--spacing)*var(--gap))] data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",
-        variant === "default" && "overflow-x-auto rounded-control border border-line-glass bg-glass p-0.75 shadow-glass backdrop-blur-lg backdrop-saturate-140 [scrollbar-width:none]",
-        className,
+        variant === "default" ? "min-w-0 overflow-x-auto fade-x p-0.75 [scrollbar-width:none]" : className,
       )}
       {...props}
     >
       <ToggleGroupContext.Provider value={{ variant, size, spacing, orientation }}>{children}</ToggleGroupContext.Provider>
     </ToggleGroupPrimitive.Root>
+  );
+  if (variant !== "default") return group;
+  // The tray: the glass frame keeps its drop and blur while the keys scroll inside it and fade at an edge with more past
+  // them. className styles the frame.
+  return (
+    <div data-slot="toggle-group-frame" className={cn("flex w-fit max-w-full overflow-hidden rounded-control border border-line-glass bg-glass shadow-glass backdrop-blur-lg backdrop-saturate-140", className)}>
+      {group}
+    </div>
   );
 }
 

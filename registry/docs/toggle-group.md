@@ -9,3 +9,5 @@ never: [A gliding key (choices change instantly), More than six options in the t
 source: "Extrapolated from opencommerce (the header's trays and the segmented control)"
 kinds: [tabs]
 ---
+
+The default tray keeps its glass frame while the keys scroll inside it and fade at the side with more past them (fade-x); className styles the frame.

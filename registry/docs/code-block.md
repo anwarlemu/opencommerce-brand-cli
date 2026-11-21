@@ -10,4 +10,4 @@ never: [A full syntax theme with many colors, Code in a proportional face, A dar
 source: "opencommerce-agentcard-web src/components/code-block.tsx; code-window.tsx (the same window, bar, tokenizer and colors)"
 ---
 
-Wrapped code fades at the top or bottom when it scrolls (fade-y); with wrap={false} long lines fade at the side (fade-x).
+Wrapped code fades at the top or bottom when it scrolls (fade-y); with wrap={false} it can scroll both ways and fades on both axes (fade-xy).

@@ -1,9 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
-import { Doc, glyphField, r2, svgDocument, windowSvg, type FieldOptions, type Picture, type Rect } from '../assets/kit.js';
-import { imageData } from '../assets/layouts.js';
+import { Doc, glyphField, r2, svgDocument, windowSvg, WINDOW, type FieldOptions, type Picture, type Rect } from '../assets/kit.js';
+import type { DrawnLayer } from '../design/types.js';
+import { assertDrawable, cleanText, getFaces, measure } from '../image/fonts.js';
+import { floorFor, imageData, sampleCode } from '../assets/layouts.js';
 import { clamp01, smooth } from '../assets/noise.js';
-import { getFaces } from '../image/fonts.js';
+
 import { paint, type Paint } from '../image/paint.js';
 import { unknownName } from '../lib/names.js';
 import { pkgPath } from '../lib/paths.js';
@@ -208,16 +210,17 @@ export type IllustrateRequest = {
 	height?: number;
 	seed?: number;
 	picture?: Picture;
-	/** Window subject: the bar name and code. */
+	/** Window subject: the bar name and code; `sample` draws the sample code. */
 	label?: string;
 	code?: string;
+	sample?: boolean;
 	/** Seconds into the motion (video): the field drifts, the mark sways. Unset is the still frame. */
 	t?: number;
 	/** Ground: white (default), mist or none (transparent). */
 	ground?: 'white' | 'mist' | 'none';
 };
 
-export type Illustration = { svg: string; width: number; height: number; subject: string; glyphs: number };
+export type Illustration = { layers: DrawnLayer[]; svg: string; width: number; height: number; subject: string; glyphs: number };
 
 function sizeOf(req: IllustrateRequest, s: SubjectDoc) {
 	let width = req.width ?? s.size[0];
@@ -271,15 +274,50 @@ export function illustrate(req: IllustrateRequest): Illustration {
 	const t = req.t ?? 0;
 	const k = Math.sqrt((W * H) / (imageData().unit.width * imageData().unit.height));
 	let body = '';
+	const ink: Rect[] = [];
+	const layers: DrawnLayer[] = [];
 	if (req.subject === 'field') {
-		const o: FieldOptions = { box: { x: 0, y: 0, w: W, h: H }, z: 1.3 * k, seed, t: req.t, fade: (nx, ny) => smooth(clamp01((1 - Math.max(Math.abs(nx), Math.abs(ny))) / 0.35)), keep: [], density: 0.04 };
+		const o: FieldOptions = { box: { x: 0, y: 0, w: W, h: H }, z: 1.3 * k, seed, t: req.t, fade: (nx, ny) => smooth(clamp01((1 - Math.max(Math.abs(nx), Math.abs(ny))) / 0.35)), keep: [], density: 0.04, ink };
 		body = glyphField(doc, o, c);
 	} else if (req.subject === 'window') {
 		const z = 1.3 * k;
-		const win: Rect = { x: W * 0.18, y: H * 0.16, w: W * 0.64, h: H * 0.68 };
-		const field = glyphField(doc, { box: { x: 0, y: 0, w: W, h: H }, z, seed, t: req.t, fade: (nx, ny) => 1 - smooth(clamp01((Math.hypot(nx, ny) - 0.75) / 0.35)), keep: [{ x: win.x - 4 * k, y: win.y - 4 * k, w: win.w + 8 * k, h: win.h + 8 * k }], density: 0.06 }, c);
-		const inner = req.picture ? { kind: 'picture' as const, picture: req.picture } : { kind: 'code' as const, code: req.code ?? imageData().code, highlight: req.code ? '' : '1-5', scale: 1 };
-		body = field + windowSvg(doc, win, req.label ?? (req.picture ? 'picture.png' : 'agent.ts'), inner, z, c);
+		const sampled = !req.picture && !req.code && req.sample;
+		const code = cleanText(req.code ?? (sampled ? sampleCode() : '')).replace(/\t/g, '  ').replace(/\s+$/, '');
+		if (!code && !req.picture) throw new Error('The window subject needs --code or --image: an empty window says nothing (--sample draws sample code).');
+		if (code && req.picture) throw new Error('The window holds --code or --image, not both.');
+		const label = cleanText(req.label ?? '').trim();
+		assertDrawable('code', code);
+		assertDrawable('label', label);
+		const mono = getFaces().mono;
+		const max: Rect = { x: W * 0.12, y: H * 0.12, w: W * 0.76, h: H * 0.76 };
+		const bar = WINDOW.bar * z;
+		let win: Rect;
+		let inner: Parameters<typeof windowSvg>[3];
+		if (req.picture) {
+			const pad = WINDOW.padX * z * 0.6;
+			const sc = Math.min((max.w - pad * 2) / req.picture.width, (max.h - bar - pad * 2) / req.picture.height);
+			const w = req.picture.width * sc + pad * 2;
+			const h = req.picture.height * sc + pad * 2 + bar;
+			win = { x: (W - w) / 2, y: (H - h) / 2, w, h };
+			inner = { kind: 'picture', picture: req.picture, pad };
+		} else {
+			const rows = code.split('\n');
+			const unit = Math.max(1, ...rows.map((row) => measure(mono, row, 1, 0)));
+			const size = Math.min(18 * z, (max.w - WINDOW.padX * 2 * z) / unit, (max.h - bar - WINDOW.padY * 2 * z) / (rows.length * c.leadingCode));
+			if (size < floorFor(W, H)) throw new Error('The code does not fit the window at a readable size. Shorten it or use a larger --size.');
+			const w = Math.max(unit * size + WINDOW.padX * 2 * z, max.w * 0.7);
+			const h = bar + WINDOW.padY * 2 * z + rows.length * size * c.leadingCode;
+			win = { x: (W - w) / 2, y: (H - h) / 2, w, h };
+			inner = { kind: 'code', code, highlight: sampled ? (imageData().templates.hero.sample.highlight ?? '') : '', size };
+		}
+		const ls = Math.max(WINDOW.label * z, Math.min(floorFor(W, H), bar * 0.6));
+		if (label && measure(mono, label, ls, 0) > win.w - 2 * (40 * z + 20 * z)) throw new Error('--label is too long for the window bar. Shorten it.');
+		const field = glyphField(doc, { box: { x: 0, y: 0, w: W, h: H }, z, seed, t: req.t, fade: (nx, ny) => 1 - smooth(clamp01((Math.hypot(nx, ny) - 0.75) / 0.35)), keep: [{ x: win.x - 4 * k, y: win.y - 4 * k, w: win.w + 8 * k, h: win.h + 8 * k }], density: 0.06, ink }, c);
+		body = field + windowSvg(doc, win, label, inner, z, c, { labelSize: ls });
+		layers.push({ id: 'window', kind: 'panel', box: win, can: {} });
+		if (label) layers.push({ id: 'label', kind: 'text', box: { x: win.x + win.w / 2 - measure(mono, label, ls, 0) / 2, y: win.y + (bar - ls) / 2, w: measure(mono, label, ls, 0), h: ls }, over: ['window'], text: { asked: label, drawn: label, size: r2(ls), color: c.secondary, ground: [c.windowBar] }, can: {} });
+		if (inner.kind === 'code') layers.push({ id: 'code', kind: 'text', box: { x: win.x + WINDOW.padX * z, y: win.y + bar + WINDOW.padY * z, w: win.w - WINDOW.padX * 2 * z, h: win.h - bar - WINDOW.padY * 2 * z }, over: ['window'], text: { asked: code, drawn: code, size: r2(inner.size), color: c.secondary, ground: [c.white, c.band], ...(sampled ? { sample: true } : {}) }, can: {} });
+		else layers.push({ id: 'picture', kind: 'picture', box: { x: win.x, y: win.y + bar, w: win.w, h: win.h - bar }, over: ['window'], can: {} });
 	} else if (req.subject === 'mark') {
 		const ry = moving ? D.still.ry + Math.sin(t * 0.25) * 0.34 : D.still.ry;
 		const rx = moving ? D.still.rx + Math.sin(t * 0.19) * 0.06 : D.still.rx;
@@ -297,5 +335,6 @@ export function illustrate(req: IllustrateRequest): Illustration {
 	}
 	const ground = req.ground === 'none' ? null : req.ground === 'mist' ? c.mist : c.white;
 	const svg = svgDocument(doc, W, H, ground, body, { title: `${req.subject} illustration`, desc: s.description });
-	return { svg, width: W, height: H, subject: req.subject, glyphs: (body.match(/<use /g) ?? []).length };
+	layers.unshift({ id: 'art', kind: 'art', box: { x: 0, y: 0, w: W, h: H }, ...(ink.length ? { ink } : {}), bleeds: true, ...(layers.length && !ink.length ? { over: ['window'] } : {}), can: {} });
+	return { svg, layers, width: W, height: H, subject: req.subject, glyphs: (body.match(/<use /g) ?? []).length };
 }

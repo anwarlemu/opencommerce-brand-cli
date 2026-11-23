@@ -29,113 +29,144 @@ export function ratios(font: Font) {
 	return value;
 }
 
-export function measure(font: Font, text: string, size: number, tracking: number) {
-	return font.getAdvanceWidth(text, size, { kerning: true, letterSpacing: tracking });
+/** A face for each run of characters: the asked face where it has them, else the other bundled faces. Copy is drawn
+ *  whole or not at all, so a character no bundled face has is an error (assertDrawable), never an empty box. */
+function runs(font: Font, text: string): { font: Font; text: string }[] {
+	const f = getFaces();
+	const out: { font: Font; text: string }[] = [];
+	for (const ch of text) {
+		const face = has(font, ch) ? font : ([f.sans, f.mono, f.display].find((other) => has(other, ch)) ?? font);
+		const last = out[out.length - 1];
+		if (last && last.font === face) last.text += ch;
+		else out.push({ font: face, text: ch });
+	}
+	return out;
 }
 
+const glyphs = new WeakMap<Font, Map<string, boolean>>();
+function has(font: Font, ch: string) {
+	let known = glyphs.get(font);
+	if (!known) glyphs.set(font, (known = new Map()));
+	let yes = known.get(ch);
+	if (yes === undefined) known.set(ch, (yes = /\s/.test(ch) || font.charToGlyphIndex(ch) > 0));
+	return yes;
+}
+
+/** Copy as it is drawn: composed characters, straight line breaks, no invisible joiners. */
+export const cleanText = (value: string) => value.normalize('NFC').replace(/\r\n?/g, '\n').replace(/[\u200b\u200c\u2060\ufeff\u00ad]/g, '').replace(/\u00a0/g, ' ');
+
+/** The characters in a text that no bundled face can draw. */
+export function undrawable(text: string): string[] {
+	const f = getFaces();
+	const out = new Set<string>();
+	for (const ch of text) {
+		const code = ch.codePointAt(0)!;
+		if (ch === '\n' || ch === '\t') continue;
+		if (code < 32 || (code >= 0x7f && code < 0xa0)) out.add(ch);
+		else if (![f.display, f.sans, f.mono].some((face) => has(face, ch))) out.add(ch);
+	}
+	return [...out];
+}
+
+/** Throws when a slot holds a character the bundled faces lack, naming it. */
+export function assertDrawable(slot: string, text: string) {
+	const bad = undrawable(text);
+	if (!bad.length) return;
+	const shown = bad.slice(0, 6).map((ch) => `${ch.codePointAt(0)! < 32 ? '' : `${ch} `}(U+${ch.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0')})`);
+	throw new Error(`The ${slot} has ${bad.length === 1 ? 'a character' : 'characters'} no bundled face can draw: ${shown.join(', ')}${bad.length > 6 ? ` and ${bad.length - 6} more` : ''}. The faces cover Latin, Greek and Cyrillic, with no emoji. Change the text, or put it in a picture and pass --image.`);
+}
+
+// Advances scale with the size, so each string is measured once at 1000 units and reused at every size the fitting tries.
+const widths = new WeakMap<Font, Map<string, number>>();
+function unitWidth(font: Font, text: string, tracking: number) {
+	let known = widths.get(font);
+	if (!known) widths.set(font, (known = new Map()));
+	const key = `${tracking}|${text}`;
+	let w = known.get(key);
+	if (w === undefined) {
+		w = runs(font, text).reduce((sum, run) => sum + run.font.getAdvanceWidth(run.text, 1000, { kerning: true, letterSpacing: tracking }), 0) / 1000;
+		if (known.size > 20000) known.clear();
+		known.set(key, w);
+	}
+	return w;
+}
+
+export const measure = (font: Font, text: string, size: number, tracking: number) => unitWidth(font, text, tracking) * size;
+
 export function textPath(font: Font, text: string, x: number, baseline: number, size: number, tracking: number, fill: string, opacity = 1) {
-	const d = font.getPath(text, x, baseline, size, { kerning: true, letterSpacing: tracking }).toPathData(2);
+	let at = x;
+	let d = '';
+	const list = runs(font, text);
+	for (const run of list) {
+		d += run.font.getPath(run.text, at, baseline, size, { kerning: true, letterSpacing: tracking }).toPathData(2);
+		if (list.length > 1) at += run.font.getAdvanceWidth(run.text, size, { kerning: true, letterSpacing: tracking });
+	}
 	if (!d) return '';
 	const fade = opacity < 1 ? ` fill-opacity="${opacity.toFixed(3)}"` : '';
 	return `<path fill="${fill}"${fade} d="${d}"/>`;
 }
 
-function wrapParagraph(font: Font, paragraph: string, size: number, maxWidth: number, tracking: number) {
-	const words = paragraph.trim().split(/\s+/).filter(Boolean);
-	const lines: string[] = [];
-	let line = '';
+/** A drawn line. `glued` marks one that continues a word broken from the line before. */
+export type Line = { text: string; glued: boolean };
+
+function greedy(font: Font, paragraph: string, size: number, max: number, tracking: number): Line[] {
+	const out: Line[] = [];
 	const width = (value: string) => measure(font, value, size, tracking);
-	const pushWord = (word: string) => {
-		if (width(word) <= maxWidth) {
-			line = word;
-			return;
-		}
-		let chunk = '';
-		for (const ch of word) {
-			if (chunk && width(chunk + ch) > maxWidth) {
-				lines.push(chunk);
-				chunk = ch;
-			} else chunk += ch;
-		}
-		line = chunk;
-	};
-	for (const word of words) {
+	let line = '';
+	let glued = false;
+	for (const word of paragraph.trim().split(/\s+/).filter(Boolean)) {
 		const trial = line ? `${line} ${word}` : word;
-		if (!line || width(trial) <= maxWidth) line = trial;
-		else {
-			lines.push(line);
-			pushWord(word);
+		if (width(trial) <= max) {
+			line = trial;
+			continue;
+		}
+		if (line) out.push({ text: line, glued });
+		glued = false;
+		line = '';
+		if (width(word) <= max) {
+			line = word;
+			continue;
+		}
+		// A word wider than the line: broken by character, every character kept.
+		for (const ch of word) {
+			if (line && width(line + ch) > max) {
+				out.push({ text: line, glued });
+				line = ch;
+				glued = true;
+			} else line += ch;
 		}
 	}
-	if (line) lines.push(line);
-	return lines;
+	if (line) out.push({ text: line, glued });
+	return out;
 }
 
-/** Greedy wrap that keeps explicit line breaks, then evens two- and three-line blocks. */
-export function wrap(font: Font, text: string, size: number, maxWidth: number, tracking: number) {
-	const parts = text.replace(/\r\n/g, '\n').split('\n');
-	const explicit = parts.length > 1;
-	const lines = parts.flatMap((part) => (part.trim() ? wrapParagraph(font, part, size, maxWidth, tracking) : []));
-	if (explicit || lines.length < 2 || lines.length > 3) return lines;
-	const words = lines.join(' ').split(' ');
-	const width = (value: string) => measure(font, value, size, tracking);
-	let best = lines;
-	let bestScore = Math.max(...lines.map(width)) - Math.min(...lines.map(width));
-	const consider = (candidate: string[]) => {
-		if (candidate.some((line) => width(line) > maxWidth + 0.5)) return;
-		const widths = candidate.map(width);
-		const score = Math.max(...widths) - Math.min(...widths);
-		if (score < bestScore) {
-			bestScore = score;
-			best = candidate;
+/** Wraps text to a width, keeping typed line breaks. `even` narrows the measure while the line count holds, so the last
+ *  line is not left with one word. */
+export function wrapLines(font: Font, value: string, size: number, max: number, tracking: number, even = false): Line[] {
+	return value.split('\n').flatMap((part) => {
+		if (!part.trim()) return [];
+		const lines = greedy(font, part, size, max, tracking);
+		if (!even || lines.length < 2 || lines.length > 6 || lines.some((l) => l.glued)) return lines;
+		let lo = max / 2;
+		let hi = max;
+		let best = lines;
+		for (let i = 0; i < 9; i++) {
+			const mid = (lo + hi) / 2;
+			const trial = greedy(font, part, size, mid, tracking);
+			if (trial.length === lines.length && !trial.some((l) => l.glued)) {
+				best = trial;
+				hi = mid;
+			} else lo = mid;
 		}
-	};
-	if (lines.length === 2) {
-		for (let i = 1; i < words.length; i++) consider([words.slice(0, i).join(' '), words.slice(i).join(' ')]);
-	} else {
-		for (let i = 1; i < words.length - 1; i++) for (let j = i + 1; j < words.length; j++) consider([words.slice(0, i).join(' '), words.slice(i, j).join(' '), words.slice(j).join(' ')]);
-	}
-	return best;
+		return best;
+	});
 }
+
+/** The text the lines say, with broken words whole again. */
+export const joinLines = (lines: Line[]) => lines.reduce((all, line, i) => (i === 0 ? line.text : line.glued ? all + line.text : `${all} ${line.text}`), '');
 
 export function blockHeight(font: Font, lineCount: number, size: number, leading: number) {
 	if (lineCount <= 0) return 0;
 	const { cap, desc } = ratios(font);
 	return cap * size + Math.max(0, lineCount - 1) * size * leading + desc * size;
-}
-
-export type Fitted = { lines: string[]; size: number; tracking: number; height: number };
-
-export function fitText(font: Font, text: string, maxWidth: number, start: number, min: number, maxLines: number, leading: number, trackingAt: (size: number) => number): Fitted {
-	const source = text.trim();
-	for (let size = start; size >= min; size -= 2) {
-		const tracking = trackingAt(size);
-		const lines = wrap(font, source, size, maxWidth, tracking);
-		if (lines.length > maxLines) continue;
-		if (lines.some((line) => measure(font, line, size, tracking) > maxWidth + 1)) continue;
-		return { lines, size, tracking, height: blockHeight(font, lines.length, size, leading) };
-	}
-	const tracking = trackingAt(min);
-	const all = wrap(font, source, min, maxWidth, tracking);
-	const lines = all.slice(0, maxLines);
-	const last = lines[lines.length - 1] ?? '';
-	if (all.length > maxLines && last && !last.endsWith('...')) {
-		let cut = last;
-		while (cut.length > 1 && measure(font, `${cut}...`, min, tracking) > maxWidth) cut = cut.slice(0, -1).trimEnd();
-		lines[lines.length - 1] = `${cut}...`;
-	}
-	return { lines, size: min, tracking, height: blockHeight(font, lines.length, min, leading) };
-}
-
-export function drawLines(font: Font, fitted: Fitted, leading: number, fill: string, centerX: number, top: number) {
-	const { cap } = ratios(font);
-	let baseline = top + cap * fitted.size;
-	const parts: string[] = [];
-	for (const line of fitted.lines) {
-		const width = measure(font, line, fitted.size, fitted.tracking);
-		const x = Math.round((centerX - width / 2) * 100) / 100;
-		parts.push(textPath(font, line, x, Math.round(baseline * 100) / 100, fitted.size, fitted.tracking, fill));
-		baseline += fitted.size * leading;
-	}
-	return parts.join('');
 }

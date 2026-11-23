@@ -8,20 +8,25 @@ function options(command: Command) {
 	command
 		.option('--template <name>', 'hero, window, closing, cards, field, mark, orbit, social, announcement or product')
 		.option('--size <size>', 'square, vertical or landscape')
-		.option('--title <text>', 'headline')
-		.option('--text <text>', 'supporting line, or the copy inside a product window')
-		.option('--label <text>', 'short label, or the file name in a window bar')
+		.option('--headline <text>', 'headline')
+		.option('--body <text>', 'supporting line, or the copy inside a product window')
+		.option('--badge <text>', 'the line above the headline')
+		.option('--title <text>', 'the same as --headline')
+		.option('--text <text>', 'the same as --body')
+		.option('--chip <text>', 'the same as --badge')
+		.option('--label <text>', 'the name in a window bar (or the line above a headline)')
 		.option('--action <text>', 'label of the blue key (announcement, hero, window, closing)')
 		.option('--secondary <text>', 'label of the white key (hero, window, closing)')
-		.option('--chip <text>', 'the chip above the headline (hero, window, closing)')
-		.option('--code <text>', 'code in the window (hero, window); \\n for a line break')
+		.option('--code <text>', 'code in the window (hero, window, product); \\n for a line break')
 		.option('--cards <text>', 'cards: cards separated by a blank line, heading first')
 		.option('--footer <text>', 'cards: the address in the footer')
+		.option('--sample', 'fill the slots you leave out with sample copy; without it, only your copy is drawn')
 		.option('--seed <n>', 'glyph field seed')
 		.option('--content <file>', 'JSON object with the copy slots; flags override it')
 		.option('--format <format>', 'mp4 (default) or webm; or give --out a .webm name')
 		.option('--still <seconds>', 'write one PNG frame at this time instead of a clip')
-		.option('--ground <ground>', 'white (default) or mist')
+		.option('--theme <theme>', 'the ground: white (default) or mist')
+		.option('--ground <ground>', 'the same as --theme')
 		.option('--out <path>', 'an .mp4, .webm or (with --still) .png file, or a directory (default: .ds/videos)')
 		.option('--json', 'JSON output');
 }
@@ -29,8 +34,11 @@ function options(command: Command) {
 export function videoCommands(program: Command) {
 	const video = program.command('video').description('Render a short on-brand video. Pass --template and --size.');
 	options(video);
-	video.action((_opts, command: Command) => {
+	video.argument('[template]', 'the template, the same as --template');
+	video.action((named: string | undefined, _opts, command: Command) => {
 		const opts = command.optsWithGlobals() as VideoInput & { json?: boolean; still?: string };
+		if (named && opts.template && named !== opts.template) throw new Error(`Two templates: ${named} and --template ${opts.template}. Pass one.`);
+		if (named) opts.template = named;
 		if (opts.still !== undefined) {
 			const still = renderStill(opts, Number(opts.still));
 			emit({ json: opts.json }, { ok: true, ...still }, () => `Wrote ${still.files[0].path}  ${still.width}x${still.height}  frame ${still.frame} at ${still.seconds.toFixed(2)}s (${still.template}, ${still.size}).`);
@@ -42,7 +50,7 @@ export function videoCommands(program: Command) {
 			return `Wrote ${file.path}  ${result.width}x${result.height}  ${result.frames} frames at ${result.fps} fps (${result.template}, ${result.size}).`;
 		});
 	});
-	video.addHelpText('after', `\nExamples:\n  ${cli()} video templates --json\n  ${cli()} video --template social --size square --title "..." --text "..." --out clip.mp4 --json\n  ${cli()} video --template announcement --size vertical --title "..." --action "Get started" --json\n  ${cli()} video --template product --size landscape --label order.ts --text "..." --json\n  ${cli()} video --template hero --size landscape --title "..." --text "..." --out hero.webm\n  ${cli()} video --template mark --size square --still 2 --out mark.png\n`);
+	video.addHelpText('after', `\nExamples:\n  ${cli()} video templates --json\n  ${cli()} video --template social --size square --headline "..." --body "..." --out clip.mp4 --json\n  ${cli()} video --template announcement --size vertical --headline "..." --action "Get started" --json\n  ${cli()} video --template product --size landscape --label order.ts --code "..." --json\n  ${cli()} video --template hero --size landscape --headline "..." --body "..." --out hero.webm\n  ${cli()} video --template mark --size square --still 2 --out mark.png\n`);
 	video
 		.command('templates')
 		.description('List video templates, sizes and the renderer')

@@ -31,14 +31,16 @@ describe('image layouts from the brand tool', () => {
 		const dir = mkdtempSync(join(tmpdir(), 'ds-layouts-'));
 		try {
 			for (const template of ['hero', 'window', 'closing', 'cards']) {
-				const r = renderImages({ template, preset: 'all', format: 'both', out: dir });
-				expect(r.files).toHaveLength(Object.keys(PRESETS).length * 2);
+				const r = renderImages({ template, preset: 'all', format: 'both', sample: true, out: dir });
+				// Every size but the profile picture, less the ones too small for the sample, which are named.
+				expect(r.files.length + r.skipped.length * 2).toBe((Object.keys(PRESETS).length - 1) * 2);
+				for (const s of r.skipped) expect(s.reason).toMatch(/Shorten the (code|cards)/);
 				for (const f of r.files.filter((x) => x.format === 'png')) expect(pngSize(readFileSync(f.path.startsWith('/') ? f.path : join(process.cwd(), f.path)))).toEqual({ width: f.width, height: f.height });
 				const svg = readFileSync(join(dir, `og-${template}.svg`), 'utf8');
 				expect(svg).not.toContain('font-family');
 				expect(svg).toContain('<path');
 			}
-			const custom = renderImages({ template: 'hero', preset: '1600x900', out: join(dir, 'c.png') });
+			const custom = renderImages({ template: 'hero', sample: true, preset: '1600x900', out: join(dir, 'c.png') });
 			expect(custom.files[0]).toMatchObject({ width: 1600, height: 900 });
 		} finally {
 			rmSync(dir, { recursive: true, force: true });
@@ -48,9 +50,9 @@ describe('image layouts from the brand tool', () => {
 	it('is deterministic per seed, and the seed changes the field', () => {
 		const dir = mkdtempSync(join(tmpdir(), 'ds-seed-'));
 		try {
-			const a = renderImages({ template: 'hero', preset: 'og', seed: 7, out: join(dir, 'a.png') });
-			const b = renderImages({ template: 'hero', preset: 'og', seed: 7, out: join(dir, 'b.png') });
-			const c = renderImages({ template: 'hero', preset: 'og', seed: 8, out: join(dir, 'c.png') });
+			const a = renderImages({ template: 'hero', sample: true, preset: 'og', seed: 7, out: join(dir, 'a.png') });
+			const b = renderImages({ template: 'hero', sample: true, preset: 'og', seed: 7, out: join(dir, 'b.png') });
+			const c = renderImages({ template: 'hero', sample: true, preset: 'og', seed: 8, out: join(dir, 'c.png') });
 			expect(sha(readFileSync(join(dir, 'a.png')))).toBe(sha(readFileSync(join(dir, 'b.png'))));
 			expect(sha(readFileSync(join(dir, 'a.png')))).not.toBe(sha(readFileSync(join(dir, 'c.png'))));
 			expect(a.files[0].bytes).toBe(b.files[0].bytes);
@@ -71,7 +73,7 @@ describe('image layouts from the brand tool', () => {
 			expect(renderImages({ content, preset: 'square', out: join(dir, 'cards.png') }).template).toBe('cards');
 			const closing = renderImages({ template: 'closing', preset: 'og', title: 'Give your agent a checkout', action: 'Get started', secondary: 'Read the docs', format: 'svg', out: join(dir, 'k.svg') });
 			expect(readFileSync(closing.files[0].path.startsWith('/') ? closing.files[0].path : join(process.cwd(), closing.files[0].path), 'utf8')).toContain('Get started');
-			expect(() => renderImages({ template: 'cards', preset: 'og', title: 'x', cards: 'a', chip: 'no' })).toThrow(/does not take --chip/);
+			expect(() => renderImages({ template: 'cards', preset: 'og', title: 'x', cards: 'a', chip: 'no' })).toThrow(/does not take --badge/);
 			expect(() => renderImages({ template: 'headline', title: 'x', code: 'y' })).toThrow(/does not take --code/);
 		} finally {
 			rmSync(dir, { recursive: true, force: true });
@@ -83,9 +85,12 @@ describe('deck', () => {
 	it('draws every slide type at 1920x1080 and writes one PDF page per slide', { timeout: 120000 }, () => {
 		const dir = mkdtempSync(join(tmpdir(), 'ds-deck-'));
 		try {
-			for (const type of slideTypes()) expect(slideSvg({ type })).toContain('viewBox="0 0 1');
+			const shot = renderImages({ template: 'headline', title: 'Shot', preset: 'square', out: join(dir, 'a shot.png') }).files[0].path;
+			const of = (type: string) => (type === 'image' ? { type, title: 'Watch it buy', image: 'a shot.png' } : { type, sample: true });
+			for (const type of slideTypes()) expect(slideSvg(type === 'image' ? { type, title: 'Watch it buy', picture: loadImage(shot) } : { type, sample: true })).toContain('viewBox="0 0 1920 1080"');
+			for (const type of slideTypes()) expect(() => slideSvg({ type })).toThrow(/needs/);
 			const input = join(dir, 'deck.json');
-			writeFileSync(input, JSON.stringify({ slides: slideTypes().map((type) => ({ type })) }));
+			writeFileSync(input, JSON.stringify({ slides: slideTypes().map(of) }));
 			const out = JSON.parse(run(['deck', '--input', input, '--out', join(dir, 'out'), '--json']));
 			const pngs = out.files.filter((f: { format: string }) => f.format === 'png');
 			expect(pngs).toHaveLength(slideTypes().length);
@@ -111,7 +116,7 @@ describe('merch', () => {
 	it('writes each item at its physical size with bleed, logos inside the safe area', { timeout: 120000 }, () => {
 		for (const item of merchItems()) {
 			for (const variant of item.variants) {
-				const r = renderItem(item, { variant, dpi: 72 });
+				const r = renderItem(item, { variant, dpi: 72, sample: true });
 				expect(r.widthIn).toBe(item.size[0] + 2 * item.bleed);
 				expect(r.svg).toContain(`width="${r.widthIn}in"`);
 				expect(pngSize(r.png!)).toEqual({ width: Math.round(r.widthIn * 72), height: Math.round(r.heightIn * 72) });
@@ -147,8 +152,8 @@ describe('illustrate', () => {
 	it('draws every subject as vector glyphs, the same bytes for the same seed', () => {
 		for (const subject of subjects()) {
 			const picture = subject === 'halftone' ? loadImage(join(ROOT, 'brand', 'logo', 'mark.svg')) : undefined;
-			const one = illustrate({ subject, width: 600, height: 400, seed: 5, picture });
-			const two = illustrate({ subject, width: 600, height: 400, seed: 5, picture });
+			const one = illustrate({ subject, width: 1200, height: 800, seed: 5, picture, sample: true });
+			const two = illustrate({ subject, width: 1200, height: 800, seed: 5, picture, sample: true });
 			expect(one.svg).toBe(two.svg);
 			expect(one.glyphs).toBeGreaterThan(20);
 			expect(one.svg).toMatch(/<path id="g/);
@@ -162,11 +167,11 @@ describe('illustrate', () => {
 describe('video', () => {
 	it('renders layout and art frames and moves between frames', { timeout: 120000 }, () => {
 		for (const template of ['hero', 'cards', 'field', 'mark']) {
-			const a = renderFramePng({ template, size: 'square' }, 2);
-			const b = renderFramePng({ template, size: 'square' }, 40);
+			const a = renderFramePng({ template, size: 'square', sample: true }, 2);
+			const b = renderFramePng({ template, size: 'square', sample: true }, 40);
 			expect(pngSize(a)).toEqual({ width: 1080, height: 1080 });
 			expect(sha(a)).not.toBe(sha(b));
-			expect(sha(renderFramePng({ template, size: 'square' }, 40))).toBe(sha(b));
+			expect(sha(renderFramePng({ template, size: 'square', sample: true }, 40))).toBe(sha(b));
 		}
 	});
 

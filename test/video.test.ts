@@ -23,9 +23,11 @@ describe('video', () => {
 		expect(() => renderVideo({ template: 'social', size: 'story', title: 'Hello' }, { frames: 1 })).toThrow(/Unknown size/);
 		expect(() => renderVideo({ template: 'social', title: 'Hello' }, { frames: 1 })).toThrow(/Missing size/);
 		expect(() => renderVideo({ size: 'square', title: 'Hello' }, { frames: 1 })).toThrow(/Missing template/);
-		expect(() => renderVideo({ template: 'social', size: 'square' }, { frames: 1 })).toThrow(/needs --title/);
-		expect(() => renderVideo({ template: 'product', size: 'square', title: 'Hello' }, { frames: 1 })).toThrow(/needs --text/);
+		expect(() => renderVideo({ template: 'social', size: 'square' }, { frames: 1 })).toThrow(/needs --headline/);
+		expect(() => renderVideo({ template: 'product', size: 'square', title: 'Hello' }, { frames: 1 })).toThrow(/needs --body or --code/);
 		expect(() => renderVideo({ template: 'social', size: 'square', title: 'Hello', ground: 'blue' }, { frames: 1 })).toThrow(/Unknown ground/);
+		expect(() => renderVideo({ template: 'hero', size: 'square' }, { frames: 1 })).toThrow(/needs --headline/);
+		expect(() => renderVideo({ template: 'social', size: 'square', title: 'Hello', text: 'Too much to read in a clip. '.repeat(80) }, { frames: 1 })).toThrow(/does not fit .* Shorten the body/);
 		expect(() => renderVideo({ template: 'social', size: 'square', title: 'Hello', by: 'Ada' }, { frames: 1 })).toThrow(/do not take --by/);
 		expect(() => renderVideo({ template: 'announcement', size: 'square', title: 'Hello', out: 'clip.gif' }, { frames: 1 })).toThrow(/\.mp4/);
 	});
@@ -33,7 +35,7 @@ describe('video', () => {
 	it('renders every template at every size as a PNG of that size', { timeout: 120000 }, () => {
 		for (const template of VIDEO_TEMPLATES) {
 			for (const [size, box] of Object.entries(VIDEO_SIZES)) {
-				const png = renderFramePng({ template: template.id, size, ...(copy as Record<string, object>)[template.id] }, 0, 1);
+				const png = renderFramePng({ template: template.id, size, sample: true, ...(copy as Record<string, object>)[template.id] }, 0, 1);
 				expect(pngSize(png)).toEqual({ width: box.width, height: box.height });
 			}
 		}

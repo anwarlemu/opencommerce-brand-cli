@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { getFaces, ratios, textPath } from '../src/image/fonts.js';
 import { paint } from '../src/image/paint.js';
-import { rasterize, renderImages } from '../src/image/render.js';
+import { rasterize, renderImages, type ImageInput } from '../src/image/render.js';
 
 // Review stills for the image command. Words are the product's own: search, check out, track.
 
@@ -44,15 +44,15 @@ writeFileSync(shot, productShot());
 
 const code = ['const order = {', '  store: "north",', '  sku: "cup",', '  qty: 2,', '}', '', 'return order'].join('\n');
 
-const jobs = [
+const jobs: (ImageInput & { outName?: string })[] = [
 	{ preset: 'og', template: 'headline', title: 'Open router for commerce', format: 'both' },
 	{ preset: 'og', template: 'lead', title: 'Open router for commerce', text: 'One endpoint for agents to search, check out and track orders at any store.' },
-	{ preset: 'og', template: 'quote', label: 'From the docs', text: 'The checkout is one request, and the order comes back as data.', by: 'Agentcard' },
+	{ preset: 'og', template: 'quote', badge: 'From the docs', text: 'The checkout is one request, and the order comes back as data.', by: 'by Agentcard' },
 	{ preset: 'og', template: 'announcement', label: 'Now available', title: 'Agents can buy from any store', action: 'Get started' },
 	{ preset: 'og', template: 'frame', label: 'order.live', image: shot },
-	{ preset: 'og', template: 'frame', label: 'order.ts', text: code, outName: 'og-frame-code' },
+	{ preset: 'og', template: 'frame', label: 'order.ts', code, outName: 'og-frame-code' },
 	{ preset: 'square', template: 'announcement', label: 'Now available', title: 'Agents can buy from any store', action: 'Get started' },
-	{ preset: 'portrait', template: 'quote', text: 'One endpoint for every store an agent needs to buy from.', by: 'opencommerce' },
+	{ preset: 'portrait', template: 'quote', text: 'One endpoint for every store an agent needs to buy from.', by: 'by opencommerce' },
 	{ preset: 'landscape', template: 'lead', title: 'Built for agents that buy', text: 'Search, check out and track the order from one endpoint.', ground: 'mist' },
 ];
 

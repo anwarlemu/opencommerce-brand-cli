@@ -1,37 +1,20 @@
-import { drawLines, fitText, getFaces } from '../image/fonts.js';
-import { paint, trackingFor, type Paint } from '../image/paint.js';
-import { drawCode, drawLockup, drawProse, drawWindow, glyphField, keyPiece, layoutFor, type Box } from '../image/scene.js';
-import { tokens } from '../lib/brand.js';
-import { duration, played, templateDef, timeOf, type VideoSize, type VideoTemplate, VIDEO_SIZES } from './motion.js';
-import { designFor, type LayoutId } from '../assets/layouts.js';
-import { layoutSvg } from '../image/render.js';
+import { sceneSvg, type Scene, type TemplateId } from '../assets/layouts.js';
 import { illustrate } from '../illustrate/render.js';
+import { tokens } from '../lib/brand.js';
+import type { Copy } from '../assets/layouts.js';
+import { duration, played, templateDef, VIDEO_SIZES, type VideoSize, type VideoTemplate } from './motion.js';
 
 export type VideoFrame = {
 	template: VideoTemplate;
 	size: VideoSize;
 	ground: 'white' | 'mist';
-	title: string;
-	text: string;
-	label: string;
-	action: string;
-	chip?: string;
-	secondary?: string;
-	code?: string;
-	cards?: string;
-	footer?: string;
+	copy: Copy;
+	sample?: Set<string>;
 	seed?: number;
 };
 
-type FrameReq = VideoFrame & { width: number; height: number };
-
-function esc(value: string) {
-	return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
 function px(value: string) {
 	if (value.endsWith('rem')) return Number.parseFloat(value) * 16;
-	if (value.endsWith('px')) return Number.parseFloat(value);
 	return Number.parseFloat(value);
 }
 
@@ -41,154 +24,54 @@ function slide(value: string) {
 	return n;
 }
 
-function fade(svg: string, amount: number, drop = 0) {
-	const dy = Math.round((1 - amount) * drop);
-	return `<g opacity="${amount.toFixed(3)}" transform="translate(0 ${dy})">${svg}</g>`;
-}
+/** The still each clip rests on: the same layout, fitted the same way, as the image of that name. */
+const STILL: Record<string, (copy: Copy) => TemplateId> = {
+	social: (copy) => (copy.body ? 'lead' : 'headline'),
+	announcement: () => 'announcement',
+	product: () => 'frame',
+};
 
-function looksLikeCode(text: string) {
-	return text.includes('\n') && /(import |export |const |function |=>|[{;])/.test(text);
-}
-
-type StackPiece = { height: number; gap: number; draw: (top: number) => string };
-
-function stack(pieces: StackPiece[], areaTop: number, areaHeight: number, bias: number) {
-	const total = pieces.reduce((sum, piece, index) => sum + piece.height + (index ? piece.gap : 0), 0);
-	let y = areaTop + Math.round(Math.max(0, areaHeight - total) * bias);
-	return pieces
-		.map((piece, index) => {
-			if (index) y += piece.gap;
-			const svg = piece.draw(y);
-			y += piece.height;
-			return svg;
-		})
-		.join('');
-}
-
-function textBlock(text: string, font: 'display' | 'sans' | 'mono', start: number, min: number, maxWidth: number, maxLines: number, leading: number, fill: string, centerX: number, colors: Paint) {
-	const face = font === 'display' ? getFaces().display : font === 'mono' ? getFaces().mono : getFaces().sans;
-	const track = font === 'display' ? (size: number) => trackingFor(size, colors) : () => 0;
-	const fitted = fitText(face, text, maxWidth, start, min, maxLines, leading, track);
-	return { height: fitted.height, draw: (top: number) => drawLines(face, fitted, leading, fill, centerX, top) };
-}
-
-function poster(req: FrameReq, frame: number, colors: Paint) {
-	const L = layoutFor(req.width, req.height);
-	const centerX = req.width / 2;
-	const column = req.width - L.padX * 2;
-	const fast = duration('--ds-duration-fast');
-	const base = duration('--ds-duration-base');
-	const slow = duration('--ds-duration-slow');
-	const time = timeOf(frame);
-	const drop = slide('--ds-space-3');
-	const pieces: StackPiece[] = [];
-	const add = (height: number, gap: number, draw: (top: number) => string) => pieces.push({ height, gap: pieces.length ? gap : 0, draw });
-	if (req.label) {
-		const block = textBlock(req.label, 'mono', L.kicker, 12, column, 2, 1.2, req.template === 'announcement' ? colors.label : colors.secondary, centerX, colors);
-		const amount = played(time, 0, fast);
-		add(block.height, 0, (top) => fade(block.draw(top), amount));
-	}
-	const headline = textBlock(req.title, 'display', L.headline, 32, Math.min(column, L.wide ? 1000 : 920), L.wide ? 3 : 4, colors.leadingHeading, colors.ink, centerX, colors);
-	const headlineAt = played(time, fast * 0.5, base);
-	add(headline.height, req.label ? 22 : 0, (top) => fade(headline.draw(top), headlineAt, drop));
-	if (req.template === 'social' && req.text) {
-		const body = textBlock(req.text, 'sans', L.lead, 16, Math.min(column, L.wide ? 660 : 740), L.wide ? 3 : 5, colors.leadingLead, colors.secondary, centerX, colors);
-		const amount = played(time, fast + base * 0.5, slow);
-		add(body.height, 22, (top) => fade(body.draw(top), amount, drop));
-	}
-	if (req.template === 'announcement' && req.action) {
-		const key = keyPiece(req.action, centerX, column, colors, !L.wide);
-		const amount = played(time, fast + base, base);
-		// A press scales a key to 97 percent. The key settles from that scale to 1.
-		add(key.height, 32, (top) => {
-			const cy = top + key.height / 2;
-			const scale = (0.97 + 0.03 * amount).toFixed(4);
-			return `<g opacity="${amount.toFixed(3)}" transform="translate(${centerX} ${cy}) scale(${scale}) translate(${-centerX} ${-cy})">${key.draw(top)}</g>`;
-		});
-	}
-	const areaTop = L.padY + L.mark + (L.wide ? 32 : 48);
-	const areaHeight = req.height - L.padY - areaTop;
-	const bias = L.wide ? 0.46 : req.height / req.width > 1.15 ? 0.4 : 0.48;
-	const lock = played(time, 0, fast);
-	return `${fade(drawLockup(L.padX, L.padY, L.mark, colors), lock)}${stack(pieces, areaTop, areaHeight, bias)}`;
-}
-
-function product(req: FrameReq, frame: number, colors: Paint) {
-	const L = layoutFor(req.width, req.height);
-	const time = timeOf(frame);
-	const fast = duration('--ds-duration-fast');
-	const base = duration('--ds-duration-base');
-	const drop = slide('--ds-space-3');
-	const centerX = req.width / 2;
-	const headerBottom = L.padY + L.mark;
-	let cursor = headerBottom + (L.wide ? 28 : 36);
-	let titleSvg = '';
-	if (req.title) {
-		const block = textBlock(req.title, 'display', L.frameTitle, 24, req.width - L.padX * 2, 2, colors.leadingHeading, colors.ink, centerX, colors);
-		const amount = played(time, 0, fast);
-		titleSvg = fade(block.draw(cursor), amount, drop);
-		cursor += block.height + (L.wide ? 22 : 28);
-	}
-	const bottom = req.height - L.padY;
-	const windowW = Math.min(req.width - L.padX * 2, L.wide ? 960 : req.width - L.padX * 2);
-	const box: Box = { x: Math.round((req.width - windowW) / 2), y: Math.round(cursor), w: Math.round(windowW), h: Math.max(80, Math.round(bottom - cursor)) };
-	const body: Box = { x: box.x, y: box.y + 40, w: box.w, h: box.h - 40 };
-	const dark = looksLikeCode(req.text);
-	const lineAlpha = (index: number) => played(time, fast + index * base, base);
-	const inner = dark ? drawCode(body, req.text, colors, lineAlpha) : drawProse(body, req.text, colors, lineAlpha);
-	const amount = played(time, 0, base);
-	const dy = Math.round((1 - amount) * drop);
-	const field = fade(glyphField(box, headerBottom, colors), amount);
-	const lock = fade(drawLockup(L.padX, L.padY, L.mark, colors), played(time, 0, fast));
-	const window = `<g opacity="${amount.toFixed(3)}" transform="translate(0 ${dy})">${drawWindow(box, req.label || 'preview', colors, inner, dark)}</g>`;
-	return `${field}${lock}${titleSvg}${window}`;
-}
-
-/** A layout frame: the entrance (field, words, window, then code lines or cards staggered 60ms), each on the ease-out
- *  token at the duration tokens, while the field drifts linearly from the first frame. */
-function layoutFrame(req: VideoFrame, frame: number, fps: number) {
+export function videoScene(req: VideoFrame): Scene {
 	const size = VIDEO_SIZES[req.size];
-	const ms = (frame / fps) * 1000;
-	const fast = duration('--ds-duration-fast');
-	const base = duration('--ds-duration-base');
-	const slow = duration('--ds-duration-slow');
-	const d = designFor(req.template as LayoutId, size.width, size.height);
-	if (req.title || req.text || req.chip || req.cards) {
-		d.title = req.title;
-		d.text = req.text;
-		d.chip = req.chip ?? '';
-	}
-	if (req.cards) d.cards = req.cards;
-	if (req.footer) d.footer = req.footer;
-	d.primary = req.action;
-	d.secondary = req.secondary ?? '';
-	if (req.label) d.windowName = req.label;
-	if (req.code) d.code = req.code;
-	if (req.seed !== undefined) d.seed = req.seed;
-	d.t = frame / fps;
-	d.enter = {
-		field: played(ms, 0, slow),
-		words: played(ms, 80, base),
-		window: played(ms, 160, slow),
-		codeLine: (i) => played(ms, 360 + i * 60, fast),
-		item: (i) => played(ms, 160 + i * 60, slow),
-	};
-	return layoutSvg(d, req.ground);
+	const template = STILL[req.template]?.(req.copy) ?? (req.template as TemplateId);
+	return { template, width: size.width, height: size.height, theme: req.ground, copy: req.copy, seed: req.seed, sample: req.sample };
 }
 
 export function frameSvg(req: VideoFrame, frame: number, fps = 12) {
 	const def = templateDef(req.template);
-	if (def.kind === 'layout') return layoutFrame(req, frame, fps);
-	if (def.kind === 'art') {
-		const size = VIDEO_SIZES[req.size];
-		return illustrate({ subject: req.template, width: size.width, height: size.height, t: frame / fps, seed: req.seed, ground: req.ground }).svg;
-	}
 	const size = VIDEO_SIZES[req.size];
-	const colors = paint();
-	const ground = req.ground === 'mist' ? colors.mist : colors.white;
-	const full: FrameReq = { ...req, width: size.width, height: size.height };
-	const body = req.template === 'product' ? product(full, frame, colors) : poster(full, frame, colors);
-	const title = req.title || req.text || req.template;
-	const desc = [req.label, req.title, req.text, req.action].filter(Boolean).join(' ');
-	return `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${size.width}" height="${size.height}" viewBox="0 0 ${size.width} ${size.height}" role="img">\n<title>${esc(title)}</title>\n<desc>${esc(desc)}</desc>\n<rect width="${size.width}" height="${size.height}" fill="${ground}"/>\n${body}\n</svg>\n`;
+	if (def.kind === 'art') return illustrate({ subject: req.template, width: size.width, height: size.height, t: frame / fps, seed: req.seed, ground: req.ground }).svg;
+	const ms = (frame / fps) * 1000;
+	const fast = duration('--ds-duration-fast');
+	const base = duration('--ds-duration-base');
+	const slow = duration('--ds-duration-slow');
+	const scene = videoScene(req);
+	const still = STILL[req.template] !== undefined;
+	const drop = still ? slide('--ds-space-3') : undefined;
+	const k = Math.sqrt((size.width * size.height) / (1200 * 630));
+	// Posters settle top to bottom; layouts bring in the field, the words, then the window with its code or the cards,
+	// 60ms apart. Each on the ease-out token at the duration tokens; the field drifts linearly from the first frame.
+	const enter = (id: string) => {
+		if (id === 'logo') return still ? { alpha: played(ms, 0, fast) } : req.template === 'closing' ? { alpha: played(ms, 80, base), drop: 12 * k } : undefined;
+		if (id === 'panel') return undefined;
+		if (id === 'art') return { alpha: still ? played(ms, 0, base) : played(ms, 0, slow) };
+		if (still) {
+			if (id === 'badge') return { alpha: played(ms, 0, fast) };
+			if (id === 'headline') return { alpha: req.template === 'product' ? played(ms, 0, fast) : played(ms, fast * 0.5, base), drop };
+			if (id === 'body') return { alpha: played(ms, fast + base * 0.5, slow), drop };
+			if (id === 'window') return { alpha: played(ms, 0, base), drop };
+			if (id === 'action') {
+				const amount = played(ms, fast + base, base);
+				// A press scales a key to 97 percent. The key settles from that scale to 1.
+				return { alpha: amount, scale: 0.97 + 0.03 * amount };
+			}
+			return undefined;
+		}
+		const card = /^card-(\d+)$/.exec(id);
+		if (card) return { alpha: played(ms, 160 + (Number(card[1]) - 1) * 60, slow), drop: 24 * k };
+		if (id === 'window') return { alpha: played(ms, 160, slow), drop: 24 * k };
+		return { alpha: played(ms, 80, base), drop: 12 * k };
+	};
+	const lines = still ? (i: number) => played(ms, fast + i * 60, base) : (i: number) => played(ms, 360 + i * 60, fast);
+	return sceneSvg({ ...scene, enter, lines, ...(still ? {} : { t: frame / fps }) }).svg;
 }

@@ -11,7 +11,7 @@ const BIN = join(ROOT, 'bin.js');
 const copy: Partial<Record<TemplateId, { title?: string; text?: string; label?: string; by?: string; action?: string }>> = {
 	headline: { title: 'Open router for commerce' },
 	lead: { title: 'Open router for commerce', text: 'One endpoint for agents to search, check out and track orders.' },
-	frame: { title: 'Watch it in action', label: 'agent.ts' },
+	frame: { title: 'Watch it in action', label: 'agent.ts', text: 'Search, check out, track.' },
 	quote: { text: 'The checkout is one request, and the order comes back as data.', by: 'A merchant' },
 	announcement: { label: 'Now available', title: 'Agents can buy from any store', action: 'Get started' },
 };
@@ -22,7 +22,12 @@ describe('image', () => {
 		try {
 			for (const template of TEMPLATES) {
 				for (const [preset, size] of Object.entries(PRESETS)) {
-					const result = renderImages({ ...copy[template.id as TemplateId], template: template.id, preset, format: 'png', out: join(dir, `${preset}-${template.id}.png`) });
+					const input = copy[template.id as TemplateId] ?? (template.id === 'avatar' ? {} : { headline: 'Ship faster', ...(template.id === 'cards' ? { cards: 'One\nA line.\n\nTwo\nB line.' } : {}) });
+					if (!template.sizes.includes(preset)) {
+						expect(() => renderImages({ ...input, template: template.id, preset, out: join(dir, 'no.png') })).toThrow(/avatar/);
+						continue;
+					}
+					const result = renderImages({ ...input, template: template.id, preset, format: 'png', out: join(dir, `${preset}-${template.id}.png`) });
 					expect(result.files).toHaveLength(1);
 					expect(result.template).toBe(template.id);
 					const file = result.files[0];
@@ -63,9 +68,10 @@ describe('image', () => {
 			const shot = renderImages({ template: 'headline', title: 'Inside', preset: 'square', out: join(dir, 'shot.png') });
 			const framed = renderImages({ template: 'frame', image: shot.files[0].path, label: 'shot.png', preset: 'landscape', out: join(dir, 'framed.png') });
 			expect(pngSize(readFileSync(framed.files[0].path))).toEqual({ width: 1200, height: 675 });
-			const coded = renderImages({ template: 'frame', label: 'order.ts', text: 'const order = {\n  sku: "cup",\n}\nreturn order\n', preset: 'og', format: 'svg', out: join(dir, 'code.svg') });
+			const coded = renderImages({ template: 'frame', label: 'order.ts', code: 'const order = {\n  sku: "cup",\n}\nreturn order\n', preset: 'og', format: 'svg', out: join(dir, 'code.svg') });
 			const svg = readFileSync(coded.files[0].path, 'utf8');
-			expect(svg).toContain('order.ts');
+			expect(coded.layers.og.find((y) => y.id === 'label')?.text?.drawn).toBe('order.ts');
+			expect(coded.layers.og.find((y) => y.id === 'code')?.text?.drawn).toContain('return order');
 			expect(svg).not.toContain('font-family');
 		} finally {
 			rmSync(dir, { recursive: true, force: true });
@@ -74,7 +80,7 @@ describe('image', () => {
 
 	it('rejects an unknown template and a headline with no title', () => {
 		expect(() => renderImages({ template: 'banner', title: 'Hello' })).toThrow(/Unknown template/);
-		expect(() => renderImages({ template: 'headline' })).toThrow(/needs --title/);
+		expect(() => renderImages({ template: 'headline' })).toThrow(/needs --headline/);
 		expect(() => renderImages({ preset: 'stroy', title: 'Hello' })).toThrow(/Unknown preset `stroy`. Did you mean `story`/);
 		expect(() => renderImages({ preset: '9000x100', title: 'Hello' })).toThrow(/200 to 4000/);
 		expect(() => renderImages({ template: 'headline', title: 'Hello', ground: 'paper' })).toThrow(/Unknown ground/);
@@ -101,7 +107,7 @@ describe('image', () => {
 	it('rejects an --out file that is not a png or an svg', () => {
 		const dir = mkdtempSync(join(tmpdir(), 'ds-image-out-'));
 		try {
-			const out = join(dir, 'card.jpg');
+			const out = join(dir, 'card.bmp');
 			expect(() => renderImages({ title: 'Hello', out })).toThrow(/--out must be a \.png or \.svg/);
 			expect(existsSync(out)).toBe(false);
 		} finally {
@@ -166,8 +172,8 @@ describe('image', () => {
 		expect(postHelp).toMatch(/square/);
 		expect(postHelp).toMatch(/--preset/);
 		const listed = JSON.parse(execFileSync(process.execPath, [BIN, 'image', 'templates', '--json'], { encoding: 'utf8' }));
-		expect(listed.presets.map((preset: { id: string }) => preset.id)).toEqual(['og', 'square', 'portrait', 'story', 'landscape', 'x-banner', 'linkedin-banner']);
-		expect(listed.templates).toHaveLength(9);
+		expect(listed.presets.map((preset: { id: string }) => preset.id)).toEqual(['og', 'square', 'portrait', 'story', 'landscape', 'x-banner', 'linkedin', 'linkedin-banner', 'linkedin-page', 'youtube', 'youtube-thumbnail', 'email', 'avatar']);
+		expect(listed.templates).toHaveLength(10);
 		const dir = mkdtempSync(join(tmpdir(), 'ds-image-cli-'));
 		try {
 			const stdout = execFileSync(process.execPath, [BIN, 'image', '--preset', '1200x675', '--template', 'headline', '--title', 'Hello', '--out', join(dir, 'card.png'), '--json'], { encoding: 'utf8' });

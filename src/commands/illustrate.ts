@@ -1,7 +1,8 @@
-import { join, resolve } from 'node:path';
+import { extname, join, resolve } from 'node:path';
 import type { Command } from 'commander';
-import { display, num, pick, write, type OutFile } from '../assets/io.js';
-import { loadImage, rasterize } from '../image/render.js';
+import { display, num, write, type OutFile } from '../assets/io.js';
+import { picture as readPicture } from '../image/load.js';
+import { encodeScene, parseFormats, parseSize, parseTheme, type Format } from '../image/render.js';
 import { illustrate, illustrateData, subjects } from '../illustrate/render.js';
 import { cli } from '../lib/brand.js';
 import { unknownName } from '../lib/names.js';
@@ -15,14 +16,16 @@ export function illustrateCommand(program: Command) {
 	program
 		.command('illustrate [subject]')
 		.description('Illustrations in the brand style (field, window, mark, orbit, halftone of your --image): SVG and PNG')
-		.option('--size <WxH>', 'size in px (default: the subject\'s; halftone keeps the picture\'s shape)')
+		.option('--size <size>', 'WIDTHxHEIGHT or a size name such as og or square (default: the subject\'s; halftone keeps the picture\'s shape)')
 		.option('--seed <n>', 'field seed (field and window)')
 		.option('--image <file>', 'window: the picture inside it; halftone: the picture to draw')
 		.option('--label <text>', 'window: the name in the bar')
 		.option('--code <text>', 'window: the code inside it (\\n for a line break)')
-		.option('--ground <ground>', 'white (default), mist or none (transparent)')
-		.option('-f, --format <format>', 'both, svg or png', 'both')
-		.option('-o, --out <path>', 'a directory (default illustrations/) or one .svg or .png file')
+		.option('--sample', 'window: draw the sample code')
+		.option('--theme <theme>', 'the ground: white (default), mist or none (transparent)')
+		.option('--ground <ground>', 'the same as --theme')
+		.option('-f, --format <formats>', 'both (svg and png), svg, png, jpg, webp, pdf, or several with commas')
+		.option('-o, --out <path>', 'a directory (default illustrations/) or one file')
 		.option('--list', 'subjects with their sources')
 		.option('--json', 'JSON output')
 		.action((subject: string | undefined, _o, cmd: Command) => run(subject, cmd.optsWithGlobals() as Opts))
@@ -42,27 +45,24 @@ function run(subject: string | undefined, o: Opts) {
 	let width: number | undefined;
 	let height: number | undefined;
 	if (typeof o.size === 'string') {
-		const m = /^(\d+)x(\d+)$/i.exec(o.size);
-		if (!m) throw new Error('--size takes WIDTHxHEIGHT, such as 1200x630.');
-		width = Number(m[1]);
-		height = Number(m[2]);
+		const size = parseSize(o.size);
+		width = size.width;
+		height = size.height;
 	}
-	const ground = typeof o.ground === 'string' ? pick('ground', o.ground, ['white', 'mist', 'none'] as const) : 'white';
-	let format = pick('format', String(o.format ?? 'both'), ['both', 'svg', 'png'] as const);
+	const asked = (o.theme ?? o.ground) as string | undefined;
+	const ground = asked === 'none' ? ('none' as const) : parseTheme(asked);
 	const out = typeof o.out === 'string' ? resolve(cwd, o.out) : undefined;
-	const ext = out && /\.(svg|png)$/i.exec(out)?.[1]?.toLowerCase();
-	if (ext) format = ext as 'svg' | 'png';
-	const picture = typeof o.image === 'string' ? loadImage(resolve(cwd, o.image)) : undefined;
-	const r = illustrate({ subject, width, height, seed: num('seed', o.seed, 0, 100000, { integer: true }), picture, label: typeof o.label === 'string' ? o.label : undefined, code: typeof o.code === 'string' ? o.code.replace(/\\n/g, '\n') : undefined, ground });
-	const base = ext ? out!.replace(/\.(svg|png)$/i, '') : join(out ?? resolve(cwd, 'illustrations'), `${subject}-${r.width}x${r.height}`);
+	const ext = out ? extname(out) : '';
+	const formats: Format[] = typeof o.format === 'string' || ext ? parseFormats(o.format as string | undefined, out) : ['svg', 'png'];
+	if (ext && (formats.length !== 1 || ext.slice(1).toLowerCase().replace('jpeg', 'jpg') !== formats[0])) throw new Error(`--out names one ${ext} file, but --format is ${formats.join(', ')}. Pass a directory for several.`);
+	const picture = typeof o.image === 'string' ? readPicture(o.image) : undefined;
+	const r = illustrate({ subject, width, height, seed: num('seed', o.seed, 0, 100000, { integer: true }), picture, label: typeof o.label === 'string' ? o.label : undefined, code: typeof o.code === 'string' ? o.code.replace(/\\n/g, '\n') : undefined, sample: !!o.sample, ground });
+	const base = ext ? out!.slice(0, -ext.length) : join(out ?? resolve(cwd, 'illustrations'), `${subject}-${r.width}x${r.height}`);
 	const files: OutFile[] = [];
-	if (format !== 'png') {
-		write(`${base}.svg`, r.svg);
-		files.push({ path: display(cwd, `${base}.svg`), format: 'svg', width: r.width, height: r.height });
-	}
-	if (format !== 'svg') {
-		write(`${base}.png`, rasterize(r.svg));
-		files.push({ path: display(cwd, `${base}.png`), format: 'png', width: r.width, height: r.height });
+	const data = encodeScene(r.svg, r.width, r.height, formats);
+	for (const f of formats) {
+		write(`${base}.${f}`, data[f]!);
+		files.push({ path: display(cwd, `${base}.${f}`), format: f, width: r.width, height: r.height });
 	}
 	emit(o, { ok: true, subject, glyphs: r.glyphs, files }, () => files.map((f) => `${f.path}  ${f.width}x${f.height}`).join('\n'));
 }

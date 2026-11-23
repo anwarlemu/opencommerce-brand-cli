@@ -1,17 +1,19 @@
-import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, extname, isAbsolute, join, relative, resolve } from 'node:path';
-import { Resvg } from '@resvg/resvg-js';
-import { Doc, svgDocument } from '../assets/kit.js';
-import { designFor, drawLayout, imageData, LAYOUTS, type Design, type LayoutId } from '../assets/layouts.js';
+import type { Picture } from '../assets/kit.js';
+import { imageData, SLOTS, sceneSvg, TEMPLATE_IDS, TEMPLATE_SLOTS, type Copy, type Scene, type SizeDef, type Slot, type TemplateId } from '../assets/layouts.js';
+import { imagesToPdf } from '../assets/pdf.js';
+import type { DrawnLayer, LayerEdit } from '../design/types.js';
 import { unknownName } from '../lib/names.js';
-import { mergeCopy, readContent, type Copy } from './content.js';
-import { paint } from './paint.js';
-import { renderSvg, type SceneImage, type SceneRequest } from './scene.js';
+import { mergeCopy, readContent, type CopyInput, type ReadCopy } from './content.js';
+import { toJpg, toWebp } from './encode.js';
+import { picture, pngSize, rasterize, rasterRgb } from './load.js';
 
-type Size = { width: number; height: number; description: string };
+export { loadImage, pngSize, rasterize, rasterRgb, resolveImage } from './load.js';
+export type { TemplateId } from '../assets/layouts.js';
 
 /** Named sizes, from brand/assets/image.json. */
-export const PRESETS: Record<string, Size> = new Proxy({} as Record<string, Size>, {
+export const PRESETS: Record<string, SizeDef> = new Proxy({} as Record<string, SizeDef>, {
 	get: (_t, key: string) => imageData().sizes[key],
 	ownKeys: () => Object.keys(imageData().sizes),
 	getOwnPropertyDescriptor: (_t, key: string) => (key in imageData().sizes ? { enumerable: true, configurable: true, value: imageData().sizes[key] } : undefined),
@@ -20,203 +22,231 @@ export const PRESETS: Record<string, Size> = new Proxy({} as Record<string, Size
 
 export type PresetId = string;
 
-const CLASSIC = [
-	{ id: 'headline', description: 'A centered headline, with an optional label above it.', inputs: ['title', 'label'] },
-	{ id: 'lead', description: 'A headline and a short supporting line.', inputs: ['title', 'text', 'label'] },
-	{ id: 'frame', description: 'A product window. Pass --image for a screenshot, or --text for copy or code inside it.', inputs: ['title', 'text', 'label', 'image'] },
-	{ id: 'quote', description: 'A quotation, with an optional attribution.', inputs: ['text', 'by', 'label', 'title'] },
-	{ id: 'announcement', description: 'A label, a headline and an optional flat key.', inputs: ['title', 'label', 'action'] },
-] as const;
+export const sizeIds = () => Object.keys(imageData().sizes);
+/** The sizes a template draws: a profile picture is the mark alone, and the mark fills only a square. */
+export const sizesFor = (template: TemplateId) => (template === 'avatar' ? ['avatar', 'square'] : sizeIds().filter((id) => id !== 'avatar'));
 
-const LAYOUT_INPUTS: Record<LayoutId, string[]> = {
-	hero: ['chip', 'title', 'text', 'action', 'secondary', 'label', 'code', 'highlight', 'image'],
-	window: ['chip', 'title', 'text', 'action', 'secondary', 'label', 'code', 'highlight', 'image'],
-	closing: ['chip', 'title', 'text', 'action', 'secondary'],
-	cards: ['title', 'cards', 'footer'],
-};
+export const templateInputs = (id: TemplateId): string[] => [...TEMPLATE_SLOTS[id].takes, ...(TEMPLATE_SLOTS[id].image ? ['image'] : [])];
 
-export const TEMPLATES = [...CLASSIC.map((t) => ({ ...t, inputs: [...t.inputs] as string[], source: 'CLI' })), ...LAYOUTS.map((id) => ({ id, description: imageData().templates[id].description, inputs: LAYOUT_INPUTS[id], source: imageData().templates[id].source }))];
+export const TEMPLATES = TEMPLATE_IDS.map((id) => ({ id, description: imageData().templates[id].description, inputs: templateInputs(id), required: TEMPLATE_SLOTS[id].required as string[], sizes: sizesFor(id), source: imageData().templates[id].source }));
 
-export type TemplateId = (typeof CLASSIC)[number]['id'] | LayoutId;
-const isLayout = (id: string): id is LayoutId => (LAYOUTS as string[]).includes(id);
+export const THEMES = ['white', 'mist'] as const;
+export type Theme = (typeof THEMES)[number];
+export const FORMATS = ['png', 'svg', 'jpg', 'webp', 'pdf'] as const;
+export type Format = (typeof FORMATS)[number];
 
-export type ImageInput = Partial<Record<keyof Copy, string>> & {
+export type ImageInput = CopyInput & {
 	preset?: string;
 	size?: string;
+	width?: string | number;
+	height?: string | number;
 	template?: string;
 	ground?: string;
+	theme?: string;
 	format?: string;
+	scale?: string | number;
 	out?: string;
-	content?: string;
 	seed?: string | number;
 	logo?: boolean;
 	glyphs?: boolean;
 	window?: boolean;
+	inset?: boolean;
+	sample?: boolean;
+	page?: string;
+	edits?: Record<string, LayerEdit>;
 };
 
-export type Written = { path: string; format: 'png' | 'svg'; preset: PresetId; template: TemplateId; width: number; height: number; bytes: number };
+export type Written = { path: string; format: Format; preset: PresetId; template: TemplateId; width: number; height: number; bytes: number };
 
-export function chooseTemplate(copy: Copy): TemplateId {
+export function chooseTemplate(copy: Copy, image: boolean): TemplateId {
 	if (copy.cards) return 'cards';
-	if (copy.image) return 'frame';
+	if (copy.code) return copy.headline ? 'window' : 'frame';
+	if (image) return 'frame';
 	if (copy.by) return 'quote';
 	if (copy.action) return 'announcement';
-	if (copy.text && copy.title) return 'lead';
-	if (copy.text) return 'quote';
+	if (copy.body && copy.headline) return 'lead';
+	if (copy.body) return 'quote';
 	return 'headline';
 }
 
-const presetIds = () => Object.keys(imageData().sizes);
+export type Target = { id: string; width: number; height: number };
 
-type Target = { id: string; width: number; height: number };
+/** One size by id, alias or WIDTHxHEIGHT. */
+export function parseSize(id: string): Target {
+	const d = imageData();
+	const alias = d.aliases[id] ?? id;
+	if (alias in d.sizes) return { id: alias, width: d.sizes[alias].width, height: d.sizes[alias].height };
+	const custom = /^(\d+)x(\d+)$/i.exec(id);
+	if (custom) return customSize(Number(custom[1]), Number(custom[2]));
+	const err = unknownName('preset', id, [...sizeIds(), ...Object.keys(d.aliases).filter((a) => !/^\d/.test(a)), 'all']);
+	throw Object.assign(new Error(`${err.message} Or pass a size such as 1600x900.`), { suggestions: (err as Error & { suggestions?: string[] }).suggestions });
+}
 
-function parseSizes(value: string): Target[] {
-	if (value === 'all') return presetIds().map((id) => ({ id, ...imageData().sizes[id] }));
-	const ids = value.split(',').map((part) => part.trim()).filter(Boolean);
-	if (!ids.length) throw new Error(`Pass a preset: ${presetIds().join(', ')}, a size such as 1600x900, or all.`);
-	return ids.map((id) => {
-		const alias = imageData().aliases[id] ?? id;
-		if (alias in imageData().sizes) return { id: alias, ...imageData().sizes[alias] };
-		const custom = /^(\d+)x(\d+)$/i.exec(id);
-		if (custom) {
-			const { min, max } = imageData().custom;
-			const width = Number(custom[1]);
-			const height = Number(custom[2]);
-			if (width < min || height < min || width > max || height > max) throw new Error(`A custom size takes ${min} to ${max} px on each side; ${id} is outside that.`);
-			return { id: `${width}x${height}`, width, height };
+export function customSize(width: number, height: number): Target {
+	const { min, max } = imageData().custom;
+	if (!Number.isInteger(width) || !Number.isInteger(height) || width < min || height < min || width > max || height > max) throw new Error(`A custom size takes whole numbers from ${min} to ${max} px on each side; ${width}x${height} is outside that.`);
+	const named = Object.entries(imageData().sizes).find(([, s]) => s.width === width && s.height === height);
+	return { id: named ? named[0] : `${width}x${height}`, width, height };
+}
+
+function parseSizes(input: ImageInput, template: TemplateId): Target[] {
+	const w = input.width === undefined || input.width === '' ? undefined : Number(input.width);
+	const h = input.height === undefined || input.height === '' ? undefined : Number(input.height);
+	const value = input.size || input.preset || '';
+	if (w !== undefined || h !== undefined) {
+		if (w === undefined || h === undefined) throw new Error('Pass both --width and --height.');
+		if (value && value !== 'custom' && !(input.preset === 'og' && !input.size)) throw new Error('Pass --size or --width and --height, not both.');
+		return [customSize(w, h)];
+	}
+	if (value === 'custom') throw new Error('The custom size takes --width and --height (200 to 4000 px each).');
+	const fallback = template === 'avatar' ? 'avatar' : 'og';
+	if (value === 'all') return sizesFor(template).map(parseSize);
+	const ids = (value || fallback).split(',').map((part) => part.trim()).filter(Boolean);
+	if (!ids.length) throw new Error(`Pass a size: ${sizeIds().join(', ')}, a size such as 1600x900, or all.`);
+	const targets = ids.map(parseSize);
+	for (const t of targets) assertSize(template, t);
+	return targets.filter((t, i) => targets.findIndex((o) => o.id === t.id) === i);
+}
+
+/** Throws when a template does not draw a size. */
+export function assertSize(template: TemplateId, t: Target) {
+	if (t.id === 'avatar' && template !== 'avatar') throw new Error(`A profile picture holds no words: the avatar size takes the avatar template, not ${template}.`);
+	if (template === 'avatar' && t.width !== t.height) throw new Error(`The avatar template draws a square (avatar, square, or a custom size with equal sides), not ${t.id}.`);
+}
+
+function parseTemplate(value: string | undefined, copy: Copy, image: boolean, size?: string): TemplateId {
+	if (!value) return !Object.keys(copy).length && !image && size && (imageData().aliases[size] ?? size) === 'avatar' ? 'avatar' : chooseTemplate(copy, image);
+	if (!(TEMPLATE_IDS as readonly string[]).includes(value)) throw unknownName('template', value, [...TEMPLATE_IDS]);
+	return value as TemplateId;
+}
+
+export function parseTheme(theme: string | undefined, ground?: string): Theme {
+	const value = theme || ground || 'white';
+	if (!(THEMES as readonly string[]).includes(value)) throw unknownName(theme ? 'theme' : 'ground', value, [...THEMES]);
+	return value as Theme;
+}
+
+/** A list of formats; when --out names one file, its extension decides. */
+export function parseFormats(value: string | undefined, out?: string, fallback: Format = 'png'): Format[] {
+	const fix = (v: string) => (v === 'jpeg' ? 'jpg' : v);
+	const ext = out ? fix(extname(out).slice(1).toLowerCase()) : '';
+	if (!value) return (FORMATS as readonly string[]).includes(ext) ? [ext as Format] : [fallback];
+	const list = value === 'both' ? ['svg', 'png'] : value === 'all' ? [...FORMATS] : value.split(',').map((v) => fix(v.trim())).filter(Boolean);
+	for (const v of list) if (!(FORMATS as readonly string[]).includes(v)) throw unknownName('format', v, [...FORMATS, 'both']);
+	return [...new Set(list)] as Format[];
+}
+
+export function parseSeed(value: string | number | undefined): number | undefined {
+	if (value === undefined || value === '') return undefined;
+	const seed = Number(value);
+	if (!Number.isInteger(seed) || seed < 0 || seed > 100000) throw new Error('--seed takes a whole number from 0 to 100000.');
+	return seed;
+}
+
+export function parseScale(value: string | number | undefined): number {
+	if (value === undefined || value === '') return 1;
+	const n = Number(value);
+	if (!Number.isFinite(n) || n < 0.25 || n > 4) throw new Error('--scale takes a number from 0.25 to 4.');
+	return n;
+}
+
+/** Copy as a template takes it: aliases folded, sample copy filled on request, and an error for a slot it cannot draw. */
+export function settleCopy(template: TemplateId, given: Copy, image: boolean, sample: boolean): { copy: Copy; sample: Set<string> } {
+	const spec = TEMPLATE_SLOTS[template];
+	const copy: Copy = { ...given };
+	// A label on a poster is the line above its headline.
+	if (copy.label && spec.takes.includes('badge') && !spec.takes.includes('label') && !copy.badge) {
+		copy.badge = copy.label;
+		delete copy.label;
+	}
+	if (template === 'quote' && copy.headline) {
+		if (!copy.body) copy.body = copy.headline;
+		else if (copy.body !== copy.headline && !copy.badge) copy.badge = copy.headline;
+		else if (copy.body !== copy.headline) throw new Error('The quote template does not take --headline beside --body and --badge.');
+		delete copy.headline;
+	}
+	const filled = new Set<string>();
+	if (sample) {
+		for (const [slot, value] of Object.entries(imageData().templates[template].sample) as [Slot, string][]) {
+			if (copy[slot]) continue;
+			if ((slot === 'code' || slot === 'highlight') && (image || given.code || (template === 'frame' && given.body))) continue;
+			copy[slot] = value;
+			filled.add(slot);
 		}
-		const err = unknownName('preset', id, [...presetIds(), ...Object.keys(imageData().aliases).filter((a) => !/^\d/.test(a)), 'all']);
-		throw Object.assign(new Error(`${err.message} Or pass a size such as 1600x900.`), { suggestions: (err as Error & { suggestions?: string[] }).suggestions });
-	});
-}
-
-function parseTemplate(value: string | undefined, copy: Copy): TemplateId {
-	if (!value) return chooseTemplate(copy);
-	const found = TEMPLATES.find((item) => item.id === value);
-	if (!found) throw unknownName('template', value, TEMPLATES.map((t) => t.id));
-	return found.id as TemplateId;
-}
-
-function parseGround(value: string | undefined): 'white' | 'mist' {
-	if (!value || value === 'white') return 'white';
-	if (value === 'mist') return 'mist';
-	throw unknownName('ground', value, ['white', 'mist']);
-}
-
-/** png, svg or both; when --out names one file, its extension decides. */
-function parseFormat(value: string | undefined, out?: string): ('png' | 'svg')[] {
-	const ext = out ? extname(out).slice(1).toLowerCase() : '';
-	if (!value && (ext === 'png' || ext === 'svg')) return [ext];
-	if (!value || value === 'png') return ['png'];
-	if (value === 'svg') return ['svg'];
-	if (value === 'both') return ['svg', 'png'];
-	throw unknownName('format', value, ['png', 'svg', 'both']);
-}
-
-function assertCopy(template: TemplateId, copy: Copy) {
-	if ((template === 'headline' || template === 'lead' || template === 'announcement') && !copy.title) throw new Error(`The ${template} template needs --title.`);
-	if (template === 'quote' && !copy.text && !copy.title) throw new Error('The quote template needs --text.');
-	if (template === 'lead' && !copy.text) throw new Error('The lead template needs --text. Use headline when there is no supporting line.');
-	if (!isLayout(template)) {
-		for (const key of ['chip', 'secondary', 'code', 'highlight', 'cards', 'footer'] as const) if (copy[key]) throw new Error(`The ${template} template does not take --${key}. It goes with ${LAYOUTS.filter((id) => LAYOUT_INPUTS[id].includes(key)).join(', ')}.`);
-	} else {
-		const takes = LAYOUT_INPUTS[template];
-		for (const key of ['chip', 'text', 'action', 'secondary', 'label', 'code', 'highlight', 'image', 'cards', 'footer', 'by'] as const) if (copy[key] && !takes.includes(key)) throw new Error(`The ${template} template does not take --${key}. It takes ${takes.map((t) => `--${t}`).join(', ')}.`);
 	}
-}
-
-export function pngSize(buffer: Buffer) {
-	if (buffer.length < 24 || buffer[0] !== 0x89 || buffer.toString('ascii', 1, 4) !== 'PNG') throw new Error('Output is not a PNG.');
-	return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
-}
-
-export function rasterize(svg: string, opts: { width?: number } = {}) {
-	const resvg = new Resvg(svg, { fitTo: opts.width ? { mode: 'width', value: opts.width } : { mode: 'original' }, font: { loadSystemFonts: false }, shapeRendering: 2, textRendering: 2, imageRendering: 0 });
-	return Buffer.from(resvg.render().asPng());
-}
-
-/** The RGB pixels of an SVG (for a PDF page), and its size. */
-export function rasterRgb(svg: string, opts: { width?: number } = {}) {
-	const resvg = new Resvg(svg, { fitTo: opts.width ? { mode: 'width', value: opts.width } : { mode: 'original' }, font: { loadSystemFonts: false }, shapeRendering: 2, textRendering: 2, imageRendering: 0, background: '#ffffff' });
-	const img = resvg.render();
-	const px = img.pixels;
-	const rgb = Buffer.alloc((px.length / 4) * 3);
-	for (let i = 0, j = 0; i < px.length; i += 4, j += 3) {
-		const a = px[i + 3] / 255;
-		rgb[j] = Math.round(px[i] * a + 255 * (1 - a));
-		rgb[j + 1] = Math.round(px[i + 1] * a + 255 * (1 - a));
-		rgb[j + 2] = Math.round(px[i + 2] * a + 255 * (1 - a));
+	for (const slot of SLOTS) {
+		if (copy[slot] && !spec.takes.includes(slot)) throw new Error(`The ${template} template does not take --${slot}.${spec.takes.length ? ` It takes ${templateInputs(template).map((t) => `--${t}`).join(', ')}.` : ' It draws the mark alone.'}`);
 	}
-	return { rgb, width: img.width, height: img.height, png: Buffer.from(img.asPng()) };
+	if (image && !spec.image) throw new Error(`The ${template} template does not take --image. Use ${TEMPLATE_IDS.filter((id) => TEMPLATE_SLOTS[id].image).join(', ')}.`);
+	for (const slot of spec.required) if (!copy[slot]) throw new Error(template === 'lead' && slot === 'body' ? 'The lead template needs --body. Use headline when there is no supporting line.' : `The ${template} template needs --${slot} (or --sample for sample copy).`);
+	if (spec.needs && !image && !spec.needs.some((s) => copy[s])) throw new Error(`The ${template} template needs --image, ${spec.needs.map((s) => `--${s}`).join(' or ')}: an empty window says nothing (--sample draws sample code).`);
+	if (copy.highlight && !copy.code) throw new Error('--highlight marks lines of --code; pass --code too.');
+	if (copy.label && !copy.code && !image && !(template === 'frame' && copy.body)) throw new Error('--label names the window, and there is no window without --code or --image.');
+	if (template === 'frame' && copy.code && copy.body) throw new Error('A frame holds --code or --body, not both.');
+	if (image && copy.code) throw new Error('A window holds --code or --image, not both.');
+	return { copy, sample: filled };
 }
 
-function jpegSize(buffer: Buffer) {
-	let offset = 2;
-	while (offset + 1 < buffer.length) {
-		if (buffer[offset] !== 0xff) {
-			offset += 1;
-			continue;
+/** The scene a request draws at a size. */
+export function sceneFor(template: TemplateId, target: Target, copy: Copy, sample: Set<string>, input: ImageInput, pic?: Picture): Scene {
+	if (input.window === false && (copy.code || pic)) throw new Error('--no-window leaves out the window; drop --code and --image with it.');
+	return {
+		template,
+		width: target.width,
+		height: target.height,
+		theme: parseTheme(input.theme, input.ground),
+		copy,
+		picture: pic,
+		seed: parseSeed(input.seed),
+		...(typeof input.logo === 'boolean' ? { logo: input.logo } : {}),
+		...(input.glyphs === false ? { glyphs: false } : {}),
+		...(input.window === false ? { window: false } : {}),
+		...(input.inset ? { inset: true } : {}),
+		...(input.page ? { page: input.page } : {}),
+		...(input.edits ? { edits: input.edits } : {}),
+		sample,
+	};
+}
+
+/** One drawing in each format asked for. */
+export function encodeScene(svg: string, width: number, height: number, formats: Format[], scale = 1): Partial<Record<Format, Buffer>> {
+	const out: Partial<Record<Format, Buffer>> = {};
+	const px = Math.round(width * scale);
+	let png: Buffer | undefined;
+	const raster = () => {
+		if (png) return png;
+		png = rasterize(svg, scale === 1 ? {} : { width: px });
+		const size = pngSize(png);
+		if (scale === 1 && (size.width !== width || size.height !== height)) throw new Error(`Rendered ${size.width}x${size.height}, expected ${width}x${height}.`);
+		return png;
+	};
+	for (const f of formats) {
+		if (f === 'svg') out.svg = Buffer.from(svg);
+		else if (f === 'png') out.png = raster();
+		else if (f === 'jpg') out.jpg = toJpg(raster());
+		else if (f === 'webp') out.webp = toWebp(raster());
+		else {
+			const r = rasterRgb(svg, { width: Math.round(px * 2) });
+			// A CSS pixel is 1/96 in, so a page is three quarters of the image's pixels in points.
+			out.pdf = imagesToPdf([{ rgb: r.rgb, width: r.width, height: r.height }], Math.round(width * 0.75 * 100) / 100);
 		}
-		while (offset < buffer.length && buffer[offset] === 0xff) offset += 1;
-		if (offset >= buffer.length) break;
-		const marker = buffer[offset];
-		offset += 1;
-		// Standalone markers carry no length: stuffed 0x00, TEM, restart, SOI and EOI.
-		if (marker === 0x00 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd9)) continue;
-		if (offset + 1 >= buffer.length) break;
-		const length = buffer.readUInt16BE(offset);
-		if (length < 2) throw new Error('Could not read the JPEG size.');
-		const startOfFrame = marker >= 0xc0 && marker <= 0xcf && marker !== 0xc4 && marker !== 0xc8 && marker !== 0xcc;
-		if (startOfFrame) {
-			if (offset + 6 >= buffer.length) break;
-			return { height: buffer.readUInt16BE(offset + 3), width: buffer.readUInt16BE(offset + 5) };
-		}
-		offset += length;
 	}
-	throw new Error('Could not read the JPEG size.');
+	return out;
 }
 
-export function loadImage(file: string): SceneImage {
-	const buffer = readFileSync(file);
-	if (buffer.length > 12 * 1024 * 1024) throw new Error('Image files must be under 12 MB.');
-	if (buffer[0] === 0x89 && buffer.toString('ascii', 1, 4) === 'PNG') {
-		const size = pngSize(buffer);
-		return { data: buffer, mime: 'image/png', ...size };
-	}
-	if (buffer[0] === 0xff && buffer[1] === 0xd8) return { data: buffer, mime: 'image/jpeg', ...jpegSize(buffer) };
-	const head = buffer.subarray(0, 300).toString('utf8');
-	if (head.includes('<svg')) {
-		const png = rasterize(buffer.toString('utf8'));
-		return { data: png, mime: 'image/png', ...pngSize(png) };
-	}
-	throw new Error('The image must be a PNG, JPEG or SVG file.');
+/** A warning for a raster over its platform's upload limit. */
+export function overLimit(id: string, format: string, bytes: number): string | undefined {
+	const s = imageData().sizes[id];
+	if (!s || format === 'svg' || format === 'pdf' || bytes <= s.limitMb * 1024 * 1024) return undefined;
+	return `${id}.${format} is ${(bytes / 1048576).toFixed(1)} MB, over the ${s.limitMb} MB limit (${s.limitSource}). Use --format jpg.`;
 }
 
-export function resolveImage(file: string, contentFile?: string) {
-	const fromCwd = resolve(file);
-	if (exists(fromCwd)) return fromCwd;
-	if (contentFile) {
-		const beside = resolve(dirname(contentFile), file);
-		if (exists(beside)) return beside;
-	}
-	throw new Error(`No image at ${file}.`);
-}
-
-function exists(file: string) {
-	try {
-		statSync(file);
-		return true;
-	} catch {
-		return false;
-	}
-}
-
-function destinations(targets: Target[], formats: ('png' | 'svg')[], template: TemplateId, out?: string) {
+function destinations(targets: Target[], formats: Format[], template: TemplateId, out?: string) {
 	const single = targets.length === 1 && formats.length === 1;
 	if (out) {
-		const ext = extname(out).slice(1).toLowerCase();
+		const ext = extname(out).slice(1).toLowerCase().replace('jpeg', 'jpg');
 		if (ext) {
-			if (ext !== 'png' && ext !== 'svg') throw new Error('--out must be a .png or .svg file, or a directory.');
+			if (!(FORMATS as readonly string[]).includes(ext)) throw new Error(`--out must be a .png or .svg file (or ${FORMATS.slice(2).map((f) => `.${f}`).join(', ')}), or a directory.`);
 			if (!single) throw new Error('Pass a directory to --out when rendering more than one file.');
 			if (ext !== formats[0]) throw new Error(`--out is a .${ext} file, but --format is ${formats[0]}.`);
 			return [{ target: targets[0], format: formats[0], path: resolve(out) }];
@@ -229,92 +259,73 @@ function destinations(targets: Target[], formats: ('png' | 'svg')[], template: T
 export function imageSpec() {
 	const d = imageData();
 	return {
-		presets: presetIds().map((id) => ({ id, width: d.sizes[id].width, height: d.sizes[id].height, description: d.sizes[id].description })),
+		presets: sizeIds().map((id) => ({ id, width: d.sizes[id].width, height: d.sizes[id].height, description: d.sizes[id].description, shownAt: d.sizes[id].shown, ...(d.sizes[id].safe ? { safe: d.sizes[id].safe } : {}), limitMb: d.sizes[id].limitMb })),
 		aliases: d.aliases,
-		custom: { ...d.custom, usage: 'Pass --preset WIDTHxHEIGHT, such as 1600x900.' },
+		custom: { ...d.custom, usage: 'Pass --size WIDTHxHEIGHT, such as 1600x900, or --width and --height.' },
 		templates: TEMPLATES.map((item) => ({ ...item })),
-		slots: ['title', 'text', 'label', 'by', 'action', 'secondary', 'chip', 'code', 'highlight', 'cards', 'footer', 'image'],
-		options: { seed: 'glyph field seed (integer); each layout has its own default', logo: 'show or hide the lockup (--logo, --no-logo)', glyphs: 'show or hide the glyph field (--no-glyphs)', window: 'hero and window: hide the window (--no-window)' },
-		formats: ['png', 'svg', 'both'],
-		grounds: ['white', 'mist'],
-		defaults: { preset: 'og', format: 'png (or the --out extension)', ground: 'white', template: 'chosen from the inputs' },
+		slots: [...SLOTS, 'image'],
+		slotAliases: { title: 'headline', text: 'body', chip: 'badge' },
+		options: { seed: 'glyph field seed (integer); each layout has its own default', logo: 'show or hide the lockup (--logo, --no-logo)', glyphs: 'show or hide the glyph field (--no-glyphs)', window: 'hero and window: hide the window (--no-window)', inset: 'avatar: the whole mark on the ground', sample: 'fill unset slots with sample copy (--sample); nothing is filled without it' },
+		formats: [...FORMATS, 'both'],
+		grounds: [...THEMES],
+		themes: [...THEMES],
+		floor: d.floor,
+		logo: d.logo,
+		defaults: { preset: 'og', size: 'og', format: 'png (or the --out extension)', ground: 'white', theme: 'white', template: 'chosen from the inputs' },
 		notes: d.notes,
 	};
 }
 
-/** A layout design from the copy and options, over the layout's opening values. */
-export function layoutDesign(template: LayoutId, width: number, height: number, copy: Copy, input: ImageInput, picture?: SceneImage): Design {
-	const d = designFor(template, width, height);
-	const given = Boolean(copy.title || copy.text || copy.chip || copy.cards);
-	if (given) {
-		d.title = copy.title;
-		d.text = copy.text;
-		d.chip = copy.chip;
-	}
-	if (copy.cards) d.cards = copy.cards;
-	if (copy.footer) d.footer = copy.footer;
-	d.primary = copy.action;
-	d.secondary = copy.secondary;
-	if (copy.label) d.windowName = copy.label;
-	if (copy.code) d.code = copy.code;
-	if (copy.highlight) d.highlight = copy.highlight === 'none' ? '' : copy.highlight;
-	if (picture) {
-		d.inside = 'picture';
-		d.picture = picture;
-	}
-	if (input.seed !== undefined && input.seed !== '') {
-		const seed = Number(input.seed);
-		if (!Number.isInteger(seed) || seed < 0 || seed > 100000) throw new Error('--seed takes a whole number from 0 to 100000.');
-		d.seed = seed;
-	}
-	if (typeof input.logo === 'boolean') d.logo = input.logo;
-	if (input.glyphs === false) d.glyphs = false;
-	if (input.window === false) d.showWindow = false;
-	if (template === 'cards' && !d.cards.trim()) throw new Error('The cards template needs --cards (blank-line-separated cards, heading first).');
-	return d;
+/** The request settled: template, sizes, copy and picture. */
+export function settle(input: ImageInput, fromFile?: ReadCopy, contentFile?: string) {
+	const { copy: given, image } = mergeCopy(input, fromFile);
+	const template = parseTemplate(input.template, given, !!image, input.size || input.preset);
+	const { copy, sample } = settleCopy(template, given, !!image, !!input.sample);
+	const pic = image ? picture(image, contentFile) : undefined;
+	return { template, copy, sample, pic };
 }
 
-export function layoutSvg(design: Design, ground: 'white' | 'mist' = 'white') {
-	const colors = paint();
-	const doc = new Doc();
-	const body = drawLayout(doc, design, colors).svg;
-	const title = design.title || design.text || design.layout;
-	const desc = [design.chip, design.title, design.text, design.primary, design.secondary, design.layout === 'cards' ? design.cards.replace(/\s+/g, ' ') : ''].filter(Boolean).join(' ');
-	return svgDocument(doc, design.width, design.height, ground === 'mist' ? colors.mist : colors.white, body, { title, desc });
-}
+const shown = (path: string) => {
+	const rel = relative(process.cwd(), path);
+	return rel.startsWith('..') || isAbsolute(rel) ? path : rel || path;
+};
 
-/** Render one or more images and write them. Paths in the result are relative to the working directory when they can be. */
-export function renderImages(input: ImageInput): { template: TemplateId; ground: 'white' | 'mist'; files: Written[] } {
-	const fromFile = input.content ? readContent(resolve(input.content)) : undefined;
-	const copy = mergeCopy(input, fromFile);
-	const template = parseTemplate(input.template, copy);
-	assertCopy(template, copy);
-	const ground = parseGround(input.ground);
-	const formats = parseFormat(input.format, input.out);
-	const sizes = parseSizes(input.size || input.preset || 'og');
-	const unique = sizes.filter((s, i) => sizes.findIndex((o) => o.id === s.id) === i);
-	if (template === 'quote' && !copy.text) copy.text = copy.title;
-	if (template === 'quote' && copy.title && copy.text && copy.title !== copy.text && !copy.label) copy.label = copy.title;
-	const image = copy.image ? loadImage(resolveImage(copy.image, input.content ? resolve(input.content) : undefined)) : undefined;
-	const colors = paint();
-	const files: Written[] = [];
-	for (const dest of destinations(unique, formats, template, input.out)) {
-		const { width, height } = dest.target;
-		let svg: string;
-		if (isLayout(template)) svg = layoutSvg(layoutDesign(template, width, height, copy, input, image), ground);
-		else {
-			const scene: SceneRequest = { width, height, template, ground, title: copy.title, text: copy.text, label: copy.label, by: copy.by, action: copy.action, image };
-			svg = renderSvg(scene, colors);
+/** Render one or more images and write them. Paths in the result are relative to the working directory when they can be.
+ *  Everything is drawn before anything is written, so a size that cannot hold the copy leaves no half set behind. */
+export function renderImages(input: ImageInput): { template: TemplateId; ground: Theme; theme: Theme; files: Written[]; skipped: { size: string; reason: string }[]; warnings: string[]; layers: Record<string, DrawnLayer[]> } {
+	const contentFile = input.content ? resolve(input.content) : undefined;
+	const { template, copy, sample, pic } = settle(input, contentFile ? readContent(contentFile) : undefined, contentFile);
+	const theme = parseTheme(input.theme, input.ground);
+	const formats = parseFormats(input.format, input.out);
+	const scale = parseScale(input.scale);
+	const targets = parseSizes(input, template);
+	const places = destinations(targets, formats, template, input.out);
+	const warnings: string[] = [];
+	const layers: Record<string, DrawnLayer[]> = {};
+	const pending: { path: string; data: Buffer; entry: Omit<Written, 'bytes' | 'path'> }[] = [];
+	const skipped: { size: string; reason: string }[] = [];
+	const every = input.size === 'all' || (!input.size && input.preset === 'all');
+	for (const target of targets) {
+		let scene: ReturnType<typeof sceneSvg>;
+		try {
+			scene = sceneSvg(sceneFor(template, target, copy, sample, input, pic));
+		} catch (error) {
+			// Every size was asked for: the ones that cannot hold this copy are named, and the rest are drawn.
+			if (!every || !(error as { fit?: boolean }).fit) throw error;
+			skipped.push({ size: target.id, reason: (error as Error).message });
+			continue;
 		}
-		const data = dest.format === 'svg' ? Buffer.from(svg) : rasterize(svg);
-		if (dest.format === 'png') {
-			const size = pngSize(data);
-			if (size.width !== width || size.height !== height) throw new Error(`Rendered ${size.width}x${size.height}, expected ${width}x${height}.`);
-		}
-		mkdirSync(dirname(dest.path), { recursive: true });
-		writeFileSync(dest.path, data);
-		const rel = relative(process.cwd(), dest.path);
-		files.push({ path: rel.startsWith('..') || isAbsolute(rel) ? dest.path : rel || dest.path, format: dest.format, preset: dest.target.id, template, width, height, bytes: statSync(dest.path).size });
+		layers[target.id] = scene.layers;
+		const data = encodeScene(scene.svg, target.width, target.height, formats, scale);
+		for (const dest of places.filter((p) => p.target === target)) pending.push({ path: dest.path, data: data[dest.format]!, entry: { format: dest.format, preset: target.id, template, width: dest.format === 'svg' || dest.format === 'pdf' ? target.width : Math.round(target.width * scale), height: dest.format === 'svg' || dest.format === 'pdf' ? target.height : Math.round(target.height * scale) } });
 	}
-	return { template, ground, files };
+	if (!pending.length) throw new Error(`${skipped[0].reason} (No size holds it.)`);
+	const files = pending.map((p) => {
+		mkdirSync(dirname(p.path), { recursive: true });
+		writeFileSync(p.path, p.data);
+		const warn = overLimit(p.entry.preset, p.entry.format, p.data.length);
+		if (warn) warnings.push(warn);
+		return { path: shown(p.path), ...p.entry, bytes: statSync(p.path).size };
+	});
+	return { template, ground: theme, theme, files, skipped, warnings, layers };
 }

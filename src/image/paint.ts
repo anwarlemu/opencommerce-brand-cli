@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { brand, colorHex, tokens } from '../lib/brand.js';
 import { pkgPath } from '../lib/paths.js';
+import { getFaces, measure, ratios, textPath } from './fonts.js';
 
 // Every color and every spacing step the images use is read from the brand tokens, not written here.
 
@@ -38,7 +39,7 @@ export function paint() {
 		codeText: color('text-code'),
 		codeKey: color('text-code-key'),
 		codeString: color('text-code-string'),
-		codeDim: color('text-code-dim'),
+		codeBand: color('bg-code-soft'),
 		radiusControl: step('--ds-radius-control'),
 		radiusPanel: step('--ds-radius-panel'),
 		radiusChip: step('--ds-radius-sm'),
@@ -79,4 +80,30 @@ export function logoMark(x: number, y: number, size: number) {
 	mark ??= readFileSync(pkgPath('brand', 'logo', 'mark.svg'), 'utf8').replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
 	const scale = Math.round((size / 32) * 10000) / 10000;
 	return `<g transform="translate(${Math.round(x)} ${Math.round(y)}) scale(${scale})">${mark}</g>`;
+}
+
+const markLockupSizes = (mark: number) => ({ name: Math.round(mark * (17 / 32)), byline: Math.max(12, Math.round(mark * (12 / 32))) });
+
+/** Width of the mark with the lockup beside it. */
+export function measureMarkLockup(mark: number, colors: Paint) {
+	const { display } = getFaces();
+	const s = markLockupSizes(mark);
+	const byline = lockupByline();
+	return mark + Math.round(mark * 0.24) + measure(display, brand().name, s.name, colors.trackingTight) + (byline ? Math.round(mark * 0.16) + measure(display, byline, s.byline, 0) : 0);
+}
+
+/** The mark with the lockup beside it, the name at 17/32 of the mark as in the logo files. */
+export function drawMarkLockup(x: number, y: number, mark: number, colors: Paint) {
+	const { display } = getFaces();
+	const s = markLockupSizes(mark);
+	const byline = lockupByline();
+	const { cap, desc } = ratios(display);
+	const baseline = y + mark / 2 + ((cap - desc) * s.name) / 2;
+	let cursor = x + mark + Math.round(mark * 0.24);
+	const parts = [logoMark(x, y, mark), textPath(display, brand().name, cursor, baseline, s.name, colors.trackingTight, colors.ink)];
+	if (byline) {
+		cursor += measure(display, brand().name, s.name, colors.trackingTight) + Math.round(mark * 0.16);
+		parts.push(textPath(display, byline, cursor, baseline, s.byline, 0, colors.secondary));
+	}
+	return parts.join('');
 }

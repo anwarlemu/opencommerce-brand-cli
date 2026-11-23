@@ -1,7 +1,7 @@
 {
-	"$comment": "Merch print files only (no mockups). Trim sizes, bleed and safe areas are common vendor print areas (the same conventions as the context-ds and spyglass-ds engines): confirm with the vendor template before ordering. Layouts are in inches from the trim. Only the approved logo files are used, as drawn: brand/logo/lockup.svg (the name and 'by Agentcard', typeset from the display face) and brand/logo/mark.svg (never recolored). The brand has one ground, white, and refuses blue grounds and dark pages (brand/principles.md), so there are two variants: color (the art alone on a transparent ground, for white or light blanks) and paper (a white ground to the bleed, for printed items). Print on white or light blanks only.",
+	"$comment": "Merch print files only (no mockups). Trim sizes, bleed and safe areas are common vendor print areas (the same conventions as the context-ds and spyglass-ds engines): confirm with the vendor template before ordering. Layouts are in inches from the trim. Only the approved logo files are used, as drawn: brand/logo/lockup.svg (the name and 'by Agentcard', typeset from the display face) and brand/logo/mark.svg (never recolored). The brand has one ground, white, and refuses blue grounds and dark pages (brand/principles.md), so there are two variants: color (the art alone on a transparent ground, for white or light blanks) and paper (a white ground to the bleed, for printed items). Print on white or light blanks only. An item draws only the copy it is given (slots holds the sample copy --sample fills); a tee back with no code has no window.",
 	"dpi": 300,
-	"slots": { "headline": "Open router for commerce", "body": "Buy from any online store from a single endpoint.", "label": "agent.ts" },
+	"slots": { "headline": "Open router for commerce", "body": "Buy from any online store from a single endpoint.", "badge": "Product by Agentcard", "label": "agent.ts", "code": "const commerceAgent = tool({\n  name: \"make_purchase\",\n  execute: async ({ thing }) => {\n    return agentcard.purchase({ thing });\n  },\n});" },
 	"variants": {
 		"color": { "ground": false, "description": "The art alone on a transparent ground; for white or light blanks." },
 		"paper": { "ground": true, "description": "A white ground to the bleed; for printed items." }
@@ -32,7 +32,7 @@
 			"variants": ["color"],
 			"layers": [
 				{ "type": "field", "box": [0.5, 0.5, 11, 10.5], "seed": 3, "glyph": 0.12 },
-				{ "type": "window", "box": [1.5, 2.4, 9, 4.6], "slot": "label" },
+				{ "type": "window", "box": [1.5, 2.4, 9, 4.6] },
 				{ "type": "text", "slot": "headline", "box": [0.75, 11.4, 10.5, 2.4], "size": 1.1, "maxLines": 2 },
 				{ "type": "lockup", "box": [3, 14.2, 6, 0.8] }
 			]

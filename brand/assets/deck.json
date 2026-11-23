@@ -1,63 +1,71 @@
 {
-	"$comment": "Deck slides at 1920x1080, each one of the brand image tool's layouts (brand/assets/image.json) or the CLI's quote, set at slide size. Slots are the copy each slide takes, with its opening copy; unknown slots are errors. Sources: agd-playground src/components/opencommerce-og/draw.ts, and the site's sections (a 44px heading over a 64 percent ink line, windows as the card).",
+	"$comment": "Deck slides at 1920x1080, each one of the brand image tool's layouts (brand/assets/image.json) or the CLI's quote, set at slide size. Slots are the copy each slide takes, with the sample copy --sample fills; a slide draws only what it is given, and unknown slots are errors. Sources: agd-playground src/components/opencommerce-og/draw.ts, and the site's sections (a 44px heading over a 64 percent ink line, windows as the card).",
 	"width": 1920,
 	"height": 1080,
 	"slides": {
 		"cover": {
 			"name": "Cover",
 			"layout": "hero",
-			"description": "The hero: chip, title and line centered, a window rising from the bottom edge with code or your --image, the glyph field in the margins.",
-			"slots": { "chip": "Product by Agentcard", "title": "Open router for commerce", "body": "Buy from any online store from a single endpoint.", "label": "agent.ts", "code": "", "image": "" },
-			"seed": 3
+			"description": "The hero: chip, title and line centered, a window under it with your code or --image, the glyph field in the margins.",
+			"slots": { "chip": "Product by Agentcard", "title": "Open router for commerce", "body": "Buy from any online store from a single endpoint.", "label": "agent.ts", "code": "const commerceAgent = tool({\n  name: \"make_purchase\",\n  execute: async ({ thing }) => {\n    return agentcard.purchase({ thing });\n  },\n});", "image": "" },
+			"seed": 3,
+			"required": ["title"]
 		},
 		"section": {
 			"name": "Section",
 			"layout": "window",
 			"description": "A section opener: the number in a chip with the blue [*], the title on the left, the glyph field gathering on the right.",
 			"slots": { "number": "01", "title": "How it works", "body": "" },
-			"seed": 23
+			"seed": 23,
+			"required": ["title"]
 		},
 		"statement": {
 			"name": "Statement",
 			"layout": "hero",
 			"description": "One line, centered, with the glyph field in the margins either side and no window.",
 			"slots": { "title": "An agent should buy the way a person does", "body": "" },
-			"seed": 41
+			"seed": 41,
+			"required": ["title"]
 		},
 		"bullets": {
 			"name": "Bullets",
 			"layout": "cards",
 			"description": "A title and up to six points as numbered cards; a point is a heading, or a heading and a line after a colon.",
 			"slots": { "title": "What the endpoint does", "items": "Search: Find a product at any online store. | Check out: Carts, payment and confirmation, end to end. | Track: Every order reports back." },
-			"seed": 17
+			"seed": 17,
+			"required": ["items"]
 		},
 		"stat": {
 			"name": "Stat",
 			"layout": "closing",
 			"description": "One figure set large on the mist card, with the line that explains it.",
 			"slots": { "stat": "1 endpoint", "body": "for every online store your agent buys from" },
-			"seed": 11
+			"seed": 11,
+			"required": ["stat"]
 		},
 		"quote": {
 			"name": "Quote",
 			"layout": "quote",
 			"description": "A quotation in the display face with its attribution under it.",
 			"slots": { "quote": "The checkout is one request, and the order comes back as data.", "attribution": "an engineer at Acme" },
-			"seed": 0
+			"seed": 0,
+			"required": ["quote"]
 		},
 		"image": {
 			"name": "Image",
 			"layout": "window",
 			"description": "The words on the left and your --image in a window on the right, the glyph field round it.",
 			"slots": { "title": "Watch it buy", "body": "Every step of a purchase, live.", "label": "checkout.png", "image": "" },
-			"seed": 23
+			"seed": 23,
+			"required": ["image"]
 		},
 		"end": {
 			"name": "End card",
 			"layout": "closing",
 			"description": "The closing card: the lockup, the title and line, the blue and white keys, and the address in the chip.",
 			"slots": { "title": "Give your agent a checkout", "body": "One endpoint, every online store.", "primary": "Get started", "secondary": "Read the docs", "url": "opencommerce.agentcard.sh" },
-			"seed": 11
+			"seed": 11,
+			"required": ["title"]
 		}
 	}
 }

@@ -82,24 +82,6 @@ export function text(font: Font, value: string, x: number, baseline: number, siz
 	return textPath(font, value, r2(left), r2(baseline), size, tracking, fill, opacity);
 }
 
-/** Greedy wrap, as a canvas measure-and-break does; explicit line breaks are kept. */
-export function wrapGreedy(font: Font, value: string, size: number, tracking: number, max: number) {
-	const out: string[] = [];
-	for (const para of value.split('\n')) {
-		const words = para.split(/\s+/).filter(Boolean);
-		let line = '';
-		for (const word of words) {
-			const next = line ? `${line} ${word}` : word;
-			if (line && measure(font, next, size, tracking) > max) {
-				out.push(line);
-				line = word;
-			} else line = next;
-		}
-		out.push(line);
-	}
-	return out;
-}
-
 /** The [*]: an asterisk in three strokes between typed brackets, centered at (cx, cy). Returns its width and SVG. */
 export function bracketMark(cx: number, cy: number, fs: number, color: string) {
 	const mono = getFaces().mono;
@@ -137,98 +119,6 @@ export function lockup(x: number, y: number, size: number, c: Paint, mode: 'draw
 /** The square mark from the logo file, as drawn (never recolored). */
 export const squareMark = (x: number, y: number, size: number) => logoMark(x, y, size);
 
-export type Keys = { primary?: string; secondary?: string };
-
-/** Flat keys: 8px corners at the image's unit, Inter 500, the blue key then the white one. */
-export function keys(k: Keys, x: number, y: number, unit: number, align: 'left' | 'center', c: Paint) {
-	const font = getFaces().sansMedium;
-	const fs = 17 * unit;
-	const h = 46 * unit;
-	const gap = 10 * unit;
-	const list = [
-		{ label: (k.primary ?? '').trim(), blue: true },
-		{ label: (k.secondary ?? '').trim(), blue: false },
-	].filter((b) => b.label);
-	if (!list.length) return null;
-	const widths = list.map((b) => measure(font, b.label, fs, 0) + 40 * unit);
-	const total = widths.reduce((a, b) => a + b, 0) + gap * (list.length - 1);
-	let left = align === 'center' ? x - total / 2 : x;
-	const radius = c.radiusControl * unit;
-	const parts: string[] = [];
-	list.forEach((b, i) => {
-		const w = widths[i];
-		parts.push(roundRect({ x: left + 0.5 * unit, y: y + 0.5 * unit, w: w - unit, h: h - unit }, radius, `fill="${b.blue ? c.brand : c.white}" stroke="${b.blue ? c.blueEdge : c.border}" stroke-width="${r2(unit)}"`));
-		parts.push(text(font, b.label, left + w / 2, y + h / 2 + fs * 0.35, fs, 0, b.blue ? c.onBrand : c.ink, 'center'));
-		left += w + gap;
-	});
-	return { rect: { x: align === 'center' ? x - total / 2 : x, y, w: total, h }, svg: parts.join('') };
-}
-
-const ATTRIBUTION = /^(?:.*\s)?by\s+(\S.*)$/i;
-
-/** The chip above a headline: white, a hairline edge, 6px corners. An attribution ("Product by X") is typeset
- *  muted with the maker's name in the display face; any other line takes the blue [*] in front. */
-export function chip(value: string, unit: number, c: Paint) {
-	const fs = 20 * unit;
-	const h = 38 * unit;
-	const sans = getFaces().sans;
-	const display = getFaces().display;
-	const attribution = ATTRIBUTION.exec(value.trim());
-	if (attribution && /^product\s+by\s/i.test(value.trim())) {
-		const lead = value.trim().slice(0, value.trim().length - attribution[1].length);
-		const leadW = measure(display, lead, fs, 0);
-		const makerW = measure(display, attribution[1], fs * 1.05, c.trackingTight);
-		const w = 34 * unit + leadW + makerW;
-		return {
-			w,
-			h,
-			draw: (x: number, y: number) =>
-				roundRect({ x: x + 0.5 * unit, y: y + 0.5 * unit, w: w - unit, h: h - unit }, c.radiusChip * unit, `fill="${c.white}" stroke="${c.border}" stroke-width="${r2(unit)}"`) +
-				text(display, lead, x + 16 * unit, y + h / 2 + fs * 0.36, fs, 0, c.secondary) +
-				text(display, attribution[1], x + 16 * unit + leadW, y + h / 2 + fs * 0.36, fs * 1.05, c.trackingTight, c.secondary),
-		};
-	}
-	const tw = measure(sans, value, fs, 0);
-	const mw = markWidth(fs);
-	const w = 16 * unit + mw + 10 * unit + tw + 18 * unit;
-	return {
-		w,
-		h,
-		draw: (x: number, y: number) =>
-			roundRect({ x: x + 0.5 * unit, y: y + 0.5 * unit, w: w - unit, h: h - unit }, c.radiusChip * unit, `fill="${c.white}" stroke="${c.border}" stroke-width="${r2(unit)}"`) +
-			bracketMark(x + 16 * unit + mw / 2, y + h / 2, fs, c.brand).svg +
-			text(sans, value, x + 16 * unit + mw + 10 * unit, y + h / 2 + fs * 0.36, fs, 0, c.secondary),
-	};
-}
-
-/** The words: the headline at the display face, tracked tight, and a muted line under it. */
-export function measureWords(title: string, body: string, size: number, max: number, c: Paint) {
-	const display = getFaces().display;
-	const sans = getFaces().sans;
-	const S = size;
-	const bs = Math.max(16, S * 0.33);
-	const head = title.trim() ? wrapGreedy(display, title, S, c.trackingHero, max) : [];
-	const lines = body.trim() ? wrapGreedy(sans, body, bs, 0, max * 0.9) : [];
-	const headW = head.map((l) => measure(display, l, S, c.trackingHero));
-	const bodyW = lines.map((l) => measure(sans, l, bs, 0));
-	const headH = head.length * S * c.leadingHeading;
-	const gap = head.length && lines.length ? S * 0.32 : 0;
-	const h = headH + gap + lines.length * bs * c.leadingLead;
-	return { S, bs, head, body: lines, headH, gap, h, w: Math.max(1, ...headW, ...bodyW) };
-}
-
-export type Words = ReturnType<typeof measureWords>;
-
-export function drawWords(m: Words, x: number, top: number, align: 'left' | 'center', c: Paint) {
-	const display = getFaces().display;
-	const sans = getFaces().sans;
-	const parts: string[] = [];
-	m.head.forEach((l, i) => parts.push(text(display, l, x, top + m.S * 0.86 + i * m.S * c.leadingHeading, m.S, c.trackingHero, c.ink, align)));
-	const bt = top + m.headH + m.gap;
-	m.body.forEach((l, i) => parts.push(text(sans, l, x, bt + m.bs * 1.1 + i * m.bs * c.leadingLead, m.bs, 0, c.secondary, align)));
-	return parts.join('');
-}
-
 /** Lines that wear the blue band: "1-4", "2,5", or empty. */
 export function bandLines(spec: string) {
 	const out = new Set<number>();
@@ -242,14 +132,20 @@ export function bandLines(spec: string) {
 
 const KEYWORDS = new Set(['const', 'let', 'var', 'async', 'await', 'return', 'import', 'from', 'export', 'function', 'new', 'if', 'else', 'for', 'of', 'true', 'false']);
 
-/** One line of light code, colored as the site colors it: keywords blue, strings deep blue, comments faint, the rest ink. */
-export function codeLine(line: string, x: number, baseline: number, size: number, c: Paint, opacity = 1) {
+export type CodeColors = { word: string; string: string; comment: string; text: string; ground: string; band: string };
+
+/** Code colors on the white window and on the dark one. Comments take the nearest ink that passes 4.5:1 at code size. */
+export const codeColors = (c: Paint, dark: boolean): CodeColors =>
+	dark ? { word: c.codeKey, string: c.codeString, comment: c.faint, text: c.codeText, ground: c.codeBg, band: c.codeBand } : { word: c.brand, string: c.string, comment: c.secondary, text: c.ink, ground: c.white, band: c.band };
+
+/** One line of code, colored as the site colors it: keywords, strings, comments, and the rest. */
+export function codeLine(line: string, x: number, baseline: number, size: number, colors: CodeColors, opacity = 1) {
 	const mono = getFaces().mono;
-	const parts = line.match(/\/\/.*$|"[^"]*"?|'[^']*'?|`[^`]*`?|[A-Za-z_$][\w$]*|\s+|./g) ?? [];
+	const parts = line.match(/\/\/.*$|"[^"]*"?|'[^']*'?|`[^`]*`?|[A-Za-z_$][\w$]*|\s+|./gu) ?? [];
 	let cx = x;
 	const out: string[] = [];
 	for (const p of parts) {
-		const fill = p.startsWith('//') ? c.faint : /^["'`]/.test(p) ? c.string : KEYWORDS.has(p) ? c.brand : c.ink;
+		const fill = p.startsWith('//') ? colors.comment : /^["'`]/.test(p) ? colors.string : KEYWORDS.has(p) ? colors.word : colors.text;
 		if (p.trim()) out.push(textPath(mono, p, r2(cx), r2(baseline), size, 0, fill, opacity));
 		cx += measure(mono, p, size, 0);
 	}
@@ -258,50 +154,65 @@ export function codeLine(line: string, x: number, baseline: number, size: number
 
 export type Picture = { data: Buffer; width: number; height: number; mime: string };
 
-export type WindowBody = { kind: 'code'; code: string; highlight: string; scale: number; lineAlpha?: (i: number) => number } | { kind: 'picture'; picture: Picture } | { kind: 'empty' };
+export type WindowBody =
+	| { kind: 'code'; code: string; highlight: string; size: number; dark?: boolean; lineAlpha?: (i: number) => number }
+	| { kind: 'picture'; picture: Picture; pad: number }
+	| { kind: 'prose'; lines: string[]; size: number; leading: number; lineAlpha?: (i: number) => number };
 
-/** The window: white with a hairline edge and 12px corners, the card's soft drop, a mist bar with the dimmed arrow, a
- *  file-like name and the blue [*], and code with its blue band or a picture. `z` is the window's own unit. */
-export function windowSvg(doc: Doc, r: Rect, name: string, body: WindowBody, z: number, c: Paint) {
+export const WINDOW = { bar: 36, label: 11.5, padX: 22, padY: 14, mark: 13 };
+
+/** The window: white with a hairline edge and 12px corners, the card's soft drop, a mist bar with the dimmed arrow, the
+ *  name it was given and the blue [*], and code with its blue band, a picture or copy. `z` is the window's own unit;
+ *  `fadeFrom` fades the window into the ground from that y to `fadeTo` (a window that leaves the canvas). */
+export function windowSvg(doc: Doc, r: Rect, name: string, body: WindowBody, z: number, c: Paint, opts: { labelSize?: number; fadeFrom?: number; fadeTo?: number } = {}) {
 	const rad = c.radiusPanel * z;
 	const clip = doc.id('win');
 	doc.defs.push(`<clipPath id="${clip}"><rect x="${r2(r.x)}" y="${r2(r.y)}" width="${r2(r.w)}" height="${r2(r.h)}" rx="${r2(rad)}"/></clipPath>`);
-	const bar = 36 * z;
-	const fs = 11.5 * z;
+	const bar = WINDOW.bar * z;
+	const fs = opts.labelSize ?? WINDOW.label * z;
 	const mono = getFaces().mono;
 	const parts: string[] = [boxShadow(doc, r, rad, '--ds-shadow-card', z), roundRect(r, rad, `fill="${c.white}"`), `<g clip-path="url(#${clip})">`];
 	parts.push(`<rect x="${r2(r.x)}" y="${r2(r.y)}" width="${r2(r.w)}" height="${r2(bar)}" fill="${c.windowBar}"/>`);
 	parts.push(`<rect x="${r2(r.x)}" y="${r2(r.y + bar - z)}" width="${r2(r.w)}" height="${r2(z)}" fill="${c.rule}"/>`);
-	// The arrow is typed in the platform mono; the bundled mono has no such glyph, so it falls back to the text face.
-	parts.push(text(getFaces().sans, '↳', r.x + 14 * z, r.y + bar / 2 + fs * 0.35, fs, 0, c.secondary, 'left', 0.6));
+	// The arrow is typed in the platform mono; the bundled mono has no such glyph, so it is drawn from the text face.
+	parts.push(text(getFaces().sans, '↳', r.x + 14 * z, r.y + bar / 2 + WINDOW.label * z * 0.35, WINDOW.label * z, 0, c.secondary, 'left', 0.6));
 	if (name) parts.push(text(mono, name, r.x + r.w / 2, r.y + bar / 2 + fs * 0.35, fs, 0, c.secondary, 'center'));
-	parts.push(bracketMark(r.x + r.w - 26 * z, r.y + bar / 2, 13 * z, c.brand).svg);
+	parts.push(bracketMark(r.x + r.w - 26 * z, r.y + bar / 2, WINDOW.mark * z, c.brand).svg);
 	const inner: Rect = { x: r.x, y: r.y + bar, w: r.w, h: r.h - bar };
 	if (body.kind === 'code') {
-		// Code keeps its size unless its longest line would leave the window; then it shrinks to fit.
-		const longest = Math.max(1, ...body.code.split('\n').map((l) => measure(mono, l, 100, 0) / 100));
-		const cs = Math.min(13 * z * body.scale, (inner.w - 44 * z) / longest);
-		const lh = cs * c.leadingCode;
+		const colors = codeColors(c, !!body.dark);
+		if (body.dark) parts.push(`<rect x="${r2(inner.x)}" y="${r2(inner.y)}" width="${r2(inner.w)}" height="${r2(inner.h)}" fill="${colors.ground}"/>`);
+		const lh = body.size * c.leadingCode;
 		const band = bandLines(body.highlight);
 		body.code.split('\n').forEach((line, i) => {
-			const top = inner.y + 14 * z + i * lh;
-			if (top > inner.y + inner.h) return;
+			const top = inner.y + WINDOW.padY * z + i * lh;
 			const alpha = body.lineAlpha ? body.lineAlpha(i) : 1;
 			if (alpha <= 0) return;
-			if (band.has(i + 1)) parts.push(`<rect x="${r2(inner.x)}" y="${r2(top)}" width="${r2(inner.w)}" height="${r2(lh)}" fill="${c.band}"${alpha < 1 ? ` fill-opacity="${alpha.toFixed(3)}"` : ''}/>`);
-			parts.push(codeLine(line, inner.x + 22 * z, top + lh / 2 + cs * 0.35, cs, c, alpha));
+			if (band.has(i + 1)) parts.push(`<rect x="${r2(inner.x)}" y="${r2(top)}" width="${r2(inner.w)}" height="${r2(lh)}" fill="${colors.band}"${alpha < 1 ? ` fill-opacity="${alpha.toFixed(3)}"` : ''}/>`);
+			parts.push(codeLine(line, inner.x + WINDOW.padX * z, top + lh / 2 + body.size * 0.35, body.size, colors, alpha));
 		});
 	} else if (body.kind === 'picture') {
-		const pad = 22 * z;
 		const im = body.picture;
-		const sc = Math.min((inner.w - pad * 2) / im.width, (inner.h - pad * 2) / im.height);
-		const w = im.width * sc;
-		const h = im.height * sc;
-		parts.push(`<image href="data:${im.mime};base64,${im.data.toString('base64')}" x="${r2(inner.x + (inner.w - w) / 2)}" y="${r2(inner.y + (inner.h - h) / 2)}" width="${r2(w)}" height="${r2(h)}" preserveAspectRatio="none"/>`);
+		const w = inner.w - body.pad * 2;
+		const h = (w * im.height) / im.width;
+		parts.push(`<image href="data:${im.mime};base64,${im.data.toString('base64')}" x="${r2(inner.x + body.pad)}" y="${r2(inner.y + body.pad)}" width="${r2(w)}" height="${r2(h)}" preserveAspectRatio="none"/>`);
+	} else {
+		const sans = getFaces().sans;
+		const { cap } = ratios(sans);
+		body.lines.forEach((line, i) => {
+			const alpha = body.lineAlpha ? body.lineAlpha(i) : 1;
+			if (alpha > 0) parts.push(text(sans, line, inner.x + WINDOW.padX * z * 1.4, inner.y + WINDOW.padY * z * 2 + cap * body.size + i * body.size * body.leading, body.size, 0, c.ink, 'left', alpha));
+		});
 	}
 	parts.push('</g>');
 	parts.push(roundRect({ x: r.x + z / 2, y: r.y + z / 2, w: r.w - z, h: r.h - z }, rad, `fill="none" stroke="${c.border}" stroke-width="${r2(z)}"`));
-	return parts.join('');
+	if (opts.fadeFrom === undefined) return parts.join('');
+	const grad = doc.id('fade');
+	const mask = doc.id('mask');
+	const to = opts.fadeTo ?? r.y + r.h;
+	doc.defs.push(`<linearGradient id="${grad}" gradientUnits="userSpaceOnUse" x1="0" y1="${r2(opts.fadeFrom)}" x2="0" y2="${r2(to)}"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></linearGradient>`);
+	doc.defs.push(`<mask id="${mask}" maskUnits="userSpaceOnUse" x="${r2(r.x - r.w)}" y="${r2(r.y - r.h)}" width="${r2(r.w * 3)}" height="${r2(r.h * 3)}"><rect x="${r2(r.x - r.w)}" y="${r2(r.y - r.h)}" width="${r2(r.w * 3)}" height="${r2(r.h * 3)}" fill="url(#${grad})"/></mask>`);
+	return `<g mask="url(#${mask})">${parts.join('')}</g>`;
 }
 
 /** Glyph outlines for the field, defined once per size and color-free, placed with <use>. */
@@ -323,6 +234,8 @@ function glyphDefs(doc: Doc, size: number) {
 
 export type FieldOptions = {
 	box: Rect;
+	/** Collects where glyphs were drawn (one rect per run of neighboring cells), for the overlap check. */
+	ink?: Rect[];
 	z: number;
 	seed: number;
 	/** A cell's strength from its place in the box (nx, ny from -1 to 1). */
@@ -354,6 +267,7 @@ export function glyphField(doc: Doc, o: FieldOptions, c: Paint) {
 	const parts: string[] = [];
 	for (let r = 0; r < rows; r++) {
 		const wy = moving ? Math.sin(r / 9 + t * 0.21) * 0.35 : 0;
+		let run: Rect | undefined;
 		for (let col = 0; col < cols; col++) {
 			const nx = col / 16 + dx + wy;
 			const ny = r / 11 + dy + (moving ? Math.sin(col / 13 - t * 0.17) * 0.25 : 0);
@@ -372,6 +286,10 @@ export function glyphField(doc: Doc, o: FieldOptions, c: Paint) {
 			const alpha = (blue ? 0.6 : 0.12 + odds * 0.08) * f * show * (o.alpha ?? 1);
 			if (alpha < 0.004) continue;
 			const id = hash(col * 3 + 1, r * 5 + 2) > 0.45 ? ids.star : ids.at;
+			if (o.ink) {
+				if (run && run.x + run.w > x - cw * 0.5) run.w = x + cw - run.x;
+				else o.ink.push((run = { x, y, w: cw, h: ch }));
+			}
 			parts.push(`<use href="#${id}" x="${r2(x + cw / 2)}" y="${r2(y)}" fill="${blue ? c.brand : c.ink}" fill-opacity="${alpha.toFixed(3)}"/>`);
 		}
 	}

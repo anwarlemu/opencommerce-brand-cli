@@ -4,7 +4,7 @@ import type { Command } from 'commander';
 import { checkFigmaValues, dedupe } from '../figma/check.js';
 import { figmaSvg, parseFigmaUrl, svgScript } from '../figma/push.js';
 import { figmaTokens, figmaTokenScripts } from '../figma/tokens.js';
-import { loadImage, rasterize } from '../image/render.js';
+import { picture as readPicture, rasterize } from '../image/load.js';
 import { illustrate, subjects } from '../illustrate/render.js';
 import { brand } from '../lib/brand.js';
 import { unknownName } from '../lib/names.js';
@@ -133,8 +133,8 @@ async function pushAction(kind: string | undefined, target: string | undefined, 
 			width = Number(m[1]);
 			height = Number(m[2]);
 		}
-		const picture = typeof flags.image === 'string' ? loadImage(resolve(flags.image)) : undefined;
-		const r = illustrate({ subject: target, width, height, seed: typeof flags.seed === 'string' ? Number(flags.seed) : undefined, picture });
+		const picture = typeof flags.image === 'string' ? readPicture(flags.image) : undefined;
+		const r = illustrate({ subject: target, width, height, seed: typeof flags.seed === 'string' ? Number(flags.seed) : undefined, picture, code: typeof flags.code === 'string' ? flags.code.replace(/\\n/g, '\n') : undefined, sample: !!flags.sample });
 		const svg = join(dir, `illustration-${target}.svg`);
 		const png = join(dir, `illustration-${target}.png`);
 		writeFileSync(svg, r.svg);
@@ -221,6 +221,8 @@ export function figmaCommand(program: Command) {
 		.option('--out <dir>', 'where to write the files (default ./figma)')
 		.option('--file <key>', 'an existing Figma file key (skips the create-file steps)')
 		.option('--image <file>', 'push illustration: the picture (window, halftone)')
+		.option('--code <text>', 'push illustration window: the code inside it')
+		.option('--sample', 'push illustration window: draw the sample code')
 		.option('--size <WxH>', 'push illustration: frame size')
 		.option('--seed <n>', 'push illustration: seed')
 		.option('--example <name>', 'push component: which preview (default the first)')

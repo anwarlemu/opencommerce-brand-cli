@@ -1,15 +1,21 @@
 {
-	"$comment": "Share images and social posts. Layouts and opening copy follow the brand's image tool in agd-playground (src/components/opencommerce-og/draw.ts and Editor.tsx, routes opencommerce-og-image-playground and opencommerce-social-post). The four layouts there are hero, window, closing and cards; the CLI keeps its earlier five (headline, lead, frame, quote, announcement) beside them. Sizes are the tool's six plus the social set. Colors, radii, shadows, faces, tracking and line heights come from brand/tokens.css; where the tool's literals disagree, the token wins (see notes). Pixel sizes are the tool's, in the 1200x630 preview's pixels, grown with the image's area (unit k).",
-	"unit": { "width": 1200, "height": 630 },
-	"custom": { "min": 200, "max": 4000 },
+	"$comment": "Share images and social posts. Layouts and opening copy follow the brand's image tool in agd-playground (src/components/opencommerce-og/draw.ts and Editor.tsx, routes opencommerce-og-image-playground and opencommerce-social-post). The four layouts there are hero, window, closing and cards; the CLI keeps its earlier five (headline, lead, frame, quote, announcement) beside them. Sizes are the tool's six plus the social set; each has the width it is usually shown at (the text floor comes from it), the area its platform leaves clear, and the platform's upload limit. Colors, radii, shadows, faces, tracking and line heights come from brand/tokens.css; where the tool's literals disagree, the token wins (see notes). Pixel sizes are the tool's, in the 1200x630 preview's pixels, grown with the image's area (unit k).",
+	"unit": {"width": 1200, "height": 630},
+	"custom": {"min": 200, "max": 4000},
 	"sizes": {
-		"og": { "width": 1200, "height": 630, "description": "Open Graph and link previews, 1200x630" },
-		"square": { "width": 1080, "height": 1080, "description": "Square social post, 1080x1080" },
-		"portrait": { "width": 1080, "height": 1350, "description": "Portrait social post, 4:5 (1080x1350)" },
-		"story": { "width": 1080, "height": 1920, "description": "Story, 9:16 (1080x1920)" },
-		"landscape": { "width": 1200, "height": 675, "description": "Landscape post for X and LinkedIn, 16:9 (1200x675)" },
-		"x-banner": { "width": 1500, "height": 500, "description": "X profile banner, 1500x500" },
-		"linkedin-banner": { "width": 1584, "height": 396, "description": "LinkedIn page banner, 1584x396" }
+		"og": {"width": 1200, "height": 630, "description": "Open Graph and link previews, 1200x630", "shown": 600, "limitMb": 8, "limitSource": "Facebook image limit, 8 MB"},
+		"square": {"width": 1080, "height": 1080, "description": "Square social post, 1080x1080", "shown": 400, "limitMb": 8, "limitSource": "Instagram API image limit, 8 MB"},
+		"portrait": {"width": 1080, "height": 1350, "description": "Portrait social post, 4:5 (1080x1350)", "shown": 400, "limitMb": 8, "limitSource": "Instagram API image limit, 8 MB"},
+		"story": {"width": 1080, "height": 1920, "description": "Story, 9:16 (1080x1920)", "shown": 390, "limitMb": 8, "limitSource": "Instagram API image limit, 8 MB", "safe": {"inset": [250, 0, 340, 0], "approximate": false, "source": "Meta: leave about 14 percent (250 px) of the top and 20 percent (340 px) of the bottom free of text and logos"}},
+		"landscape": {"width": 1200, "height": 675, "description": "Landscape post for X and LinkedIn, 16:9 (1200x675)", "shown": 600, "limitMb": 5, "limitSource": "X photo limit, 5 MB"},
+		"x-banner": {"width": 1500, "height": 500, "description": "X profile banner, 1500x500", "shown": 600, "limitMb": 5, "limitSource": "X banner limit, 5 MB", "safe": {"inset": [0, 0, 0, 0], "avoid": [[0, 326, 392, 174]], "approximate": true, "source": "X publishes no number: the profile picture (134 px on a 600 px wide profile, half of it over the banner) scaled to 1500 px, with its ring"}},
+		"linkedin": {"width": 1200, "height": 627, "description": "LinkedIn link and post image, 1200x627", "shown": 550, "limitMb": 5, "limitSource": "LinkedIn image limit, 5 MB"},
+		"linkedin-banner": {"width": 1584, "height": 396, "description": "LinkedIn profile banner, 1584x396", "shown": 800, "limitMb": 8, "limitSource": "LinkedIn background photo limit, 8 MB", "safe": {"inset": [0, 0, 0, 0], "avoid": [[0, 160, 420, 236]], "approximate": true, "source": "LinkedIn publishes no number: the profile picture over the lower left of the banner, measured at desktop width"}},
+		"linkedin-page": {"width": 1128, "height": 191, "description": "LinkedIn company page cover, 1128x191", "shown": 1128, "limitMb": 3, "limitSource": "LinkedIn page cover limit, 3 MB", "safe": {"inset": [0, 0, 0, 0], "avoid": [[0, 88, 190, 103]], "approximate": true, "source": "LinkedIn publishes no number: the page logo over the lower left of the cover, measured at desktop width"}},
+		"youtube": {"width": 2560, "height": 1440, "description": "YouTube channel art, 2560x1440", "shown": 1280, "limitMb": 6, "limitSource": "YouTube banner limit, 6 MB", "safe": {"inset": [508, 507, 509, 507], "approximate": false, "source": "YouTube Help: the safe area for text and logos is 1235x338 at 2048x1152, which is 1546x423 at 2560x1440"}},
+		"youtube-thumbnail": {"width": 1280, "height": 720, "description": "YouTube thumbnail, 1280x720", "shown": 360, "limitMb": 2, "limitSource": "YouTube thumbnail limit, 2 MB"},
+		"email": {"width": 1200, "height": 300, "description": "Email header, 1200x300", "shown": 600, "limitMb": 1, "limitSource": "Kept light for mail: many clients clip large messages (not a published limit)"},
+		"avatar": {"width": 400, "height": 400, "description": "Profile picture, 400x400, shown in a circle", "shown": 128, "limitMb": 2, "limitSource": "X profile photo limit, 2 MB"}
 	},
 	"aliases": {
 		"wide": "landscape",
@@ -20,45 +26,75 @@
 		"1080x1920": "story",
 		"1200x675": "landscape",
 		"1500x500": "x-banner",
-		"1584x396": "linkedin-banner"
+		"1584x396": "linkedin-banner",
+		"li": "linkedin",
+		"li-link": "linkedin",
+		"li-post": "linkedin",
+		"li-banner": "linkedin-banner",
+		"li-page": "linkedin-page",
+		"yt": "youtube",
+		"youtube-banner": "youtube",
+		"thumbnail": "youtube-thumbnail",
+		"profile": "avatar",
+		"profile-picture": "avatar",
+		"twitter-banner": "x-banner",
+		"twitter": "landscape",
+		"x": "landscape",
+		"instagram": "square",
+		"email-header": "email",
+		"open-graph": "og",
+		"1200x627": "linkedin",
+		"1128x191": "linkedin-page",
+		"2560x1440": "youtube",
+		"1280x720": "youtube-thumbnail",
+		"1200x300": "email",
+		"400x400": "avatar"
 	},
 	"templates": {
 		"hero": {
-			"description": "The chip, the headline and its line centered, optional keys, and a window rising from the bottom edge with the glyph field in the margins either side.",
+			"description": "The badge, the headline and its line centered, optional keys, and a window under them with the glyph field in the margins either side. Code is always whole; a picture too tall for the room left rises from the bottom edge and fades into the ground. With no --code or --image the window is left out.",
 			"source": "draw.ts drawHero",
 			"textSize": 90,
-			"textWidth": { "wide": 0.86, "tall": 0.9 },
-			"defaults": { "chip": "Product by Agentcard", "title": "Open router for commerce", "text": "Buy from any online store from a single endpoint.", "label": "agent.ts", "inside": "code", "highlight": "1-5", "seed": 3, "logo": false }
+			"textWidth": {"wide": 0.86, "tall": 0.9},
+			"sample": {"badge": "Product by Agentcard", "headline": "Open router for commerce", "body": "Buy from any online store from a single endpoint.", "label": "agent.ts", "highlight": "1-5", "code": "const commerceAgent = tool({\n  name: \"make_purchase\",\n  execute: async ({ thing }) => {\n    return agentcard.purchase({ thing });\n  },\n});"},
+			"seed": 3,
+			"logo": false
 		},
 		"window": {
-			"description": "The words on one side and the window on the other with the glyph field round it; stacked on a tall image.",
+			"description": "The words on one side and the window on the other with the glyph field round it; stacked on a tall image. The window takes --code or --image and is sized to it.",
 			"source": "draw.ts drawSplit",
 			"textSize": 54,
-			"textWidth": { "wide": 0.4, "tall": 0.86 },
-			"defaults": { "chip": "", "title": "Built for agents that buy", "text": "One endpoint, every online store.", "label": "agent.ts", "inside": "code", "highlight": "1-5", "seed": 23, "logo": true }
+			"textWidth": {"wide": 0.4, "tall": 0.86},
+			"sample": {"headline": "Built for agents that buy", "body": "One endpoint, every online store.", "label": "agent.ts", "highlight": "1-5", "code": "const commerceAgent = tool({\n  name: \"make_purchase\",\n  execute: async ({ thing }) => {\n    return agentcard.purchase({ thing });\n  },\n});"},
+			"seed": 23,
+			"logo": true
 		},
 		"closing": {
 			"description": "A mist card with 16px corners and a hairline edge, the glyph field gathering at its edges, the lockup, words and keys centered.",
 			"source": "draw.ts drawClosing",
 			"textSize": 64,
-			"textWidth": { "wide": 0.86, "tall": 0.9 },
-			"defaults": { "chip": "", "title": "Give your agent a checkout", "text": "One endpoint, every online store. Start free, and your first purchase can go through today.", "seed": 11, "logo": true }
+			"textWidth": {"wide": 0.86, "tall": 0.9},
+			"sample": {"headline": "Give your agent a checkout", "body": "One endpoint, every online store. Start free, and your first purchase can go through today.", "action": "Get started", "secondary": "Read the docs"},
+			"seed": 11,
+			"logo": true
 		},
 		"cards": {
-			"description": "Numbered cards on white: a title across the top, window-white cards with the blue number, the glyph field round the edges, and a footer with the lockup and an address.",
+			"description": "Numbered cards: a title across the top, window-white cards with the blue number, the glyph field round the edges, and a footer with the lockup and the address.",
 			"source": "draw.ts drawOcCards and context-og/cards.ts",
 			"textSize": 38,
-			"textWidth": { "wide": 0.86, "tall": 0.9 },
-			"defaults": {
-				"title": "Built for agents that buy",
-				"cards": "Every merchant\nOne integration reaches any online store, with no per-merchant adapters to build or maintain.\n\nMonitored uptime\nDependable and continuous uptime monitoring to ensure your services are always available.\n\nSpeed optimized\nRoutes are cached and warmed, so a purchase lands in seconds instead of minutes.\n\nCheckout completion\nCarts, payment and confirmation are handled end to end, and every step reports back.",
-				"footer": "opencommerce.agentcard.sh",
-				"seed": 17,
-				"logo": true
-			}
-		}
+			"textWidth": {"wide": 0.86, "tall": 0.9},
+			"sample": {"headline": "Built for agents that buy", "cards": "Every merchant\nOne integration reaches any online store, with no per-merchant adapters to build or maintain.\n\nMonitored uptime\nDependable and continuous uptime monitoring to ensure your services are always available.\n\nSpeed optimized\nRoutes are cached and warmed, so a purchase lands in seconds instead of minutes.\n\nCheckout completion\nCarts, payment and confirmation are handled end to end, and every step reports back."},
+			"seed": 17,
+			"logo": true,
+			"footer": "opencommerce.agentcard.sh"
+		},
+		"headline": {"description": "A headline, with an optional badge line above it.", "source": "CLI", "sample": {"headline": "Open router for commerce"}},
+		"lead": {"description": "A headline and a short supporting line.", "source": "CLI", "sample": {"headline": "Open router for commerce", "body": "One endpoint for agents to search, check out and track orders."}},
+		"frame": {"description": "A product window: --image for a screenshot (shown whole), --code for code, or --body for copy inside it. --headline sits above.", "source": "CLI", "sample": {"headline": "Watch it in action", "label": "agent.ts", "code": "const commerceAgent = tool({\n  name: \"make_purchase\",\n  execute: async ({ thing }) => {\n    return agentcard.purchase({ thing });\n  },\n});"}},
+		"quote": {"description": "A quotation (--body), with an optional attribution.", "source": "CLI", "sample": {"body": "The checkout is one request, and the order comes back as data.", "by": "an engineer at Acme"}},
+		"announcement": {"description": "A badge line, a headline and an optional flat key.", "source": "CLI", "sample": {"badge": "Now available", "headline": "Agents can buy from any store", "action": "Get started"}},
+		"avatar": {"description": "A profile picture: the mark, its blue carried to the edges so a circle crop never cuts it. --inset sets the whole mark on the ground instead.", "source": "brand/logo/mark.svg; the edge is the sticker rule in brand/assets/merch.json (the mark carried past the cut)", "sample": {}}
 	},
-	"code": "const commerceAgent = tool({\n  name: \"make_purchase\",\n  execute: async ({ thing }) => {\n    return agentcard.purchase({ thing });\n  },\n});",
 	"notes": [
 		"Line heights: the tool sets headlines at 1.04 and the line under them at 1.5; the tokens say --ds-leading-heading 1.02 and --ds-leading-lead 1.55, and the CLI uses the tokens.",
 		"Window drop: the tool's canvas shadow is rgba(23,24,24,0.22) with a 32px blur and no spread; the CLI draws --ds-shadow-card (a hairline drop and 0 12px 32px -20px at 22 percent), so the drop is tighter than the tool's.",
@@ -66,8 +102,21 @@
 		"Attribution chip: the tool draws Agentcard's own lockup after 'Product by'. That lockup is not a file in brand/logo, so the CLI typesets the maker's name in the display face instead.",
 		"Merchants: the tool can fill the window with sixteen store logos (public/opencommerce-og). Those are third-party marks and are not shipped; the window takes code or your own --image.",
 		"Lockup: the tool follows the name with 'Product by' and Agentcard's lockup; the CLI uses brand/logo/lockup.svg (the name and 'by Agentcard').",
-		"Hero without room for its window: the tool leaves the words at the top; the CLI centers them, as it does when the window is turned off.",
 		"The window arrow is typed in the platform mono; the bundled mono has no such glyph, so it is drawn from Inter.",
-		"Code in a narrow window: the tool lets long lines run past the window's edge (hero on a tall image); the CLI shrinks the code until its longest line fits."
-	]
+		"Hero window: the tool runs the window off the bottom edge and cuts it. The CLI draws code whole, and fades a picture window that leaves the canvas.",
+		"Opening copy: the tool opens with its own chip, headline and code. The CLI draws only the copy it is given; --sample fills the sample copy.",
+		"Comments in code: the site's faint ink (2.7:1 on white) fails for text this small, so images set them in --ds-color-text-secondary on white and --ds-color-text-faint on the dark window.",
+		"Logo clear space and smallest size: brand/ has no printed rule, so they are the site header's own (see logo)."
+	],
+	"floor": {
+		"shownPx": 8,
+		"custom": {"wide": 600, "tall": 400},
+		"largePx": 24,
+		"$comment": "Small text is at least 8 px at the width an image is usually shown (sizes.shown); sizes with no listed width use the custom widths. Large text (3:1 contrast) starts at 24 px on a 1200 px wide image."
+	},
+	"logo": {
+		"min": 17,
+		"clear": 0.53,
+		"source": "The site header sets the name at 17px and pads its tray 9px round it (registry site-header: pt-2.25): no smaller, and no closer."
+	}
 }

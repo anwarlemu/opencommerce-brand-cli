@@ -1,0 +1,291 @@
+{
+	"steps": [
+		{
+			"command": "design new hero --size x-banner --headline 'One endpoint for every online store' --body 'Search, check out and track orders from a single request.' -o banner",
+			"answer": "banner.design.json  hero, x-banner 1500x500 (X header), white\nbanner.png\nCheck: no errors",
+			"picture": "1-new.png",
+			"ok": true
+		},
+		{
+			"command": "design revise banner 'bigger headline'",
+			"answer": "banner.design.json  hero, x-banner 1500x500 (X header), white\n  headline 20% bigger\nbanner.png\nCheck: no errors",
+			"picture": "2-bigger.png",
+			"ok": true
+		},
+		{
+			"command": "design revise banner 'badge \"Product by Agentcard\", darker theme'",
+			"answer": "banner.design.json  hero, x-banner 1500x500 (X header), mist\n  theme mist\n  badge \"Product by Agentcard\"\nbanner.png\nCheck: no errors",
+			"picture": "3-badge.png",
+			"ok": true
+		},
+		{
+			"command": "design revise banner 'show the logo, logo top right'",
+			"answer": "banner.design.json  hero, x-banner 1500x500 (X header), mist\n  logo shown\n  logo top right\nbanner.png\nCheck: no errors",
+			"picture": "4-logo.png",
+			"ok": true
+		},
+		{
+			"command": "design revise banner 'hide the art, headline left'",
+			"answer": "banner.design.json  hero, x-banner 1500x500 (X header), mist\n  art hidden\n  headline left\nbanner.png\nCheck: no errors",
+			"picture": "5-art.png",
+			"ok": true
+		},
+		{
+			"command": "design undo banner",
+			"answer": "banner.design.json  hero, x-banner 1500x500 (X header), mist\n  undid: hide the art, headline left\nbanner.png\nCheck: no errors",
+			"picture": "6-undo.png",
+			"ok": true
+		},
+		{
+			"command": "design revise banner 'make the logo neon green'",
+			"answer": "Nothing was changed.\n\"make the logo neon green\": Effects are not part of the brand.\nThings you can say here: move the logo up; nudge the logo left 2%; hide the logo. Copy goes in quotes. For exact edits use `design edit`.",
+			"ok": false
+		},
+		{
+			"command": "design edit banner --layer headline.dx=-0.4",
+			"answer": "The headline has no room to go that far here: it would leave the picture, or go under what x-banner covers. The furthest is headline.dx -0.145 and headline.dy 0.",
+			"ok": false
+		},
+		{
+			"command": "design variants banner --by seed --count 4",
+			"answer": "banner-seed-4.png  1500x500\nbanner-seed-5.png  1500x500\nbanner-seed-6.png  1500x500\nbanner-seed-7.png  1500x500\nbanner-by-seed.png  all of them on one sheet",
+			"picture": "7-variants.png",
+			"ok": true
+		},
+		{
+			"command": "design sizes banner --to og,square,story,x-banner,youtube",
+			"answer": "banner-og.png  1200x630\nbanner-square.png  1080x1080\nbanner-story.png  1080x1920\nbanner-x-banner.png  1500x500\nbanner-youtube.png  2560x1440\nbanner-sizes.png  all of them on one sheet",
+			"picture": "8-sizes.png",
+			"ok": true
+		},
+		{
+			"command": "design compare banner banner-og",
+			"answer": "banner-vs-banner-og.png\n  size: x-banner 1500x500 (X header) -> og 1200x630 (Link preview)\n  art: 1500x500 at 0,0 -> 1200x630 at 0,0\n  badge: 226x38 at 804,122 -> 226x38 at 487,170\n  headline: 686x184 at 574,184 -> 790x212 at 205,236\n  body: 702x24 at 566,395 -> 809x28 at 196,480\n  logo: 235x21 at 1190,60 -> 270x24 at 870,44",
+			"picture": "9-compare.png",
+			"ok": true
+		},
+		{
+			"command": "design history banner",
+			"answer": "  1  bigger headline\n  2  badge \"Product by Agentcard\", darker theme\n  3  show the logo, logo top right\n  -  hide the art, headline left (undone; design redo brings it back)",
+			"ok": true
+		}
+	],
+	"file": "{\n\t\"version\": 1,\n\t\"brand\": \"opencommerce-ds\",\n\t\"kind\": \"image\",\n\t\"template\": \"hero\",\n\t\"size\": {\n\t\t\"id\": \"x-banner\",\n\t\t\"width\": 1500,\n\t\t\"height\": 500\n\t},\n\t\"theme\": \"mist\",\n\t\"copy\": {\n\t\t\"badge\": \"Product by Agentcard\",\n\t\t\"body\": \"Search, check out and track orders from a single request.\",\n\t\t\"headline\": \"One endpoint for every online store\"\n\t},\n\t\"images\": {},\n\t\"seed\": 3,\n\t\"options\": {\n\t\t\"glyph-size\": 1\n\t},\n\t\"layers\": {\n\t\t\"headline\": {\n\t\t\t\"scale\": 1.2\n\t\t},\n\t\t\"logo\": {\n\t\t\t\"anchor\": \"top-right\",\n\t\t\t\"hidden\": false\n\t\t}\n\t},\n\t\"history\": [\n\t\t{\n\t\t\t\"change\": \"bigger headline\",\n\t\t\t\"before\": {\n\t\t\t\t\"layers\": {}\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"change\": \"badge \\\"Product by Agentcard\\\", darker theme\",\n\t\t\t\"before\": {\n\t\t\t\t\"theme\": \"white\",\n\t\t\t\t\"copy\": {\n\t\t\t\t\t\"body\": \"Search, check out and track orders from a single request.\",\n\t\t\t\t\t\"headline\": \"One endpoint for every online store\"\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"change\": \"show the logo, logo top right\",\n\t\t\t\"before\": {\n\t\t\t\t\"layers\": {\n\t\t\t\t\t\"headline\": {\n\t\t\t\t\t\t\"scale\": 1.2\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t],\n\t\"future\": [\n\t\t{\n\t\t\t\"change\": \"hide the art, headline left\",\n\t\t\t\"after\": {\n\t\t\t\t\"layers\": {\n\t\t\t\t\t\"art\": {\n\t\t\t\t\t\t\"hidden\": true\n\t\t\t\t\t},\n\t\t\t\t\t\"headline\": {\n\t\t\t\t\t\t\"anchor\": \"left\",\n\t\t\t\t\t\t\"scale\": 1.2\n\t\t\t\t\t},\n\t\t\t\t\t\"logo\": {\n\t\t\t\t\t\t\"anchor\": \"top-right\",\n\t\t\t\t\t\t\"hidden\": false\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+	"templates": [
+		{
+			"id": "hero",
+			"kind": "image",
+			"description": "The badge, the headline and its line centered, optional keys, and a window under them with the glyph field in the margins either side. Code is always whole; a picture too tall for the room left rises from the bottom edge and fades into the ground. With no --code or --image the window is left out."
+		},
+		{
+			"id": "window",
+			"kind": "image",
+			"description": "The words on one side and the window on the other with the glyph field round it; stacked on a tall image. The window takes --code or --image and is sized to it."
+		},
+		{
+			"id": "closing",
+			"kind": "image",
+			"description": "A mist card with 16px corners and a hairline edge, the glyph field gathering at its edges, the lockup, words and keys centered."
+		},
+		{
+			"id": "cards",
+			"kind": "image",
+			"description": "Numbered cards: a title across the top, window-white cards with the blue number, the glyph field round the edges, and a footer with the lockup and the address."
+		},
+		{
+			"id": "headline",
+			"kind": "image",
+			"description": "A headline, with an optional badge line above it."
+		},
+		{
+			"id": "lead",
+			"kind": "image",
+			"description": "A headline and a short supporting line."
+		},
+		{
+			"id": "quote",
+			"kind": "image",
+			"description": "A quotation (--body), with an optional attribution."
+		},
+		{
+			"id": "announcement",
+			"kind": "image",
+			"description": "A badge line, a headline and an optional flat key."
+		},
+		{
+			"id": "frame",
+			"kind": "image",
+			"description": "A screenshot, whole, in the brand's window, with an optional headline."
+		},
+		{
+			"id": "frame-code",
+			"kind": "image",
+			"description": "Code in the dark window, with an optional headline."
+		},
+		{
+			"id": "frame-note",
+			"kind": "image",
+			"description": "A short text in the window, with an optional headline."
+		},
+		{
+			"id": "avatar",
+			"kind": "image",
+			"description": "A profile picture: the mark, its blue carried to the edges so a circle crop never cuts it. --inset sets the whole mark on the ground instead."
+		},
+		{
+			"id": "slide-cover",
+			"kind": "slide",
+			"description": "The hero: chip, title and line centered, a window under it with your code or --image, the glyph field in the margins."
+		},
+		{
+			"id": "slide-section",
+			"kind": "slide",
+			"description": "A section opener: the number in a chip with the blue [*], the title on the left, the glyph field gathering on the right."
+		},
+		{
+			"id": "slide-statement",
+			"kind": "slide",
+			"description": "One line, centered, with the glyph field in the margins either side and no window."
+		},
+		{
+			"id": "slide-bullets",
+			"kind": "slide",
+			"description": "A title and up to six points as numbered cards; a point is a heading, or a heading and a line after a colon."
+		},
+		{
+			"id": "slide-stat",
+			"kind": "slide",
+			"description": "One figure set large on the mist card, with the line that explains it."
+		},
+		{
+			"id": "slide-quote",
+			"kind": "slide",
+			"description": "A quotation in the display face with its attribution under it."
+		},
+		{
+			"id": "slide-image",
+			"kind": "slide",
+			"description": "The words on the left and your --image in a window on the right, the glyph field round it."
+		},
+		{
+			"id": "slide-end",
+			"kind": "slide",
+			"description": "The closing card: the lockup, the title and line, the blue and white keys, and the address in the chip."
+		},
+		{
+			"id": "merch-tee-front",
+			"kind": "merch",
+			"description": "T-shirt front: 12 by 16 in, DTG or screen print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-tee-back",
+			"kind": "merch",
+			"description": "T-shirt back: 12 by 16 in, DTG or screen print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-hoodie-front",
+			"kind": "merch",
+			"description": "Hoodie front: 12 by 10 in, DTG or screen print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-cap-front",
+			"kind": "merch",
+			"description": "Cap front panel: 4 by 1.75 in, embroidery. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-tote",
+			"kind": "merch",
+			"description": "Tote bag: 12 by 14 in, screen print or DTG. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-mug-wrap",
+			"kind": "merch",
+			"description": "Mug wrap, 11 oz: 9 by 3.5 in, sublimation. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-sticker",
+			"kind": "merch",
+			"description": "Sticker, die-cut: 3 by 3 in, die-cut vinyl. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-poster",
+			"kind": "merch",
+			"description": "Poster, 18 by 24 in: 18 by 24 in, digital or offset print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "illustration-field",
+			"kind": "illustration",
+			"description": "The field of * and @: clumps from a noise map that crumble at their coasts, faint ink with short blue runs deep inside, feathering out toward the edges."
+		},
+		{
+			"id": "illustration-window",
+			"kind": "illustration",
+			"description": "A window (mist bar, dimmed arrow, a file-like name, the blue [*]) with code on its blue band, or your --image, and the field gathering round it."
+		},
+		{
+			"id": "illustration-mark",
+			"kind": "illustration",
+			"description": "The [*] as a solid slab drawn in characters on a fine grid, shaded from a point light; the brightest faces turn blue."
+		},
+		{
+			"id": "illustration-orbit",
+			"kind": "illustration",
+			"description": "The hero's system without its stores: nine flat rings of dots nested round the [*] slab, the far side fainter and passing behind it."
+		},
+		{
+			"id": "illustration-halftone",
+			"kind": "illustration",
+			"description": "Your --image drawn in characters on the mark's fine grid: darker tones take denser glyphs from the mark's ramp, the darkest turn blue, white stays white."
+		},
+		{
+			"id": "video-social",
+			"kind": "video",
+			"description": "Animated social clip. A label, a headline and an optional supporting line settle in. 2 seconds at 12 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-announcement",
+			"kind": "video",
+			"description": "Announcement clip. A label, a headline and an optional key settle in. 2 seconds at 12 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-product",
+			"kind": "video",
+			"description": "Product clip. A window appears, then its lines appear in order. 2 seconds at 12 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-hero",
+			"kind": "video",
+			"description": "The hero layout plays in once (field, words, then the window rising with its code lines in order) and rests while the glyph field drifts. 4 seconds at 30 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-window",
+			"kind": "video",
+			"description": "The window layout: the words settle, the window rises and types its lines, the field drifts round it. 4 seconds at 30 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-closing",
+			"kind": "video",
+			"description": "The closing card: the lockup, words and keys settle on the mist card while the field drifts at its edges. 4 seconds at 30 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-cards",
+			"kind": "video",
+			"description": "Numbered cards come in one after another under the title; the field drifts round them. 4 seconds at 30 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-field",
+			"kind": "video",
+			"description": "The glyph field alone, drifting as the site draws it: a slow sideways slide and a gentle warp, about 12 redraws a second. 6 seconds at 12 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-mark",
+			"kind": "video",
+			"description": "The [*] slab in characters, swaying gently as the hero's sun does. 6 seconds at 30 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-orbit",
+			"kind": "video",
+			"description": "The rings of dots round the swaying [*] slab (the hero without its stores). 6 seconds at 30 fps. The PNG is the frame it rests on."
+		}
+	]
+}

@@ -89,31 +89,47 @@ Run the project checks and the CLI token check. Test keyboard interaction and de
 
 ## Render an image
 
-`image` renders a PNG (and SVG when you ask) from the copy you pass in. It uses the brand tokens, the bundled fonts and the logo. It does not open a browser, so an agent can run it in CI.
+`image` renders share images, social posts, banners and profile pictures from the copy you pass in. It uses the brand tokens, the bundled fonts and the logo. It does not open a browser, so an agent can run it in CI.
 
 ```sh
 npx opencommerce-ds image templates --json
-npx opencommerce-ds image --preset og --template lead --title "Open router for commerce" --text "One endpoint for agents to search, check out and track orders." --out og.png --json
-npx opencommerce-ds image post --preset square --template announcement --title "Agents can buy from any store" --action "Get started" --json
-npx opencommerce-ds image og --template frame --image ./screen.png --format both --out ./images
+npx opencommerce-ds image lead --size og --headline "Open router for commerce" --body "One endpoint for agents to search, check out and track orders." --out og.png
+npx opencommerce-ds image hero --size og,x-banner,linkedin --headline "Open router for commerce" --format png,svg --out images
+npx opencommerce-ds image frame --image ./screen.png --size square
+npx opencommerce-ds image carousel slides.json --size portrait
 ```
 
-Presets: `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350), `story` (1080x1920), `landscape` (1200x675), `x-banner` (1500x500), `linkedin-banner` (1584x396), or `WIDTHxHEIGHT`. `image` defaults to `og`. `image post` defaults to `square`. `image og` always renders 1200x630. Templates: `hero`, `window`, `closing`, `cards` (the brand image tool's layouts, in agd-playground) and `headline`, `lead`, `frame`, `quote`, `announcement`. `--format` is `png`, `svg` or `both`. `--json` lists the files written, with width and height. `--out` is a `.png` or `.svg` file, or a directory.
+Only the copy you pass is drawn, whole. Text steps down and wraps again to a readable floor; copy that still does not fit is an error that says what to shorten. `--sample` fills sample copy on purpose. Sizes, safe areas and upload limits are in `src/design/platforms.ts` (`image templates --json` lists them, with their sources); `--size all` draws every size that holds the copy. Templates: `hero`, `window`, `closing`, `cards` (the brand image tool's layouts, in agd-playground), `headline`, `lead`, `frame`, `quote`, `announcement` and `avatar`. Formats: PNG, SVG, JPG, WebP, PDF.
 
 Headings use a bundled Helvetica-compatible face (Neue Haas Grotesk Display is not redistributable). Body and keys use Inter. Labels and code use the bundled monospace. Sample output is in `samples/images/`. Regenerate it with `npx tsx scripts/render-samples.ts`.
 
-A content file must be a JSON object whose keys are `title`, `text`, `label`, `by`, `action`, `secondary`, `chip`, `code`, `highlight`, `cards`, `footer` and `image`. Any other key, or a value that is not a string, is an error. The same inputs write the same files.
+A content file must be a JSON object whose keys are `headline`, `body`, `badge`, `label`, `by`, `action`, `secondary`, `code`, `highlight`, `cards`, `footer` and `image` (`title`, `text` and `chip` still work). Any other key, or a value that is not a string, is an error. The same inputs write the same files.
+
+## Revising a design
+
+`design` works on a small JSON file, so a person or an agent can make something, look at it, and change it until it is right.
+
+```sh
+npx opencommerce-ds design new hero --size x-banner --headline "One endpoint for every online store" -o banner
+npx opencommerce-ds design revise banner "bigger headline, show the logo, logo top right, darker theme"
+npx opencommerce-ds design edit banner --set headline="One request, any store" --layer headline.dx=0.03
+npx opencommerce-ds design undo banner
+npx opencommerce-ds design variants banner --by seed --count 4
+npx opencommerce-ds design sizes banner --to og,square,story,x-banner
+```
+
+Plain words are read by rules, with no model and no API key; a part that is not understood changes nothing. Edits are applied inside the layout, so text wraps again and the art keeps clear. Every write is checked, and an off-brand or broken result is refused and changes nothing. Slides, print files, illustrations and clips work the same way (`design templates`). `src/design/` is shared by every brand's CLI except `adapter.ts`.
 
 ## Slides, print files, illustrations and Figma
 
 ```sh
 npx opencommerce-ds deck --input deck.json --out deck        # cover, section, statement, bullets, stat, quote, image, end
-npx opencommerce-ds merch --all --out merch                  # tee, hoodie, cap, tote, mug wrap, die-cut sticker, poster
+npx opencommerce-ds merch --all --sample --out merch         # tee, hoodie, cap, tote, mug wrap, die-cut sticker, poster
 npx opencommerce-ds illustrate orbit                         # field, window, mark, orbit, halftone (--image)
 npx opencommerce-ds figma tokens                             # also push, pull, check
 ```
 
-`deck` writes a PNG (or SVG) per 1920x1080 slide and one PDF. `merch` writes print files with bleed and safe area (SVG at physical size, PNG at `--dpi`); the sizes are common vendor print areas, so confirm with your vendor, and every item prints on white or light blanks with the logo files as drawn. `illustrate` draws the brand's glyph language as vector SVG and PNG; the rules are in `brand/illustration.md`. `figma` writes files and prints the Figma MCP steps; it never calls Figma. Layouts and sizes live in `brand/assets/*.json`. The docs site's Assets, Illustrations and Figma pages show the output; regenerate it with `npx tsx scripts/render-assets.ts --video`.
+Slides and print files draw only the copy they are given; `--sample` fills sample copy. `deck` writes a PNG (or SVG) per 1920x1080 slide and one PDF. `merch` writes print files with bleed and safe area (SVG at physical size, PNG at `--dpi`); the sizes are common vendor print areas, so confirm with your vendor, and every item prints on white or light blanks with the logo files as drawn. `illustrate` draws the brand's glyph language as vector SVG and PNG; the rules are in `brand/illustration.md`. `figma` writes files and prints the Figma MCP steps; it never calls Figma. Layouts and sizes live in `brand/assets/*.json`. The docs site's Assets, Illustrations and Figma pages show the output; regenerate it with `npx tsx scripts/render-assets.ts --video`.
 
 ## Render a short video
 

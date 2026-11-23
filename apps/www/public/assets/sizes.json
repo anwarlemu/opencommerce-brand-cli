@@ -1,0 +1,74 @@
+[
+	{
+		"id": "og",
+		"description": "Link preview, 1200x630",
+		"limit": "Up to 5 MB (approximate)."
+	},
+	{
+		"id": "square",
+		"description": "Square post, 1080x1080",
+		"limit": "Up to 8 MB (approximate)."
+	},
+	{
+		"id": "portrait",
+		"description": "Portrait post, 1080x1350",
+		"limit": "Up to 8 MB (approximate)."
+	},
+	{
+		"id": "story",
+		"description": "Story, 1080x1920",
+		"zones": "Keeps clear of the profile bar at the top, the reply bar at the bottom (approximate).",
+		"limit": "Up to 8 MB (approximate)."
+	},
+	{
+		"id": "landscape",
+		"description": "Landscape post, 1200x675",
+		"limit": "Up to 5 MB (approximate)."
+	},
+	{
+		"id": "x-banner",
+		"description": "X header, 1500x500",
+		"zones": "Keeps clear of the profile picture, lower left, the strip X may crop at the top, the strip X may crop at the bottom (approximate).",
+		"limit": "Up to 5 MB (approximate)."
+	},
+	{
+		"id": "linkedin",
+		"description": "LinkedIn post, 1200x627",
+		"limit": "Up to 5 MB (approximate)."
+	},
+	{
+		"id": "linkedin-banner",
+		"description": "LinkedIn profile cover, 1584x396",
+		"zones": "Keeps clear of the profile picture, lower left (approximate).",
+		"limit": "Up to 8 MB."
+	},
+	{
+		"id": "linkedin-page",
+		"description": "LinkedIn page cover, 1512x256",
+		"zones": "Keeps clear of the lower-right corner, the page logo, lower left, the left edge, the right edge, the top edge, the bottom edge (approximate).",
+		"limit": "Up to 3 MB."
+	},
+	{
+		"id": "youtube",
+		"description": "YouTube channel art, 2560x1440",
+		"zones": "Keeps clear of everything outside the part every device shows.",
+		"limit": "Up to 6 MB."
+	},
+	{
+		"id": "youtube-thumbnail",
+		"description": "YouTube thumbnail, 1280x720",
+		"zones": "Keeps clear of the video length, lower right (approximate).",
+		"limit": "Up to 2 MB."
+	},
+	{
+		"id": "email",
+		"description": "Email header, 1200x400",
+		"limit": "Up to 1 MB (approximate)."
+	},
+	{
+		"id": "avatar",
+		"description": "Profile picture, 800x800",
+		"zones": "Keeps clear of everything outside the circle it is cropped to.",
+		"limit": "Up to 2 MB."
+	}
+]

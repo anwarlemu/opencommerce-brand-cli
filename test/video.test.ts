@@ -27,7 +27,7 @@ describe('video', () => {
 		expect(() => renderVideo({ template: 'product', size: 'square', title: 'Hello' }, { frames: 1 })).toThrow(/needs --body or --code/);
 		expect(() => renderVideo({ template: 'social', size: 'square', title: 'Hello', ground: 'blue' }, { frames: 1 })).toThrow(/Unknown ground/);
 		expect(() => renderVideo({ template: 'hero', size: 'square' }, { frames: 1 })).toThrow(/needs --headline/);
-		expect(() => renderVideo({ template: 'social', size: 'square', title: 'Hello', text: 'Too much to read in a clip. '.repeat(80) }, { frames: 1 })).toThrow(/does not fit .* Shorten the body/);
+		expect(() => renderVideo({ template: 'social', size: 'square', title: 'Hello', text: 'Too much to read in a clip. '.repeat(400) }, { frames: 1 })).toThrow(/does not fit .* Shorten the body/);
 		expect(() => renderVideo({ template: 'social', size: 'square', title: 'Hello', by: 'Ada' }, { frames: 1 })).toThrow(/do not take --by/);
 		expect(() => renderVideo({ template: 'announcement', size: 'square', title: 'Hello', out: 'clip.gif' }, { frames: 1 })).toThrow(/\.mp4/);
 	});

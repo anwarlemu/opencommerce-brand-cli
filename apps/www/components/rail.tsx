@@ -24,6 +24,7 @@ const PAGES = [
   { href: "/components", label: "All components" },
   { href: "/theme", label: "Theme" },
   { href: "/assets", label: "Assets" },
+  { href: "/designs", label: "Designs" },
   { href: "/illustrations", label: "Illustrations" },
   { href: "/figma", label: "Figma" },
 ];
@@ -87,6 +88,7 @@ export function DocsRail({ groups, name, repo, site }: { groups: Group[]; name: 
     ...groups.flatMap((g) => g.items.map((i) => ({ name: i.name, title: i.title, group: g.label, href: `/components/${i.name}` }))),
     { name: "theme", title: "Theme", group: "Docs", href: "/theme" },
     { name: "assets", title: "Assets", group: "Docs", href: "/assets" },
+    { name: "designs", title: "Designs", group: "Docs", href: "/designs" },
     { name: "illustrations", title: "Illustrations", group: "Docs", href: "/illustrations" },
     { name: "figma", title: "Figma", group: "Docs", href: "/figma" },
   ];

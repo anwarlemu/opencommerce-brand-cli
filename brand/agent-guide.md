@@ -62,23 +62,50 @@ The component reference states its source. `{{registry}}/r/audit.json` records t
 
 ## Render images
 
-The CLI can render Open Graph images and social posts from copy you pass in. It does not open a browser. Colors, type and the logo come from the brand tokens and the bundled fonts and marks.
+The CLI renders share images, social posts, banners and profile pictures from copy you pass in. It does not open a browser. Colors, type and the logo come from the brand tokens and the bundled fonts and marks.
 
 ```sh
 {{cli}} image templates --json
-{{cli}} image --preset og --template lead --title "..." --text "..." --out og.png --json
-{{cli}} image post --preset square --template announcement --title "..." --action "Get started" --json
-{{cli}} image og --template frame --title "..." --image ./screen.png --format both --out ./images
-{{cli}} image --template hero --preset og --chip "Product by Agentcard" --title "..." --text "..." --out og.png
-{{cli}} image --template window --preset square --title "..." --image ./screen.png --label screen.png
-{{cli}} image --template cards --preset portrait --title "..." --content cards.json
+{{cli}} image lead --size og --headline "..." --body "..." --out og.png --json
+{{cli}} image hero --size og,x-banner,linkedin --badge "Product by Agentcard" --headline "..." --body "..." --out ./images
+{{cli}} image window --size square --headline "..." --image ./screen.png --label screen.png
+{{cli}} image cards --size portrait --headline "..." --content cards.json
+{{cli}} image avatar
+{{cli}} image carousel slides.json --size portrait
 ```
 
-Presets are `og` (1200x630), `square` (1080x1080), `portrait` (1080x1350), `story` (1080x1920), `landscape` (1200x675, for X and LinkedIn), `x-banner` (1500x500) and `linkedin-banner` (1584x396), or any `WIDTHxHEIGHT` from 200 to 4000. `image` defaults to `og`. `image post` defaults to `square`. `image og` always renders 1200x630. Templates are `headline`, `lead` (a headline and a supporting line), `frame` (a screenshot in a window; pass `--image`, or `--text` for copy or code), `quote` (`--text` and optional `--by`) and `announcement` (a label, a headline and an optional key via `--action`). The brand image tool's four layouts are `hero` (chip, headline and line centered, a window rising from the bottom with code or your `--image`), `window` (words beside a window), `closing` (the mist card with the lockup and keys) and `cards` (numbered cards; `--cards` with blank lines between cards, heading first). They take `--chip`, `--action` and `--secondary` (the blue and white keys), `--label` (the window bar), `--code`, `--highlight`, `--seed`, `--no-logo`, `--no-glyphs` and `--no-window`, and open with the tool's own copy when you pass none. `--format` is `png` (the default), `svg` or `both`. `--ground` is `white` or `mist`. `--content file.json` reads the same fields, and flags override it.
+Only the copy you pass is drawn, and it is drawn whole: text steps down and wraps again to a readable floor, and copy that still does not fit is an error that says what to shorten. Unset slots are left out. `--sample` fills sample copy on purpose. A slot a template does not draw is an error, and so is a character no bundled face has (the faces cover Latin, Greek and Cyrillic, with no emoji).
 
-`--json` prints the files written, with width, height and byte size. SVG text is outlined, so the file does not need the fonts installed. Headings and the wordmark use the bundled Helvetica-compatible display face, because Neue Haas Grotesk Display is not redistributable; body and keys use Inter; labels and code use the bundled monospace.
+Templates: `hero` (badge, headline and line centered, a window under them with `--code` or `--image`), `window` (words beside a window), `closing` (the mist card with the lockup and keys), `cards` (`--cards` with blank lines between cards, heading first), `headline`, `lead`, `frame` (a window with `--image`, `--code` or `--body`), `quote` (`--body` and `--by`), `announcement` (badge, headline and `--action`) and `avatar` (the mark). Slots: `--headline --body --badge --label --by --action --secondary --code --highlight --cards --footer --image`; `--title`, `--text` and `--chip` still work. Themes are `white` and `mist` (`--theme`, or `--ground`).
 
-Pass `--preset all` to render every size. Give `--out` a directory when more than one file is written, or a `.png` or `.svg` path for a single file. A content file is a JSON object. Unknown fields, unknown templates, unknown presets and unknown grounds are errors. The same inputs write the same bytes.
+Sizes: `og`, `square`, `portrait`, `story`, `landscape`, `x-banner`, `linkedin`, `linkedin-banner`, `linkedin-page`, `youtube`, `youtube-thumbnail`, `email`, `avatar`, `WIDTHxHEIGHT` or `--width` and `--height` (200 to 4000). `--size a,b,c` and `--size all` draw several. Words, logos and keys stay out of what each platform covers or crops (a profile picture, a story's bars); `image templates --json` lists the zones, which are official and which approximate. `--format` is `png`, `svg`, `jpg`, `webp`, `pdf` or several; a file over the platform's upload limit is a warning. `--out` is one file or a directory. Pictures may be PNG, JPEG, WebP, GIF or SVG and are shown whole; one too tall for a hero fades into the ground.
+
+`image carousel` takes `{ "size": "portrait", "slides": [ { "template": "headline", "headline": "..." } ] }` and writes one numbered image per slide, with one headline size per template.
+
+`--json` prints the files written. SVG text is outlined, so the file does not need the fonts installed. Headings and the wordmark use the bundled Helvetica-compatible display face, because Neue Haas Grotesk Display is not redistributable. The same inputs write the same bytes.
+
+## Revising a design
+
+When someone will want changes, make a design instead of a one-off image. It is a small JSON file that remembers the copy, the settings and every change.
+
+```sh
+{{cli}} design new hero --size x-banner --headline "..." --body "..." -o banner
+{{cli}} design revise banner "bigger headline, show the logo, logo top right, darker theme"
+{{cli}} design edit banner --set headline="..." --layer headline.dx=0.03 --hide badge --theme mist --size og
+{{cli}} design undo banner
+{{cli}} design variants banner --by theme
+{{cli}} design sizes banner --to og,square,story,x-banner
+{{cli}} design compare banner banner-mist
+{{cli}} design render banner --format svg,pdf
+{{cli}} design check banner --json
+```
+
+1. Make it, then look at the PNG beside the file.
+2. Turn what the person said into edits. `revise` reads plain words by rules (copy in quotes); a part it does not understand changes nothing and lists what you can say. `edit` is exact; use it when you reason about the change yourself. `show` lists the layers, where they were drawn and what each can do.
+3. Every write is checked: whole words, nothing invented, brand colors, contrast, the logo's size and clear space, overlaps, safe areas, cuts, readable text. Errors block the write and change nothing. `--allow <rule>` accepts a composition rule; brand rules are never allowed.
+4. Look again, and repeat until the person is happy. `undo` and `redo` step through; `history` lists the steps.
+
+Edits happen inside the layout: a bigger headline wraps again, the glyph field keeps clear, a window makes room. Never hand-edit the PNG or SVG. Slides (`slide-cover`...), print files (`merch-tee-back`...), illustrations (`illustration-field`...) and clips (`video-hero`...) work the same way: `design templates` lists them. Images and slides take layer edits; the others take copy, theme, options, size and seed. A print PNG is drawn at 100 px per inch; `design render <file> --scale 3` gives 300.
 
 ## Read the brand system
 
@@ -128,13 +155,14 @@ Principles: `site` is the page system. `product` explains that this brand has no
 {{cli}} deck cover --title "..." --body "..."
 {{cli}} merch --list
 {{cli}} merch tee-front --out merch                # SVG at physical size and a 300 dpi PNG
+{{cli}} merch tee-back --headline "..." --code "..."  # words and code only when you pass them
 {{cli}} merch sticker --guides                     # trim and safe lines for proofing
 {{cli}} illustrate --list
 {{cli}} illustrate field --size 1500x500 --seed 7
 {{cli}} illustrate halftone --image ./photo.png
 ```
 
-Slides are `cover`, `section`, `statement`, `bullets`, `stat`, `quote`, `image` and `end`, each a layout of the image tool at 1920x1080. `deck.json` holds `{ "slides": [ { "type": "cover", "title": "..." } ] }`; unknown slots error. Merch items are print files only (no mockups) with bleed and safe area; sizes are common vendor print areas, so confirm with the vendor. The brand has one ground, so merch prints on white or light blanks, and logos are the files in `brand/logo/` as drawn. Illustrations follow `brand/illustration.md`: glyphs on a lattice, faint ink, blue only where the site puts it.
+Slides are `cover`, `section`, `statement`, `bullets`, `stat`, `quote`, `image` and `end`, each a layout of the image tool at 1920x1080. `deck.json` holds `{ "slides": [ { "type": "cover", "title": "..." } ] }`; unknown slots error. Slides draw only the copy they are given (`"sample": true` or `--sample` fills the rest). Merch items are print files only (no mockups) with bleed and safe area; sizes are common vendor print areas, so confirm with the vendor. The brand has one ground, so merch prints on white or light blanks, and logos are the files in `brand/logo/` as drawn. Illustrations follow `brand/illustration.md`: glyphs on a lattice, faint ink, blue only where the site puts it.
 
 ## Work in Figma
 
@@ -151,16 +179,16 @@ The CLI never calls Figma. Each action writes files and prints the Figma MCP cal
 
 ## Render a short video
 
-`video` renders a 2 second mp4 at 12 frames per second. It does not open a browser. Frames are SVG from the same tokens, bundled fonts and logo files as `image`, rasterized with system fonts off, then encoded with the pinned ffmpeg build and bitexact flags. The same inputs write the same bytes.
+`video` renders a short mp4 or webm. It does not open a browser. Frames are SVG from the same tokens, bundled fonts and logo files as `image`, rasterized with system fonts off, then encoded with the pinned ffmpeg build and bitexact flags. The same inputs write the same bytes.
 
 ```sh
 {{cli}} video templates --json
-{{cli}} video --template social --size square --title "..." --text "..." --out clip.mp4 --json
-{{cli}} video --template announcement --size vertical --title "..." --label "Now available" --action "Get started" --json
-{{cli}} video --template product --size landscape --label order.ts --text "const order = { sku: \"cup\" }" --json
+{{cli}} video --template social --size square --headline "..." --body "..." --out clip.mp4 --json
+{{cli}} video --template announcement --size vertical --headline "..." --badge "Now available" --action "Get started" --json
+{{cli}} video --template product --size landscape --label order.ts --code "const order = { sku: \"cup\" }" --json
 ```
 
-Templates are `social`, `announcement` and `product` (2 seconds at 12 fps), `hero`, `window`, `closing` and `cards` (the image tool's layouts, 4 seconds at 30 fps: they play in once on the ease-out token, staggered 60ms, and rest while the glyph field drifts as the site's does), `field` (6 seconds at 12 fps, the site's drift) and `mark` and `orbit` (6 seconds at 30 fps, the hero's swaying [*]). Sizes are `square` (1080x1080), `vertical` (1080x1920, 9:16) and `landscape` (1920x1080, 16:9). `--template` and `--size` are required. `--ground` is `white` or `mist`. `--out` is an `.mp4` or `.webm` file or a directory (default `.ds/videos`); `--format webm` also picks WebM. `--still <seconds>` writes one PNG frame instead. There is no other template, size, frame rate or duration.
+Templates are `social`, `announcement` and `product` (2 seconds at 12 fps), `hero`, `window`, `closing` and `cards` (the image tool's layouts, 4 seconds at 30 fps: they play in once on the ease-out token, staggered 60ms, and rest while the glyph field drifts as the site's does), `field` (6 seconds at 12 fps, the site's drift) and `mark` and `orbit` (6 seconds at 30 fps, the hero's swaying [*]). Sizes are `square` (1080x1080), `vertical` (1080x1920, 9:16) and `landscape` (1920x1080, 16:9). `--template` and `--size` are required; copy works as it does for images (only what you pass, whole; `--sample` fills sample copy). `--theme` is `white` or `mist`. `--out` is an `.mp4` or `.webm` file or a directory (default `.ds/videos`); `--format webm` also picks WebM. `--still <seconds>` writes one PNG frame instead. There is no other template, size, frame rate or duration.
 
 ## Verify before finishing
 
@@ -174,8 +202,8 @@ Templates are `social`, `announcement` and `product` (2 seconds at 12 fps), `her
 
 `init` and conversion install AGENTS.md and a local `.ds/agent-guide.md`, plus supported agent instruction files and hook configuration. Agents that do not load those files automatically should read them explicitly. Hooks support Claude Code, Codex and Cursor when enabled by that tool; other agents run the CLI checks directly. Codex hook activation may require the user's `/hooks` trust step. No hook integration is required to use the components correctly.
 
-Read-only commands: `guide`, `manifest`, `describe`, `brand`, `principles`, `component list`, `component inspect`, `component emit`, `list`, `show`, `look`, `tokens`, `check` without `--fix`, `image templates`, `video templates`, the `--list` of `deck`, `merch` and `illustrate`, `figma pull` and `figma check`.
-Commands that write files: `init`, `add`, `apply`, the legacy bare conversion command, `check --fix`, `image` (image files), `video` (mp4, webm or png files), `deck`, `merch`, `illustrate` and `figma tokens|push` (files under `--out`), and review/snapshot state updates. Use `--dry-run` with `init`, `add` or conversion to inspect planned writes. JSON goes to stdout and progress goes to stderr. Unknown names and installation failures return a nonzero exit code. The error JSON is `{ "ok": false, "error": "..." }`.
+Read-only commands: `guide`, `manifest`, `describe`, `brand`, `principles`, `component list`, `component inspect`, `component emit`, `list`, `show`, `look`, `tokens`, `check` without `--fix`, `image templates`, `video templates`, `design show|history|check|templates`, the `--list` of `deck`, `merch` and `illustrate`, `figma pull` and `figma check`.
+Commands that write files: `init`, `add`, `apply`, the legacy bare conversion command, `check --fix`, `image` (image files), `design new|revise|edit|undo|redo|variants|sizes|compare|render` (the design file and its pictures), `video` (mp4, webm or png files), `deck`, `merch`, `illustrate` and `figma tokens|push` (files under `--out`), and review/snapshot state updates. Use `--dry-run` with `init`, `add` or conversion to inspect planned writes. JSON goes to stdout and progress goes to stderr. Unknown names and installation failures return a nonzero exit code. The error JSON is `{ "ok": false, "error": "..." }`.
 
 ## Project configuration and agent handoff
 

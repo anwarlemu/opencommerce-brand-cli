@@ -38,13 +38,18 @@ npm run ci           # build, limits, registry, tests; must pass before you push
 - `src/check/`: the value check (rules.ts), used by hooks, pre-commit and `check`.
 - `src/review/`, `src/hooks/`, `src/commands/`.
 - `src/system/` and `brand/system.json`: `manifest` / `describe`, `brand`, `principles`, and `component list|inspect|emit`. The JSON is the machine-readable brand system. Do not add a font, logo or rule that is not backed by a file in `brand/`.
-- `src/assets/` (brand-free): `kit.ts` (the window, keys, chip, lockup, words and the glyph field as SVG), `layouts.ts`
-  (the image tool's hero, window, closing and cards), `deck.ts`, `merch.ts`, `pdf.ts`, `noise.ts` (the site's noise).
-  Layouts, sizes, slides and print items live in `brand/assets/*.json`. `src/illustrate/` draws the subjects in
+- `src/assets/` (brand-free): `layouts.ts` draws every image layout (`drawScene`), `flow.ts` the parts it stacks and the
+  fitting that sizes them (words whole, floors, layer edits applied inside the fit), `kit.ts` the window, lockup and glyph
+  field as SVG, `deck.ts`, `merch.ts`, `pdf.ts`, `noise.ts`. Slides and clips use the same layouts. Layouts, slides and
+  print items live in `brand/assets/*.json`; sizes, safe areas and upload limits in `src/design/platforms.ts`.
+  `src/image/` holds the `image` command's copy, pictures, encoders and carousel. `src/illustrate/` draws the subjects in
   `brand/assets/illustrate.json` under the rules in `brand/illustration.md`. `src/figma/` and `src/commands/figma.ts`
   write Figma files and print MCP steps (never call Figma). Sources: agd-playground `src/components/opencommerce-og/`
   (read-only) and the site. `scripts/render-assets.ts --video` regenerates the docs gallery in `apps/www/public/assets`.
-- `src/video/`: short clips. Frames are SVG from the bundled fonts and tokens, rasterized by resvg, encoded by the pinned `ffmpeg-static` binary with `cpuflags none` and bitexact flags. Templates, frame rates, durations and sizes are fixed in `src/video/motion.ts`; WebM is VP9, one thread.
+- `src/design/`: `design new|revise|edit|...`. Every file but `adapter.ts` is the shared core, the same in every brand's
+  CLI byte for byte: do not edit it here. `test/design/{core.test,conformance}.ts` come with it. Every drawn layer is
+  reported by the drawing code (`DrawnLayer`), and `test/layouts.test.ts` checks them over every template and size.
+- `src/video/`: short clips. Frames are the image layouts with entrances, SVG from the bundled fonts and tokens, rasterized by resvg, encoded by the pinned `ffmpeg-static` binary with `cpuflags none` and bitexact flags. Templates, frame rates, durations and sizes are fixed in `src/video/motion.ts`; WebM is VP9, one thread.
 
 ## Rules
 
@@ -52,6 +57,7 @@ npm run ci           # build, limits, registry, tests; must pass before you push
 - No em dashes; American spelling; sentence case.
 - Element styles use only brand tokens and follow the animation rules (no ease-in, no `transition: all`, 150 to 300ms);
   the tests check every value.
+- Images draw only the copy they are given, whole, or fail saying what to shorten; sample copy needs `--sample`.
 - Restyle only: nothing the CLI writes may change a project's copy, elements or structure. It asks for no markup.
 - Library items use only brand token classes (the value check runs over `registry/` in CI), follow the animation
   rules, take data through props (no Next imports, auth or analytics), and have a docs entry and an example.

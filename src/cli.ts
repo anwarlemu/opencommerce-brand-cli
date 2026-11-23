@@ -8,6 +8,7 @@ import { deckCommand } from './commands/deck.js';
 import { illustrateCommand } from './commands/illustrate.js';
 import { merchCommand } from './commands/merch.js';
 import { figmaCommand } from './commands/figma.js';
+import { designCommand, runDesignCommand } from './commands/design.js';
 import { review, snapshot } from './commands/review.js';
 import { run } from './commands/run.js';
 import { guide } from './commands/guide.js';
@@ -48,6 +49,7 @@ deckCommand(program);
 illustrateCommand(program);
 merchCommand(program);
 figmaCommand(program);
+designCommand(program);
 program.command('approve').description('Approve ds-override comments (a person, in a terminal)').option('--all', 'approve every pending override').action((opts) => approve(opts));
 program.command('snapshot [url]').description('Save how each main screen looks before hand edits (run once, with the app running); reviews compare against it').action((url) => snapshot(url));
 program.command('skip <screen>').description('Leave a screen as it is when it cannot pass without changing words or elements; the person sees the reason').requiredOption('--reason <text>', 'why').action((id, opts) => skip(id, opts.reason));
@@ -92,6 +94,9 @@ if (first && !first.startsWith('-') && first !== 'help' && !program.commands.som
 	else process.stderr.write(`${error.message}\n`);
 	process.exit(1);
 }
+
+// `design` reads its own words and flags, so it runs before the parser can take --json or --theme from it.
+if (first === 'design') process.exit(await runDesignCommand(process.argv.slice(3)));
 
 program.parseAsync().catch((error: Error) => {
 	if (program.opts().json || process.argv.includes('--json')) process.stdout.write(`${JSON.stringify({ ok: false, error: error.message, ...((error as Error & { suggestions?: string[] }).suggestions ? { suggestions: (error as Error & { suggestions?: string[] }).suggestions } : {}) })}\n`);

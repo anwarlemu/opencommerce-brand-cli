@@ -4,6 +4,7 @@ import { drawScene, sceneSvg, TEMPLATE_IDS, type TemplateId } from '../assets/la
 import { display, write, type OutFile } from '../assets/io.js';
 import { imagesToPdf } from '../assets/pdf.js';
 import { unknownName } from '../lib/names.js';
+import { assertScene } from './check.js';
 import { copyFrom } from './content.js';
 import { picture, rasterRgb } from './load.js';
 import { assertSize, chooseTemplate, encodeScene, overLimit, parseFormats, parseScale, parseSize, parseTheme, sceneFor, settleCopy, type Format } from './render.js';
@@ -72,7 +73,9 @@ export function renderCarousel(input: CarouselInput) {
 		const smallest = sizes.get(scene.template)!;
 		const lead = scene.template === 'quote' ? 'body' : 'headline';
 		const ratio = drawn[i] > 0 ? smallest / drawn[i] : 1;
-		const svg = sceneSvg(ratio < 0.995 && ['headline', 'lead', 'quote', 'announcement', 'closing', 'hero'].includes(scene.template) ? { ...scene, edits: { [lead]: { scale: ratio } } } : scene).svg;
+		const drawnScene = sceneSvg(ratio < 0.995 && ['headline', 'lead', 'quote', 'announcement', 'closing', 'hero'].includes(scene.template) ? { ...scene, edits: { [lead]: { scale: ratio } } } : scene);
+		const svg = drawnScene.svg;
+		assertScene({ template: scene.template, sizeId: target.id, width: target.width, height: target.height, copy: scene.copy }, drawnScene.layers);
 		const data = encodeScene(svg, target.width, target.height, raster, scale);
 		const n = String(i + 1).padStart(2, '0');
 		for (const f of raster) pending.push({ path: join(dir, `${n}-${scene.template}.${f}`), data: data[f]!, entry: { format: f, slide: i + 1, template: scene.template, width: Math.round(target.width * (f === 'svg' ? 1 : scale)), height: Math.round(target.height * (f === 'svg' ? 1 : scale)) } });

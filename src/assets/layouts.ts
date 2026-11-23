@@ -1,4 +1,6 @@
 import { readFileSync } from 'node:fs';
+import { SMALL_FLOOR } from '../design/check.js';
+import { PLATFORMS, platformOf, zonePx } from '../design/platforms.js';
 import type { DrawnLayer, LayerEdit } from '../design/types.js';
 import { assertDrawable, cleanText, getFaces, joinLines, measure, ratios, wrapLines, type Line } from '../image/fonts.js';
 import { logoMark, paint, type Paint } from '../image/paint.js';
@@ -24,16 +26,13 @@ export const SLOTS = ['headline', 'body', 'badge', 'label', 'by', 'action', 'sec
 export type Slot = (typeof SLOTS)[number];
 export type Copy = Partial<Record<Slot, string>>;
 
-export type Safe = { inset: [number, number, number, number]; avoid?: [number, number, number, number][]; approximate: boolean; source: string };
-export type SizeDef = { width: number; height: number; description: string; shown: number; limitMb: number; limitSource: string; safe?: Safe };
+export type SizeDef = { width: number; height: number; description: string };
 type TemplateDef = { description: string; source: string; textSize?: number; textWidth?: { wide: number; tall: number }; sample: Copy; seed?: number; logo?: boolean; footer?: string };
 export type ImageDoc = {
 	unit: { width: number; height: number };
 	custom: { min: number; max: number };
-	sizes: Record<string, SizeDef>;
 	aliases: Record<string, string>;
 	templates: Record<TemplateId, TemplateDef>;
-	floor: { shownPx: number; custom: { wide: number; tall: number }; largePx: number };
 	logo: { min: number; clear: number; source: string };
 	notes: string[];
 };
@@ -69,6 +68,8 @@ export type Scene = {
 	/** Show or hide the lockup; each template has its own default. */
 	logo?: boolean;
 	glyphs?: boolean;
+	/** The field's glyphs against their usual size, 0.6 to 1.8. */
+	glyphSize?: number;
 	window?: boolean;
 	/** avatar: the whole mark on the ground instead of the mark carried to the edges. */
 	inset?: boolean;
@@ -95,36 +96,39 @@ export type Scene = {
 	dry?: boolean;
 };
 
-export type Drawn = { svg: string; layers: DrawnLayer[]; ground: string; desc: string; doc: Doc };
+export type Drawn = { svg: string; layers: DrawnLayer[]; held: Ctx['held']; ground: string; desc: string; doc: Doc };
 
 export const unitOf = (w: number, h: number) => Math.sqrt((w * h) / (imageData().unit.width * imageData().unit.height));
-
-export function sizeInfo(W: number, H: number): { id?: string; shown: number; safe?: Safe } {
-	const d = imageData();
-	for (const [id, s] of Object.entries(d.sizes)) if (s.width === W && s.height === H) return { id, shown: s.shown, safe: s.safe };
-	return { shown: W / H >= 1.25 ? d.floor.custom.wide : d.floor.custom.tall };
-}
-
-/** The smallest text at a size: 8 px at the width the image is usually shown. */
-export function floorFor(W: number, H: number) {
-	const info = sizeInfo(W, H);
-	const floor = Math.max(10, (imageData().floor.shownPx * W) / info.shown);
-	// A strip of a custom size is shown larger than a post, or it could hold no words at all.
-	return info.id ? floor : Math.max(10, Math.min(floor, H * 0.07));
-}
-
-type Place = { safe: Rect; avoid: Rect[] };
-export function placeFor(W: number, H: number): Place {
-	const s = sizeInfo(W, H).safe;
-	const [t, r, b, l] = s?.inset ?? [0, 0, 0, 0];
-	return { safe: { x: l, y: t, w: W - l - r, h: H - t - b }, avoid: (s?.avoid ?? []).map(([x, y, w, h]) => ({ x, y, w, h })) };
-}
 
 const inter = (a: Rect, b: Rect): Rect => {
 	const x = Math.max(a.x, b.x);
 	const y = Math.max(a.y, b.y);
 	return { x, y, w: Math.min(a.x + a.w, b.x + b.w) - x, h: Math.min(a.y + a.h, b.y + b.h) - y };
 };
+/** The platform size with these pixels, if there is one. */
+const platformAt = (W: number, H: number) => PLATFORMS.find((p) => p.width === W && p.height === H);
+
+export const sizes: Record<string, SizeDef> = Object.fromEntries(PLATFORMS.map((p) => [p.id, { width: p.width, height: p.height, description: `${p.label}, ${p.width}x${p.height}` }]));
+
+/** The smallest text at a size: 8 px at the width the picture is usually shown at. */
+export const floorFor = (W: number, H: number) => (SMALL_FLOOR * W) / (platformAt(W, H) ?? platformOf('custom', W, H)).shown;
+
+type Place = { safe: Rect; avoid: Rect[] };
+/** Where words may go: the platform's safe area less the strips it crops, and the corners it covers. */
+export function placeFor(W: number, H: number): Place {
+	const p = platformAt(W, H);
+	let safe: Rect = { x: 0, y: 0, w: W, h: H };
+	if (p?.safe) safe = zonePx(p.safe, W, H);
+	const avoid: Rect[] = [];
+	for (const z of p?.avoid ?? []) {
+		const r = zonePx(z, W, H);
+		if (r.w >= W - 1) safe = r.y < 1 ? inter(safe, { x: 0, y: r.h, w: W, h: H - r.h }) : inter(safe, { x: 0, y: 0, w: W, h: r.y });
+		else if (r.h >= H - 1) safe = r.x < 1 ? inter(safe, { x: r.w, y: 0, w: W - r.w, h: H }) : inter(safe, { x: 0, y: 0, w: r.x, h: H });
+		else avoid.push(r);
+	}
+	return { safe, avoid };
+}
+
 const inset = (r: Rect, px: number, py = px): Rect => ({ x: r.x + px, y: r.y + py, w: r.w - px * 2, h: r.h - py * 2 });
 
 type Local = { req: Scene; ctx: Ctx; place: Place; def: TemplateDef; copy: Record<Slot, string>; outs: Out[]; wide: boolean; seed: number; art: Rect[] };
@@ -157,15 +161,22 @@ function choose(l: Local, regions: Rect[], plan: (r: Rect, i: number) => Plan): 
 	return pool.find((p) => p.plan.score >= best * 0.9)!.plan;
 }
 
-/** The whole region first, then the parts of it beside and above what the platform covers. */
+/** The whole region first, then the parts of it beside and clear above what the platform covers. */
 function regionsOf(l: Local, r: Rect): Rect[] {
 	const out = [r];
-	for (const a of l.place.avoid) {
-		if (!hits(r, a, PAD)) continue;
-		const x = a.x + a.w + PAD * 2;
-		out.push({ x: Math.max(r.x, x), y: r.y, w: r.x + r.w - Math.max(r.x, x), h: r.h });
-		out.push({ ...r, h: Math.min(r.y + r.h, a.y - PAD) - r.y });
+	const met = l.place.avoid.filter((a) => hits(r, a, PAD));
+	if (!met.length) return out;
+	const lefts = met.filter((a) => a.x + a.w / 2 < r.x + r.w / 2);
+	const rights = met.filter((a) => a.x + a.w / 2 >= r.x + r.w / 2);
+	const x0 = Math.max(r.x, ...lefts.map((a) => a.x + a.w + PAD * 2));
+	const x1 = Math.min(r.x + r.w, ...rights.map((a) => a.x - PAD * 2));
+	const y1 = Math.min(...met.map((a) => a.y - PAD));
+	out.push({ x: x0, y: r.y, w: x1 - x0, h: r.h });
+	if (lefts.length && rights.length) {
+		out.push({ x: x0, y: r.y, w: r.x + r.w - x0, h: Math.min(r.y + r.h, ...rights.map((a) => a.y - PAD)) - r.y });
+		out.push({ x: r.x, y: r.y, w: x1 - r.x, h: Math.min(r.y + r.h, ...lefts.map((a) => a.y - PAD)) - r.y });
 	}
+	out.push({ ...r, h: y1 - r.y });
 	return out;
 }
 
@@ -196,12 +207,12 @@ function field(l: Local, o: Omit<FieldOptions, 'seed' | 't' | 'keep' | 'ink'>, k
 	const e = editOf(l.ctx, 'art');
 	if (l.req.glyphs === false || e.hidden || l.req.dry) return;
 	const ink: Rect[] = [];
-	const svg = glyphField(l.ctx.doc, { ...o, z: o.z * (e.scale ?? 1), seed: l.seed, t: l.req.t, keep, ink }, l.ctx.c);
+	const svg = glyphField(l.ctx.doc, { ...o, z: o.z * (l.req.glyphSize ?? 1), seed: l.seed, t: l.req.t, keep, ink }, l.ctx.c);
 	if (!ink.length) return;
-	l.outs.unshift({ id: 'art', svg: entered(l.ctx, 'art', clip ? `<g clip-path="url(#${clip})">${svg}</g>` : svg, o.box), layers: [{ id: 'art', kind: 'art', box: o.box, ink, bleeds: true, can: { hide: true, scale: [0.6, 1.8] } }] });
+	l.outs.unshift({ id: 'art', svg: entered(l.ctx, 'art', clip ? `<g clip-path="url(#${clip})">${svg}</g>` : svg, o.box), layers: [{ id: 'art', kind: 'art', box: o.box, ink, bleeds: true, can: { hide: true } }] });
 }
 
-const keepOf = (l: Local, pad: number) => l.outs.flatMap((o) => o.layers.filter((y) => y.kind !== 'art' && !y.over?.some((id) => id === 'window' || id.startsWith('card-'))).map((y) => grow(y.box, y.logo ? Math.max(pad, y.logo.clear) : pad)));
+const keepOf = (l: Local, pad: number) => l.outs.flatMap((o) => o.layers.filter((y) => y.kind !== 'art' && !y.over?.some((id) => id === 'window' || id === 'cards')).flatMap((y) => (y.id === 'cards' ? (y.ink ?? [y.box]) : [y.box]).map((b) => grow(b, y.logo ? Math.max(pad, y.logo.clear) : pad))));
 
 function canOf(item: Item, solved: { range: (id: string) => [number, number] } | null, extra: Partial<DrawnLayer['can']> = {}): DrawnLayer['can'] {
 	// Read only when a design asks, so a plain render does not pay for the search.
@@ -210,7 +221,7 @@ function canOf(item: Item, solved: { range: (id: string) => [number, number] } |
 	return can;
 }
 
-type FlowOpts = { anchor: Anchor9; bias?: number; anchors?: Anchor9[]; rise?: boolean; maxW?: number; windowAnchors?: Anchor9[]; align?: Align; /** Share of the height the column takes at most, before it has to shrink past its floor. */ fill?: number };
+type FlowOpts = { anchor: Anchor9; bias?: number; anchors?: Anchor9[]; rise?: boolean; maxW?: number; windowAnchors?: Anchor9[]; align?: Align; /** Share of the height the column takes at most, before it has to shrink past its floor. */ fill?: number; /** What a window in its own column can be scaled to, when the columns share the room. */ windowRange?: [number, number] };
 
 /** A column of parts in a region: the plan that draws it. */
 function flowPlan(l: Local, items: Item[], region: Rect, o: FlowOpts): Plan {
@@ -243,13 +254,24 @@ function flowPlan(l: Local, items: Item[], region: Rect, o: FlowOpts): Plan {
 	const stack = solved.laid;
 	const area = at(region, stack.w, stack.h, hasWindow ? (`${across(anchor) === 'center' ? '' : across(anchor)}` as Anchor9) || 'center' : anchor, stack.rising ? 0 : (o.bias ?? 0.5));
 	const align: Align = e.align ?? (e.anchor ? across(e.anchor) : (o.align ?? across(o.anchor)));
-	const dx = (e.dx ?? 0) * ctx.W;
-	const dy = (e.dy ?? 0) * ctx.H;
+	// A nudge keeps the words where they may be: inside the safe area, and beside what the platform covers.
+	const whole = l.place.avoid.every((a) => hits(region, a));
+	const room = whole ? l.place.safe : inter(grow(region, PAD), l.place.safe);
+	const hold = (want: number, at: number, size: number, from: number, length: number) => (size >= length ? Math.max(Math.min(0, from + length - at - size), Math.min(Math.max(0, from - at), want)) : Math.max(Math.min(0, from - at), Math.min(Math.max(0, from + length - at - size), want)));
+	const wordsH = order === shown ? stack.made.filter((x) => x.item.group === 'words').reduce((n, x) => Math.max(n, x.y + x.made.h), 0) : stack.h;
+	const dx = hold((e.dx ?? 0) * ctx.W, area.x, stack.w, room.x, room.w);
+	const dy = hold((e.dy ?? 0) * ctx.H, area.y, wordsH, room.y, room.h);
+	if (Math.abs(dx - (e.dx ?? 0) * ctx.W) > 0.5 || Math.abs(dy - (e.dy ?? 0) * ctx.H) > 0.5) ctx.held[lead.id] = { dx: Math.trunc((dx / ctx.W) * 1000) / 1000, dy: Math.trunc((dy / ctx.H) * 1000) / 1000 };
 	const painted = stack.made.map(({ item, made, y }) => {
-		const own = item.id === lead.id ? {} : editOf(ctx, item.id);
+		const own = item.id === lead.id && item.group === 'words' ? {} : editOf(ctx, item.id);
 		const block = item.group === 'words';
 		const box: Rect = { x: area.x + (block ? dx : 0) + (own.dx ?? 0) * ctx.W, y: area.y + y + (block ? dy : 0) + (own.dy ?? 0) * ctx.H, w: stack.w, h: made.h };
 		const own9 = own.anchor && item.group === 'window' ? across(own.anchor) : undefined;
+		if (own9 && own9 !== 'center') {
+			// A window put to a side goes to the side of the picture, not of the column.
+			box.x = region.x + (own.dx ?? 0) * ctx.W;
+			box.w = region.w;
+		}
 		return { item, box, align: own.align ?? own9 ?? (item.group === 'window' ? (align === 'center' ? 'center' : align) : align), made };
 	});
 	const inks = () => painted.map((p) => p.made.paint(p.box, p.align, {})).flatMap((out) => out.layers.filter((y) => !y.over?.includes('window')).flatMap((y) => y.ink ?? [y.box]));
@@ -269,7 +291,7 @@ function flowPlan(l: Local, items: Item[], region: Rect, o: FlowOpts): Plan {
 		draw() {
 			for (const p of painted) {
 				const extra: Partial<DrawnLayer['can']> = p.item.id === lead.id ? { hide: false, anchors: o.anchors ?? ANCHORS } : p.item.group === 'window' ? { anchors: o.windowAnchors ?? ['left', 'center', 'right'] } : {};
-				const out = p.made.paint(p.box, p.align, canOf(p.item, p.item.id === 'logo' ? { range: () => logoRange(p.item, solved.range('logo')) } : solved, extra));
+				const out = p.made.paint(p.box, p.align, canOf(p.item, p.item.id === 'logo' ? { range: () => logoRange(p.item, solved.range('logo')) } : p.item.group === 'window' && o.windowRange ? { range: () => o.windowRange! } : solved, extra));
 				push(l, out);
 			}
 		},
@@ -285,12 +307,13 @@ function words(l: Local, o: { size: number; bodyRatio?: number; bodyShare?: numb
 	const { ctx, copy } = l;
 	const { c, k, floor, W, H } = ctx;
 	const ground = [o.ground ?? ctx.ground];
+	const key = (id: 'action' | 'secondary') => (editOf(ctx, id).hidden ? '' : copy[id]);
 	const size = o.size;
 	const items: Item[] = [];
 	if (copy.badge) items.push(badgeItem(ctx, copy.badge, { start: H / W > 1.15 ? 0.03 * W : 20 * k, gap: 0, over: o.over }));
 	if (copy.headline) items.push(textItem(ctx, { id: 'headline', value: copy.headline, face: 'display', start: size, min: Math.max(floor * 1.5, 24 * k * 0.8), gap: 28 * k, leading: c.leadingHeading, fill: c.ink, ground, over: o.over, even: true, ...(o.track === false ? {} : { tracking: () => c.trackingHero }), hide: false }));
 	if (copy.body) items.push(textItem(ctx, { id: 'body', value: copy.body, face: 'sans', start: Math.max(floor, size * (o.bodyRatio ?? 0.33)), min: floor, gap: Math.max(12 * k, size * 0.34), leading: c.leadingLead, fill: c.secondary, ground, over: o.over, share: o.bodyShare ?? 0.9, even: true }));
-	if (copy.action || copy.secondary) items.push(keysItem(ctx, copy.action, copy.secondary, { start: H / W > 1.15 ? 0.028 * W : 17 * k, gap: 34 * k, over: o.over }));
+	if (key('action') || key('secondary')) items.push(keysItem(ctx, key('action'), key('secondary'), { start: H / W > 1.15 ? 0.028 * W : 17 * k, gap: 34 * k, over: o.over }));
 	return items;
 }
 
@@ -310,7 +333,7 @@ function windowOf(l: Local, what: WindowContent, region: Rect, o: { gap: number;
 		gap: o.gap,
 		start: picture ? Math.min(o.pictureStart, region.w) : what.kind === 'prose' ? ctx.k * 34 : o.codeStart,
 		min: picture ? Math.max(90, Math.min(region.w * 0.16, (region.h * 0.5) / Math.max(0.2, tall))) : ctx.floor,
-		minW: o.minW,
+		minW: Math.min(region.w, o.minW * scaleOf(ctx, 'window')),
 		z: o.z,
 		frame: region,
 	});
@@ -340,7 +363,7 @@ function poster(l: Local) {
 	items.push(textItem(ctx, { id: quote ? 'body' : 'headline', value: head, face: 'display', start: size, min: Math.max(floor * 1.4, 22 * k * 0.8), gap: 22 * k, leading: c.leadingHeading, fill: c.ink, ground: [ctx.ground], even: true, hide: false }));
 	if (quote && copy.by) items.push(textItem(ctx, { id: 'by', value: copy.by, face: 'sans', start: Math.max(floor, tall ? 0.034 * W : 20 * k), min: floor, gap: 28 * k, leading: 1.35, fill: c.secondary, ground: [ctx.ground], even: true }));
 	if (!quote && copy.body) items.push(textItem(ctx, { id: 'body', value: copy.body, face: 'sans', start: Math.max(floor, tall ? 0.04 * W : (wide ? 22 : 24) * k), min: floor, gap: 24 * k, leading: c.leadingLead, fill: c.secondary, ground: [ctx.ground], share: wide ? 0.7 : 0.86, even: true }));
-	if (copy.action) items.push(keysItem(ctx, copy.action, '', { start: tall ? 0.03 * W : 17 * k, gap: 34 * k }));
+	if (copy.action && !editOf(ctx, 'action').hidden) items.push(keysItem(ctx, copy.action, '', { start: tall ? 0.03 * W : 17 * k, gap: 34 * k }));
 	const maxW = wide ? Math.min(region.w, 1000 * k) : region.w;
 	const plan = choose(l, regionsOf(l, region), (r) => flowPlan(l, items, r, { anchor: 'center', bias: 0.46, maxW, ...(tall ? { fill: 0.78 } : {}) }));
 	plan.draw();
@@ -361,9 +384,9 @@ function sides(l: Local, frame: Rect, o: { size: number; what: WindowContent; z:
 		const e = editOf(ctx, 'headline');
 		const own = editOf(ctx, 'window');
 		const flip = across(e.anchor ?? 'left') === 'right' || across(own.anchor ?? 'right') === 'left';
-		let best: Plan | null = null;
+		let best: (Plan & { winW: number; colW: number }) | null = null;
 		let failure: unknown;
-		for (const share of [0.53, 0.48, 0.58, 0.42, 0.63, 0.36]) {
+		const attempt = (share: number, grown: number | null) => {
 			const winW = r.w * share - o.gap / 2;
 			const wordW = r.w - winW - o.gap;
 			const wordR: Rect = { x: flip ? r.x + winW + o.gap : r.x, y: r.y, w: wordW, h: r.h };
@@ -379,12 +402,14 @@ function sides(l: Local, frame: Rect, o: { size: number; what: WindowContent; z:
 				} finally {
 					ctx.edits = keep;
 				}
-				const win = windowOf(l, o.what, winR, { gap: 0, minW: winR.w * 0.8, codeStart: 26 * ctx.k, z: o.z, pictureStart: Math.min(o.pictureStart, winR.w) });
-				plans.push(flowPlan(l, [win], winR, { anchor: 'center', windowAnchors: ['left', 'right'] }));
+				const win = windowOf(l, o.what, winR, { gap: 0, minW: winR.w * (grown ? 1 : 0.8), codeStart: 26 * ctx.k * Math.max(1, grown ?? 1), z: o.z, pictureStart: Math.min(grown ? winR.w : o.pictureStart, winR.w) });
+				plans.push(flowPlan(l, [win], winR, { anchor: 'center', windowAnchors: ['left', 'right'], windowRange: range }));
 				const score = plans[0].score * (0.75 + 0.25 * Math.min(1, share / 0.5)) * (0.9 + 0.1 * Math.min(1, plans[1].score / (o.what.kind === 'picture' ? winR.w : 20 * ctx.k)));
-				if (!best || score > best.score * 1.04)
+				if (!best || score > (best as Plan).score * 1.04)
 					best = {
 						score,
+						winW: plans[1].inks[0]?.w ?? winW,
+						colW: winW,
 						inks: plans.flatMap((p) => p.inks),
 						draw: () => {
 							ctx.edits = wordEdits;
@@ -400,6 +425,31 @@ function sides(l: Local, frame: Rect, o: { size: number; what: WindowContent; z:
 				if (!(error instanceof FitError)) throw error;
 				failure = error;
 			}
+		};
+		const scale = scaleOf(ctx, 'window');
+		const most = r.w * 0.72 - o.gap / 2;
+		const edits = ctx.edits;
+		const range: [number, number] = [1, 1];
+		const sweep = () => {
+			for (const share of [0.53, 0.48, 0.58, 0.42, 0.63, 0.36]) attempt(share, null);
+		};
+		// A scaled window takes its size from the window as the layout would set it, and the words take what is left.
+		if (edits.window) ctx.edits = { ...edits, window: { ...edits.window, scale: undefined } };
+		try {
+			sweep();
+			const base = best as (Plan & { winW: number; colW: number }) | null;
+			if (base) {
+				// Filled in here, read when the layer is reported.
+				range[0] = Math.max(0.6, Math.min(1, Math.ceil((100 * 0.3 * r.w) / base.winW) / 100));
+				range[1] = Math.max(1, Math.floor((100 * most) / base.winW) / 100);
+			}
+			if (base && scale !== 1) {
+				best = null;
+				for (let pull = 0; pull <= 10 && !best; pull++) attempt((Math.min(most, base.winW * (1 + (scale - 1) * (1 - pull / 10))) + o.gap / 2) / r.w, scale);
+				if (!best) best = base;
+			}
+		} finally {
+			ctx.edits = edits;
 		}
 		if (!best) throw failure ?? new FitError('The copy does not fit.');
 		return best;
@@ -560,12 +610,19 @@ function cards(l: Local) {
 		const room = R.w - (logo && down(logo.anchor) === 'bottom' ? logo.box.w + 40 * k : 0);
 		if (copy.footer && footW * footScale > room) throw new FitError('The footer does not fit.');
 		const drawFooter = footer && footW * footScale <= room;
-		const region = below(l, logo, drawFooter && (!logo || down(logo.anchor) !== 'bottom') ? { ...R, h: R.h - fh - 26 * k } : R, 26 * k);
+		const region0 = below(l, logo, drawFooter && (!logo || down(logo.anchor) !== 'bottom') ? { ...R, h: R.h - fh - 26 * k } : R, 26 * k);
+		const region = drawFooter ? { ...region0, h: Math.min(region0.y + region0.h, R.y + R.h - fh - 26 * k) - region0.y } : region0;
+		const footBox = (() => {
+			if (!drawFooter) return null;
+			const fs = footSize * footScale;
+			const mid = Math.min(logo && down(logo.anchor) === 'bottom' ? logo.box.y + logo.box.h / 2 : R.y + R.h, R.y + R.h - fs * 0.62);
+			return { x: (logoRight ? R.x : R.x + R.w - footW * footScale) + (footEdit.dx ?? 0) * W, y: mid - fs * 0.39 + (footEdit.dy ?? 0) * H, w: footW * footScale, h: fs };
+		})();
 		const gapX = CARD.gapX * k;
 		const gapY = CARD.gapY * k;
 		const headEdit = editOf(ctx, 'headline');
 		const lay = (sizes: Sizes, breaks: boolean, cols: number): (CardsLaid & { s: number; h: number }) | null => {
-			const s = sizes.cards / CARD.body;
+			const s = sizes['card-text'] / CARD.body;
 			const ts = sizes.headline ?? 0;
 			const tl = title && !headEdit.hidden ? wrapLines(display, title, ts, region.w, c.trackingHero, true) : [];
 			if (tl.some((x) => x.glued) && !breaks) return null;
@@ -605,14 +662,14 @@ function cards(l: Local) {
 			});
 			return { title: tl, cards: laid, top, cols, s, h: total };
 		};
-		const parts = [{ id: 'cards', start: CARD.body * (l.wide ? 1 : 1.12), min: Math.min(CARD.body, floor / k) }, ...(title && !headEdit.hidden ? [{ id: 'headline', start: (l.wide ? def.textSize! : 0.062 * W / k) * k * (req.textScale ?? 1), min: Math.max(floor * 1.15, 18 * k) }] : [])];
+		const parts = [{ id: 'card-text', start: CARD.body * (l.wide ? 1 : 1.12), min: Math.min(CARD.body, floor / k) }, ...(title && !headEdit.hidden ? [{ id: 'headline', start: (l.wide ? def.textSize! : 0.062 * W / k) * k * (req.textScale ?? 1), min: Math.max(floor * 1.15, 18 * k) }] : [])];
 		let best: ReturnType<typeof solve<CardsLaid & { s: number; h: number }>> | null = null;
 		const options = W / H < 0.65 ? [1, 2] : [2, 1, 3, 4];
 		for (const cols of options) {
 			if (cols > list.length) continue;
 			try {
 				const solved = solve(ctx, parts, (sizes, breaks) => lay(sizes, breaks, cols));
-				if (!best || solved.sizes.cards > best.sizes.cards * 1.06) best = solved;
+				if (!best || solved.sizes['card-text'] > best.sizes['card-text'] * 1.06) best = solved;
 			} catch (error) {
 				if (!(error instanceof FitError)) throw error;
 			}
@@ -632,8 +689,8 @@ function cards(l: Local) {
 			return { line, x: x + dx, baseline, rect: { x: x + dx, y: baseline - cap * ts, w, h: (cap + desc) * ts } };
 		});
 		return {
-			score: done.sizes.cards,
-			inks: [...titleRows.map((r) => r.rect), ...b.cards.map((x) => x.rect), ...(logo ? [logo.box] : [])],
+			score: done.sizes['card-text'],
+			inks: [...titleRows.map((r) => r.rect), ...b.cards.map((x) => x.rect), ...(logo ? [logo.box] : []), ...(footBox ? [footBox] : [])],
 			draw() {
 				const scale = (id: string) => ({ get scale() { return done.range(id); } });
 				const s = b.s;
@@ -646,6 +703,8 @@ function cards(l: Local) {
 					const ink = titleRows.map((r) => r.rect);
 					push(l, { id: 'headline', svg: titleRows.map((r) => text(display, r.line.text, r.x, r.baseline, ts, c.trackingHero, c.ink)).join(''), layers: [{ id: 'headline', kind: 'text', box: union(ink), ink, text: { asked: title, drawn: joinLines(b.title), size: r2(ts), color: c.ink, ground: [ctx.ground], ...mark('headline') }, can: Object.defineProperties({ move: true, align: true, hide: true }, Object.getOwnPropertyDescriptors(scale('headline'))) }] });
 				}
+				const headInk: Rect[] = [];
+				const bodyInk: Rect[] = [];
 				for (const [i, cd] of b.cards.entries()) {
 					const id = `card-${i + 1}`;
 					const r = cd.rect;
@@ -665,19 +724,22 @@ function cards(l: Local) {
 					cd.body.forEach((x, n) => p.push(text(sans, x.text, r.x + pad, bTop + bs * 1.05 + n * bs * 1.45, bs, 0, c.secondary)));
 					const tInk = cd.title.map((x, n) => ({ x: hx, y: first + n * hs * 1.2 - hs * 0.72, w: measure(display, x.text, hs, c.trackingTight), h: hs * 0.93 }));
 					const bInk = cd.body.map((x, n) => ({ x: r.x + pad, y: bTop + bs * 1.05 + n * bs * 1.45 - bs * 0.75, w: measure(sans, x.text, bs, 0), h: bs }));
-					const layers: DrawnLayer[] = [{ id, kind: 'panel', box: r, can: i === 0 ? Object.defineProperties({}, Object.getOwnPropertyDescriptors({ get scale() { return done.range('cards'); } })) : {} }];
-					layers.push({ id: `${id}-title`, kind: 'text', box: union(tInk), ink: tInk, over: [id], text: { asked: list[i].title, drawn: joinLines(cd.title), size: r2(hs), color: c.ink, ground: [c.white], ...mark('cards') }, can: {} });
-					if (bInk.length) layers.push({ id: `${id}-body`, kind: 'text', box: union(bInk), ink: bInk, over: [id], text: { asked: list[i].body, drawn: joinLines(cd.body), size: r2(bs), color: c.secondary, ground: [c.white], ...mark('cards') }, can: {} });
-					push(l, { id, svg: p.join(''), layers });
+					headInk.push(...tInk);
+					bodyInk.push(...bInk);
+					push(l, { id, svg: p.join(''), layers: [] }, r);
 				}
+				const faces = b.cards.map((x) => x.rect);
+				const grid: DrawnLayer[] = [{ id: 'cards', kind: 'panel', box: union(faces), ink: faces, can: {} }];
+				grid.push({ id: 'card-headings', kind: 'text', box: union(headInk), ink: headInk, over: ['cards'], text: { asked: list.map((x) => x.title).join('\n'), drawn: b.cards.map((x) => joinLines(x.title)).join('\n'), size: r2(hs), color: c.ink, ground: [c.white], ...mark('cards') }, can: {} });
+				if (bodyInk.length) grid.push({ id: 'card-text', kind: 'text', box: union(bodyInk), ink: bodyInk, over: ['cards'], text: { asked: list.map((x) => x.body).filter(Boolean).join('\n'), drawn: b.cards.map((x) => joinLines(x.body)).filter(Boolean).join('\n'), size: r2(bs), color: c.secondary, ground: [c.white], ...mark('cards') }, can: Object.defineProperties({}, Object.getOwnPropertyDescriptors(scale('card-text'))) });
+				l.outs.push({ id: 'grid', svg: '', layers: grid });
 				if (logo) push(l, logo);
 				if (drawFooter) {
 					const fs = footSize * footScale;
-					const bottom = logo && down(logo.anchor) === 'bottom' ? logo.box.y + logo.box.h / 2 : R.y + R.h - fs / 2;
-					const x = (logoRight ? R.x : R.x + R.w - footW * footScale) + (footEdit.dx ?? 0) * W;
-					const baseline = bottom + fs * 0.36 + (footEdit.dy ?? 0) * H;
-					const box = { x, y: baseline - fs * 0.75, w: footW * footScale, h: fs };
-					push(l, { id: 'footer', svg: text(display, address, x, baseline, fs, 0, c.secondary), layers: [{ id: 'footer', kind: 'text', box, text: { asked: address, drawn: address, size: r2(fs), color: c.secondary, ground: [ctx.ground] }, can: { move: true, hide: true, scale: [Math.ceil((floor / footSize) * 100) / 100, Math.max(1, Math.floor(Math.min(2, room / footW) * 100) / 100)] } }] });
+					const box = footBox!;
+					const x = box.x;
+					const baseline = box.y + fs * 0.75;
+					push(l, { id: 'footer', svg: text(display, address, x, baseline, fs, 0, c.secondary), layers: [{ id: 'footer', kind: 'text', box, text: { asked: address, drawn: address, size: r2(fs), color: c.secondary, ground: [ctx.ground], ...(copy.footer ? mark('footer') : { own: true }) }, can: { move: true, hide: true, scale: [Math.ceil((floor / footSize) * 100) / 100, Math.max(1, Math.floor(Math.min(2, room / footW) * 100) / 100)] } }] });
 				}
 			},
 		};
@@ -722,12 +784,12 @@ function avatar(l: Local) {
 	if (!req.inset) {
 		// The tile is the mark itself, centered; its blue fills what a circle crop would show past its corners.
 		const svg = `<rect width="${W}" height="${H}" fill="${c.brand}"/>${logoMark((W - side) / 2, (H - side) / 2, side)}`;
-		push(l, { id: 'logo', svg, layers: [{ id: 'logo', kind: 'logo', box: { x: 0, y: 0, w: W, h: H }, bleeds: true, logo: { clear: 0, min: 32 }, can: {} }] });
+		push(l, { id: 'logo', svg, layers: [{ id: 'logo', kind: 'logo', box: { x: 0, y: 0, w: W, h: H }, ink: [{ x: (W - side) / 2 + side * 0.19, y: (H - side) / 2 + side * 0.226, w: side * 0.62, h: side * 0.548 }], bleeds: true, logo: { clear: 0, min: 32 }, can: {} }] });
 		return;
 	}
 	const s = Math.min(side * 0.69, Math.max(32, side * 0.6 * (e.scale ?? 1)));
 	const box = { x: (W - s) / 2, y: (H - s) / 2, w: s, h: s };
-	push(l, { id: 'logo', svg: logoMark(box.x, box.y, s), layers: [{ id: 'logo', kind: 'logo', box, logo: { clear: r2(s * 0.1), min: 32 }, can: { scale: [Math.ceil((32 / (side * 0.6)) * 100) / 100, 1.15] } }] });
+	push(l, { id: 'logo', svg: logoMark(box.x, box.y, s), layers: [{ id: 'logo', kind: 'logo', box, logo: { clear: r2(s * 0.1), min: 32 }, can: { scale: [0.5, 1.15] } }] });
 }
 
 // ------------------------------------------------------------------------------------------------- drawing
@@ -740,7 +802,7 @@ function local(req: Scene): Local {
 	const kc = unitOf(W, H);
 	const k = Math.min(kc, unitOf(place.safe.w, place.safe.h), place.safe.h / 330, place.safe.w / 480);
 	const def = imageData().templates[req.template];
-	const ctx: Ctx = { W, H, k, kc, floor: req.floor ?? floorFor(W, H), c, doc: req.doc ?? new Doc(), edits: req.edits ?? {}, ground: req.theme === 'mist' ? c.mist : c.white, enter: req.enter, sample: req.sample ?? new Set() };
+	const ctx: Ctx = { W, H, k, kc, floor: req.floor ?? floorFor(W, H), c, doc: req.doc ?? new Doc(), edits: { ...req.edits, ...(req.edits?.action ? { keys: { ...req.edits.action, hidden: undefined } } : {}) }, ground: req.theme === 'mist' ? c.mist : c.white, enter: req.enter, sample: req.sample ?? new Set(), held: {} };
 	const copy = Object.fromEntries(SLOTS.map((s) => [s, req.copy[s] ?? ''])) as Record<Slot, string>;
 	return { req, ctx, place, def, copy, outs: [], wide: W / H >= 1.25, seed: req.seed ?? def.seed ?? 3, art: [] };
 }
@@ -759,7 +821,7 @@ function layOut(req: Scene): Local {
 		const panel = req.template === 'closing';
 		const ground = panel && ctx.ground !== ctx.c.mist ? ctx.c.mist : panel ? ctx.c.white : ctx.ground;
 		if (!editOf(ctx, 'number').hidden) {
-			push(l, { id: 'number', svg: text(mono, req.page, box.x, box.y + size * 0.8, size, 0, ctx.c.secondary), layers: [{ id: 'number', kind: 'text', box, ...(panel ? { over: ['panel'] } : {}), text: { asked: req.page, drawn: req.page, size: r2(size), color: ctx.c.secondary, ground: [ground] }, can: { hide: true } }] });
+			push(l, { id: 'number', svg: text(mono, req.page, box.x, box.y + size * 0.8, size, 0, ctx.c.secondary), layers: [{ id: 'number', kind: 'text', box, ...(panel ? { over: ['panel'] } : {}), text: { asked: req.page, drawn: req.page, size: r2(size), color: ctx.c.secondary, ground: [ground], own: true }, can: { hide: true } }] });
 			if (['hero', 'cards', 'closing'].includes(req.template)) {
 				const y = Math.max(l.place.safe.y, box.y + box.h + 12 * ctx.k);
 				l.place = { ...l.place, safe: { ...l.place.safe, y, h: l.place.safe.y + l.place.safe.h - y } };
@@ -793,8 +855,7 @@ function layOut(req: Scene): Local {
 
 /** What to shorten when copy does not fit: the longest slot, and about how long it may be. */
 function fitMessage(req: Scene): string {
-	const info = sizeInfo(req.width, req.height);
-	const where = `${req.template} at ${info.id ?? `${req.width}x${req.height}`}`;
+	const where = `${req.template} at ${platformAt(req.width, req.height)?.id ?? `${req.width}x${req.height}`}`;
 	const slots = (['headline', 'body', 'cards', 'code', 'badge', 'label', 'by', 'action', 'secondary', 'footer'] as Slot[]).filter((s) => req.copy[s]?.trim());
 	const fits = (copy: Copy) => {
 		try {
@@ -844,15 +905,15 @@ export function drawScene(req: Scene): Drawn {
 	}
 	const copy = l.copy;
 	const desc = [copy.badge, copy.headline, copy.body, copy.by, copy.action, copy.secondary, copy.cards.replace(/\s+/g, ' ')].map((s) => s.trim()).filter(Boolean).join(' ');
-	return { svg: l.outs.map((o) => o.svg).join(''), layers: l.outs.flatMap((o) => o.layers), ground: l.ctx.ground, desc: cleanText(desc), doc: l.ctx.doc };
+	return { svg: l.outs.map((o) => o.svg).join(''), layers: l.outs.flatMap((o) => o.layers), held: l.ctx.held, ground: l.ctx.ground, desc: cleanText(desc), doc: l.ctx.doc };
 }
 
 /** A scene as a whole SVG document. */
-export function sceneSvg(req: Scene): { svg: string; layers: DrawnLayer[] } {
+export function sceneSvg(req: Scene): { svg: string; layers: DrawnLayer[]; held: Ctx['held'] } {
 	const d = drawScene(req);
 	const copy = req.copy;
 	const title = cleanText((copy.headline || copy.body || brand().name).replace(/\s+/g, ' ').trim());
-	return { svg: svgDocument(d.doc, req.width, req.height, d.ground, d.svg, { title, desc: d.desc }), layers: d.layers };
+	return { svg: svgDocument(d.doc, req.width, req.height, d.ground, d.svg, { title, desc: d.desc }), layers: d.layers, held: d.held };
 }
 
 export type { Paint };

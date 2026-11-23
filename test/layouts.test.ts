@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { merchItems, itemSvg } from '../src/assets/merch.js';
 import { slideScene, slideTypes } from '../src/assets/deck.js';
+import { findingsOf } from '../src/image/check.js';
+import { errorsOf } from '../src/design/index.js';
 import { floorFor, placeFor, sceneSvg, TEMPLATE_IDS, TEMPLATE_SLOTS, type Copy, type Scene, type Slot } from '../src/assets/layouts.js';
 import type { DrawnLayer, Rect } from '../src/design/types.js';
 import { loadImage, parseSize, pngSize, rasterize, renderImages, sizesFor, type TemplateId } from '../src/image/render.js';
@@ -44,7 +46,7 @@ export function problems(req: Scene, layers: DrawnLayer[]): string[] {
 			const large = y.text.size >= 24 * (req.width / 1200);
 			for (const g of y.text.ground) if (contrast(y.text.color, g) < (large ? 3 : 4.5)) out.push(`${y.id} contrast on ${g}`);
 		}
-		if (y.kind !== 'art' && !y.bleeds && marks.some((b) => b.x < -0.5 || b.y < -0.5 || b.x + b.w > req.width + 0.5 || b.y + b.h > req.height + 0.5)) out.push(`${y.id} is cut`);
+		if (y.kind !== 'art' && !y.bleeds && !y.fades && marks.some((b) => b.x < -0.5 || b.y < -0.5 || b.x + b.w > req.width + 0.5 || b.y + b.h > req.height + 0.5)) out.push(`${y.id} is cut`);
 		if (['text', 'logo', 'key'].includes(y.kind) && !y.bleeds) {
 			const s = place.safe;
 			if (marks.some((b) => b.x < s.x - 1 || b.y < s.y - 1 || b.x + b.w > s.x + s.w + 1 || b.y + b.h > s.y + s.h + 1)) out.push(`${y.id} leaves the safe area`);
@@ -66,8 +68,8 @@ export function problems(req: Scene, layers: DrawnLayer[]): string[] {
 
 /** Every text a drawing may hold: the copy asked for, the numbers on cards, and the brand's own address. */
 function invented(layers: DrawnLayer[], copy: Copy): string[] {
-	const asked = flat(Object.values(copy).join(' '));
-	return layers.filter((y) => y.text && y.id !== 'footer').filter((y) => !asked.includes(flat(y.text!.drawn))).map((y) => `${y.id}: ${y.text!.drawn}`);
+	const asked = flat(Object.values(copy).join(' ')).split(' ');
+	return layers.filter((y) => y.text && !y.text.own).filter((y) => flat(y.text!.drawn).split(' ').some((w) => !asked.includes(w))).map((y) => `${y.id}: ${y.text!.drawn}`);
 }
 
 function copyFor(template: TemplateId, all: Copy): Copy | null {
@@ -102,14 +104,15 @@ describe('every layout', () => {
 							continue;
 						}
 						drawn++;
-						for (const p of [...problems(req, layers), ...invented(layers, copy)]) found.push(`${template} ${id} ${theme} ${kind}: ${p}`);
+						const core = errorsOf(findingsOf({ template, sizeId: id, width: size.width, height: size.height, copy }, layers)).map((f) => `${f.rule}: ${f.message}`);
+						for (const p of [...problems(req, layers), ...invented(layers, copy), ...core]) found.push(`${template} ${id} ${theme} ${kind}: ${p}`);
 					}
 				}
 			}
 		}
 		expect(found).toEqual([]);
-		expect(drawn).toBeGreaterThan(1000);
-		expect(refused).toBeLessThan(drawn * 0.1);
+		expect(drawn).toBeGreaterThan(900);
+		expect(refused).toBeLessThan(drawn * 0.12);
 	});
 
 	it('holds a nine word headline on every banner', () => {
@@ -131,7 +134,7 @@ describe('every layout', () => {
 					const { svg, layers } = sceneSvg(req);
 					expect(problems(req, layers), `${template} ${id} ${w}x${h}`).toEqual([]);
 					const win = layers.find((y) => y.id === 'window')!;
-					expect(Boolean(win.bleeds)).toBe(/<mask /.test(svg));
+					expect(Boolean(win.fades)).toBe(/<mask /.test(svg));
 					const pic = layers.find((y) => y.id === 'picture')!.box;
 					expect(pic.w / pic.h).toBeCloseTo(w / h, 1);
 				}

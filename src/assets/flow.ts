@@ -33,6 +33,8 @@ export type Ctx = {
 	enter?: Enter;
 	/** Copy slots filled by --sample. */
 	sample: Set<string>;
+	/** Layers a nudge took further than there is room for, and how far they went instead (shares of the canvas). */
+	held: Record<string, { dx: number; dy: number }>;
 };
 
 /** A measured part, ready to place. `rise`: it may leave the canvas at the bottom, fading. */
@@ -181,7 +183,8 @@ export function keysItem(ctx: Ctx, primary: string, secondary: string, o: { star
 	for (const b of list) assertDrawable(b.id, b.label);
 	const font = getFaces().sansMedium;
 	return {
-		id: 'action',
+		// The pair moves and scales as one, by the action's edits; each is hidden on its own.
+		id: 'keys',
 		start: Math.max(o.start, ctx.floor),
 		min: ctx.floor,
 		gap: o.gap,
@@ -280,13 +283,17 @@ export function windowItem(ctx: Ctx, content: WindowContent, label: string, o: {
 			let h: number;
 			let rows: Line[] = [];
 			let broken = false;
+			let pw = 0;
 			if (content.kind === 'code') {
 				w = Math.min(maxW, Math.max(unit * size + 2 * WINDOW.padX * z, labelW + chrome, o.minW));
 				if (unit * size + 2 * WINDOW.padX * z > maxW + 0.5) return null;
 				h = bar + 2 * WINDOW.padY * z + codeRows.length * size * c.leadingCode;
 			} else if (content.kind === 'picture') {
-				w = Math.min(maxW, size);
-				h = bar + content.pad * 2 * z + ((w - content.pad * 2 * z) * content.picture.height) / content.picture.width;
+				// A tall picture may be narrower than its window's bar needs.
+				pw = Math.min(maxW, size) - content.pad * 2 * z;
+				if (pw < 24) return null;
+				w = Math.min(maxW, Math.max(pw + content.pad * 2 * z, labelW + chrome, 3.2 * bar));
+				h = bar + content.pad * 2 * z + (pw * content.picture.height) / content.picture.width;
 			} else {
 				w = Math.min(maxW, Math.max(o.minW, labelW + chrome));
 				rows = wrapLines(getFaces().sans, prose, size, w - 2 * WINDOW.padX * z * 1.4, 0);
@@ -302,9 +309,9 @@ export function windowItem(ctx: Ctx, content: WindowContent, label: string, o: {
 					const x = align === 'left' ? box.x : align === 'right' ? box.x + box.w - w : box.x + box.w / 2 - w / 2;
 					const r: Rect = { x, y: box.y, w, h };
 					const leaves = r.y + r.h > ctx.H;
-					const body = content.kind === 'code' ? ({ kind: 'code', code, highlight: content.highlight, size, dark: content.dark, lineAlpha: content.lineAlpha } as const) : content.kind === 'picture' ? ({ kind: 'picture', picture: content.picture, pad: content.pad * z } as const) : ({ kind: 'prose', lines: rows.map((l) => l.text), size, leading: c.leadingLead, lineAlpha: content.lineAlpha } as const);
+					const body = content.kind === 'code' ? ({ kind: 'code', code, highlight: content.highlight, size, dark: content.dark, lineAlpha: content.lineAlpha } as const) : content.kind === 'picture' ? ({ kind: 'picture', picture: content.picture, pad: content.pad * z, width: pw } as const) : ({ kind: 'prose', lines: rows.map((l) => l.text), size, leading: c.leadingLead, lineAlpha: content.lineAlpha } as const);
 					const svg = windowSvg(ctx.doc, r, name, body, z, c, { labelSize, ...(leaves && content.kind === 'picture' ? { fadeFrom: r.y + (ctx.H - r.y) * 0.55, fadeTo: ctx.H } : {}) });
-					const layers: DrawnLayer[] = [{ id: 'window', kind: 'panel', box: r, ...(leaves && content.kind === 'picture' ? { bleeds: true } : {}), can }];
+					const layers: DrawnLayer[] = [{ id: 'window', kind: 'panel', box: r, ...(leaves && content.kind === 'picture' ? { fades: true } : {}), can }];
 					const mark = (id: string) => (ctx.sample.has(id) ? { sample: true } : {});
 					if (name) {
 						const lw = measure(mono, name, labelSize, 0);
@@ -320,7 +327,7 @@ export function windowItem(ctx: Ctx, content: WindowContent, label: string, o: {
 						layers.push({ id: 'body', kind: 'text', box: union(ink), ink, over: ['window'], text: { asked: prose, drawn: joinLines(rows), size: r2(size), color: c.ink, ground: [c.white], ...mark('body') }, can: {} });
 					} else {
 						const pad = content.pad * z;
-						layers.push({ id: 'picture', kind: 'picture', box: { x: inner.x + pad, y: inner.y + pad, w: inner.w - pad * 2, h: inner.h - pad * 2 }, over: ['window'], ...(leaves ? { bleeds: true } : {}), can: {} });
+						layers.push({ id: 'picture', kind: 'picture', box: { x: inner.x + (inner.w - pw) / 2, y: inner.y + pad, w: pw, h: inner.h - pad * 2 }, over: ['window'], ...(leaves ? { fades: true } : {}), can: {} });
 					}
 					return { id: 'window', svg, layers };
 				},

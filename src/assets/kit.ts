@@ -156,7 +156,7 @@ export type Picture = { data: Buffer; width: number; height: number; mime: strin
 
 export type WindowBody =
 	| { kind: 'code'; code: string; highlight: string; size: number; dark?: boolean; lineAlpha?: (i: number) => number }
-	| { kind: 'picture'; picture: Picture; pad: number }
+	| { kind: 'picture'; picture: Picture; pad: number; width?: number }
 	| { kind: 'prose'; lines: string[]; size: number; leading: number; lineAlpha?: (i: number) => number };
 
 export const WINDOW = { bar: 36, label: 11.5, padX: 22, padY: 14, mark: 13 };
@@ -193,9 +193,9 @@ export function windowSvg(doc: Doc, r: Rect, name: string, body: WindowBody, z: 
 		});
 	} else if (body.kind === 'picture') {
 		const im = body.picture;
-		const w = inner.w - body.pad * 2;
+		const w = body.width ?? inner.w - body.pad * 2;
 		const h = (w * im.height) / im.width;
-		parts.push(`<image href="data:${im.mime};base64,${im.data.toString('base64')}" x="${r2(inner.x + body.pad)}" y="${r2(inner.y + body.pad)}" width="${r2(w)}" height="${r2(h)}" preserveAspectRatio="none"/>`);
+		parts.push(`<image href="data:${im.mime};base64,${im.data.toString('base64')}" x="${r2(inner.x + (inner.w - w) / 2)}" y="${r2(inner.y + body.pad)}" width="${r2(w)}" height="${r2(h)}" preserveAspectRatio="none"/>`);
 	} else {
 		const sans = getFaces().sans;
 		const { cap } = ratios(sans);

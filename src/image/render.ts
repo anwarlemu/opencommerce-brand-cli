@@ -1,9 +1,12 @@
 import { mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, extname, isAbsolute, join, relative, resolve } from 'node:path';
 import type { Picture } from '../assets/kit.js';
-import { imageData, SLOTS, sceneSvg, TEMPLATE_IDS, TEMPLATE_SLOTS, type Copy, type Scene, type SizeDef, type Slot, type TemplateId } from '../assets/layouts.js';
+import { imageData, sizes, SLOTS, sceneSvg, TEMPLATE_IDS, TEMPLATE_SLOTS, type Copy, type Scene, type SizeDef, type Slot, type TemplateId } from '../assets/layouts.js';
 import { imagesToPdf } from '../assets/pdf.js';
+import { SMALL_FLOOR } from '../design/check.js';
+import { PLATFORMS, sizeAlias } from '../design/platforms.js';
 import type { DrawnLayer, LayerEdit } from '../design/types.js';
+import { assertScene } from './check.js';
 import { unknownName } from '../lib/names.js';
 import { mergeCopy, readContent, type CopyInput, type ReadCopy } from './content.js';
 import { toJpg, toWebp } from './encode.js';
@@ -12,17 +15,12 @@ import { picture, pngSize, rasterize, rasterRgb } from './load.js';
 export { loadImage, pngSize, rasterize, rasterRgb, resolveImage } from './load.js';
 export type { TemplateId } from '../assets/layouts.js';
 
-/** Named sizes, from brand/assets/image.json. */
-export const PRESETS: Record<string, SizeDef> = new Proxy({} as Record<string, SizeDef>, {
-	get: (_t, key: string) => imageData().sizes[key],
-	ownKeys: () => Object.keys(imageData().sizes),
-	getOwnPropertyDescriptor: (_t, key: string) => (key in imageData().sizes ? { enumerable: true, configurable: true, value: imageData().sizes[key] } : undefined),
-	has: (_t, key: string) => key in imageData().sizes,
-});
+/** Named sizes: the shared ones, with their pixels (src/design/platforms.ts). */
+export const PRESETS: Record<string, SizeDef> = sizes;
 
 export type PresetId = string;
 
-export const sizeIds = () => Object.keys(imageData().sizes);
+export const sizeIds = () => Object.keys(sizes);
 /** The sizes a template draws: a profile picture is the mark alone, and the mark fills only a square. */
 export const sizesFor = (template: TemplateId) => (template === 'avatar' ? ['avatar', 'square'] : sizeIds().filter((id) => id !== 'avatar'));
 
@@ -51,6 +49,7 @@ export type ImageInput = CopyInput & {
 	glyphs?: boolean;
 	window?: boolean;
 	inset?: boolean;
+	glyphSize?: number;
 	sample?: boolean;
 	page?: string;
 	edits?: Record<string, LayerEdit>;
@@ -73,19 +72,21 @@ export type Target = { id: string; width: number; height: number };
 
 /** One size by id, alias or WIDTHxHEIGHT. */
 export function parseSize(id: string): Target {
-	const d = imageData();
-	const alias = d.aliases[id] ?? id;
-	if (alias in d.sizes) return { id: alias, width: d.sizes[alias].width, height: d.sizes[alias].height };
+	const alias = resolveAlias(id);
+	if (alias in sizes) return { id: alias, width: sizes[alias].width, height: sizes[alias].height };
 	const custom = /^(\d+)x(\d+)$/i.exec(id);
 	if (custom) return customSize(Number(custom[1]), Number(custom[2]));
-	const err = unknownName('preset', id, [...sizeIds(), ...Object.keys(d.aliases).filter((a) => !/^\d/.test(a)), 'all']);
+	const err = unknownName('preset', id, [...sizeIds(), ...Object.keys(imageData().aliases), 'all']);
 	throw Object.assign(new Error(`${err.message} Or pass a size such as 1600x900.`), { suggestions: (err as Error & { suggestions?: string[] }).suggestions });
 }
+
+/** A size's other names: the brand's older ones, then the shared ones ("twitter header"). */
+const resolveAlias = (id: string) => (id in sizes ? id : (imageData().aliases[id] ?? sizeAlias(id) ?? id));
 
 export function customSize(width: number, height: number): Target {
 	const { min, max } = imageData().custom;
 	if (!Number.isInteger(width) || !Number.isInteger(height) || width < min || height < min || width > max || height > max) throw new Error(`A custom size takes whole numbers from ${min} to ${max} px on each side; ${width}x${height} is outside that.`);
-	const named = Object.entries(imageData().sizes).find(([, s]) => s.width === width && s.height === height);
+	const named = Object.entries(sizes).find(([, s]) => s.width === width && s.height === height);
 	return { id: named ? named[0] : `${width}x${height}`, width, height };
 }
 
@@ -115,7 +116,7 @@ export function assertSize(template: TemplateId, t: Target) {
 }
 
 function parseTemplate(value: string | undefined, copy: Copy, image: boolean, size?: string): TemplateId {
-	if (!value) return !Object.keys(copy).length && !image && size && (imageData().aliases[size] ?? size) === 'avatar' ? 'avatar' : chooseTemplate(copy, image);
+	if (!value) return !Object.keys(copy).length && !image && size && resolveAlias(size) === 'avatar' ? 'avatar' : chooseTemplate(copy, image);
 	if (!(TEMPLATE_IDS as readonly string[]).includes(value)) throw unknownName('template', value, [...TEMPLATE_IDS]);
 	return value as TemplateId;
 }
@@ -202,6 +203,7 @@ export function sceneFor(template: TemplateId, target: Target, copy: Copy, sampl
 		...(input.glyphs === false ? { glyphs: false } : {}),
 		...(input.window === false ? { window: false } : {}),
 		...(input.inset ? { inset: true } : {}),
+		...(input.glyphSize !== undefined && input.glyphSize !== 1 ? { glyphSize: input.glyphSize } : {}),
 		...(input.page ? { page: input.page } : {}),
 		...(input.edits ? { edits: input.edits } : {}),
 		sample,
@@ -236,9 +238,9 @@ export function encodeScene(svg: string, width: number, height: number, formats:
 
 /** A warning for a raster over its platform's upload limit. */
 export function overLimit(id: string, format: string, bytes: number): string | undefined {
-	const s = imageData().sizes[id];
-	if (!s || format === 'svg' || format === 'pdf' || bytes <= s.limitMb * 1024 * 1024) return undefined;
-	return `${id}.${format} is ${(bytes / 1048576).toFixed(1)} MB, over the ${s.limitMb} MB limit (${s.limitSource}). Use --format jpg.`;
+	const p = PLATFORMS.find((x) => x.id === id);
+	if (!p?.limit || format === 'svg' || format === 'pdf' || bytes <= p.limit.bytes) return undefined;
+	return `${id}.${format} is ${(bytes / 1048576).toFixed(1)} MB, over the ${(p.limit.bytes / 1048576).toFixed(0)} MB ${p.label} takes${p.limit.official ? '' : ' (approximate)'}. Use --format jpg.`;
 }
 
 function destinations(targets: Target[], formats: Format[], template: TemplateId, out?: string) {
@@ -259,7 +261,7 @@ function destinations(targets: Target[], formats: Format[], template: TemplateId
 export function imageSpec() {
 	const d = imageData();
 	return {
-		presets: sizeIds().map((id) => ({ id, width: d.sizes[id].width, height: d.sizes[id].height, description: d.sizes[id].description, shownAt: d.sizes[id].shown, ...(d.sizes[id].safe ? { safe: d.sizes[id].safe } : {}), limitMb: d.sizes[id].limitMb })),
+		presets: PLATFORMS.map((p) => ({ id: p.id, width: p.width, height: p.height, description: sizes[p.id].description, aliases: p.aliases, shownAt: p.shown, ...(p.avoid.length || p.safe ? { zones: [...p.avoid, ...(p.safe ? [p.safe] : [])].map((z) => ({ name: z.name, official: z.official, rect: z.rect })) } : {}), ...(p.limit ? { limitBytes: p.limit.bytes, limitOfficial: p.limit.official } : {}), ...(p.source ? { source: p.source } : {}), ...(p.note ? { note: p.note } : {}) })),
 		aliases: d.aliases,
 		custom: { ...d.custom, usage: 'Pass --size WIDTHxHEIGHT, such as 1600x900, or --width and --height.' },
 		templates: TEMPLATES.map((item) => ({ ...item })),
@@ -269,7 +271,7 @@ export function imageSpec() {
 		formats: [...FORMATS, 'both'],
 		grounds: [...THEMES],
 		themes: [...THEMES],
-		floor: d.floor,
+		floor: { shownPx: SMALL_FLOOR, note: 'Small text is at least this many px at the width a picture is usually shown at (shownAt).' },
 		logo: d.logo,
 		defaults: { preset: 'og', size: 'og', format: 'png (or the --out extension)', ground: 'white', theme: 'white', template: 'chosen from the inputs' },
 		notes: d.notes,
@@ -315,6 +317,7 @@ export function renderImages(input: ImageInput): { template: TemplateId; ground:
 			skipped.push({ size: target.id, reason: (error as Error).message });
 			continue;
 		}
+		assertScene({ template, sizeId: target.id, width: target.width, height: target.height, copy, edits: input.edits }, scene.layers);
 		layers[target.id] = scene.layers;
 		const data = encodeScene(scene.svg, target.width, target.height, formats, scale);
 		for (const dest of places.filter((p) => p.target === target)) pending.push({ path: dest.path, data: data[dest.format]!, entry: { format: dest.format, preset: target.id, template, width: dest.format === 'svg' || dest.format === 'pdf' ? target.width : Math.round(target.width * scale), height: dest.format === 'svg' || dest.format === 'pdf' ? target.height : Math.round(target.height * scale) } });

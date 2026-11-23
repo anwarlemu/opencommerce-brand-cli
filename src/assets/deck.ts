@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import type { DrawnLayer, LayerEdit } from '../design/types.js';
+import { assertScene } from '../image/check.js';
 import { rasterRgb } from '../image/load.js';
 import { unknownName } from '../lib/names.js';
 import { pkgPath } from '../lib/paths.js';
@@ -103,7 +104,9 @@ export function slideSvg(slide: Slide): string {
 }
 
 export function renderSlide(slide: Slide, opts: { png?: boolean; svg?: boolean }) {
-	const { svg, layers } = sceneSvg(slideScene(slide));
+	const scene = slideScene(slide);
+	const { svg, layers } = sceneSvg(scene);
+	assertScene({ template: slide.type, kind: 'slide', sizeId: 'slide', width: scene.width, height: scene.height, copy: scene.copy, edits: scene.edits }, layers);
 	const out: { svg?: string; png?: Buffer; rgb?: Buffer; layers: DrawnLayer[]; width: number; height: number } = { width: deckDoc().width, height: deckDoc().height, layers };
 	if (opts.svg) out.svg = svg;
 	if (opts.png) {

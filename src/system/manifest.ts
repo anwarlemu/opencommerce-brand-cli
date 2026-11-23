@@ -6,6 +6,7 @@ import { videoSpec } from '../video/motion.js';
 import { deckCatalog } from '../assets/deck.js';
 import { merchCatalog } from '../assets/merch.js';
 import { illustrateData } from '../illustrate/render.js';
+import { designCatalog } from '../commands/design.js';
 import { FIGMA_ACTIONS, PUSH_KINDS } from '../commands/figma.js';
 import { listComponents, componentSummary } from './components.js';
 import { fontRecords, gaps, loadSystem, logoRecords } from './load.js';
@@ -38,7 +39,9 @@ export function manifest() {
 			{ id: 'component list', usage: `${bin} component list --json`, readOnly: true, summary: 'Every component. Filter with --type. Unknown types error.' },
 			{ id: 'component inspect', usage: `${bin} component inspect <name> --json`, readOnly: true, summary: 'Props, states, constraints and source for one component.' },
 			{ id: 'component emit', usage: `${bin} component emit <name> --state Site --json`, readOnly: true, summary: 'Example source for a state, or JSX for validated props.' },
-			{ id: 'image', usage: `${bin} image --template hero --preset og --title "..." --json`, readOnly: false, summary: 'Share images and social posts: nine templates (hero, window, closing, cards from the brand image tool, plus headline, lead, frame, quote, announcement) at seven sizes or WIDTHxHEIGHT; PNG and SVG; --image for your pictures. image templates lists them.' },
+			{ id: 'image', usage: `${bin} image --template hero --preset og --title "..." --json`, readOnly: false, summary: 'Share images and social posts: ten templates (hero, window, closing, cards, headline, lead, frame, quote, announcement, avatar) at thirteen sizes or WIDTHxHEIGHT; PNG, SVG, JPG, WebP and PDF; only the copy you pass, whole. image templates lists them.' },
+			{ id: 'image carousel', usage: `${bin} image carousel slides.json --json`, readOnly: false, summary: 'Several images at one size from one JSON file, consistent and numbered.' },
+			{ id: 'design', usage: `${bin} design new hero --headline "..." -o banner.design.json`, readOnly: false, summary: 'Make a design, then revise it: design revise <file> "bigger headline, logo top right" in plain words, design edit for exact changes, undo, redo, variants, sizes, compare, render, check. Every write is checked; errors change nothing.' },
 			{ id: 'video', usage: `${bin} video --template hero --size landscape --json`, readOnly: false, summary: 'Short MP4 or WebM clips (hero, window, closing, cards, field, mark, orbit, social, announcement, product) at square, vertical and landscape; --still <seconds> for one PNG. video templates lists them.' },
 			{ id: 'deck', usage: `${bin} deck --input deck.json --json`, readOnly: false, summary: 'Slides at 1920x1080 (cover, section, statement, bullets, stat, quote, image, end): PNG or SVG per slide and one PDF. deck --list shows the slots.' },
 			{ id: 'merch', usage: `${bin} merch tee-front --json`, readOnly: false, summary: 'Print files with bleed and safe area (tee front and back, hoodie, cap, tote, mug wrap, die-cut sticker, poster): SVG at physical size and PNG at a dpi. merch --list shows sizes; they are vendor conventions.' },
@@ -71,6 +74,7 @@ export function manifest() {
 		deck: deckCatalog(),
 		merch: merchCatalog(),
 		illustrate: { ...illustrateData(), rules: 'brand/illustration.md' },
+		design: designCatalog(),
 		figma: { actions: [...FIGMA_ACTIONS], pushKinds: [...PUSH_KINDS], note: 'The CLI never calls Figma: each action writes files and prints the Figma MCP tool calls to make, in order.' },
 		unknownNames: 'Every command, template, size, slot, subject, item, variant and slide type is checked against a fixed list; an unknown name exits 1 and names the nearest choices.',
 		gaps: gaps(),

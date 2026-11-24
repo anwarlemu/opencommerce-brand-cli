@@ -2,7 +2,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { applyEdits, checkDesign, contactSheet, contrast, create, decodePng, docText, encodePng, errorsOf, examples, parseDoc, parsePhrases, PLATFORMS, redo, runDesign, sheetSvg, sizeAlias, stateOf, undo, zonePx, type Adapter, type Anchor, type DesignDoc, type DesignIO, type DrawnLayer, type Rect } from '../../src/design/index.js';
+import { applyEdits, blockRects, checkDesign, contactSheet, contrast, create, decodePng, docText, encodePng, errorsOf, examples, infoFor, parseDoc, parsePhrases, PLATFORMS, redo, runDesign, sheetSvg, sizeAlias, stateOf, undo, zonePx, type Adapter, type Anchor, type DesignDoc, type DesignIO, type DrawnLayer, type Rect } from '../../src/design/index.js';
 import { designConformance } from './conformance.js';
 
 // The core on its own, against a brand made up for the test: plain boxes for words, so nothing but Node is needed.
@@ -22,7 +22,7 @@ function fake(over: Partial<{ extra: DrawnLayer[]; tamper: (l: DrawnLayer[]) => 
 	return {
 		brand: 'acme',
 		templates: () => [
-			{ id: 'plain', kind: 'image', description: 'A headline and a line.', sizes: ['og', 'square', 'custom'], themes: Object.keys(THEMES), copy: [{ id: 'headline', required: true }, { id: 'body' }, { id: 'badge' }], images: [{ id: 'picture', values: ['none', 'sample:one'] }], options: [{ id: 'density', range: [0, 10] }, { id: 'field', values: ['none', 'rings'] }], layers: Object.entries(CAN).map(([id, can]) => ({ id, can })), grounds: Object.fromEntries(Object.entries(THEMES).map(([k, v]) => [k, v.bg])) },
+			{ id: 'plain', kind: 'image', description: 'A headline and a line.', sizes: ['og', 'square', 'custom'], themes: Object.keys(THEMES), copy: [{ id: 'headline', required: true }, { id: 'body' }, { id: 'badge' }], images: [{ id: 'picture', values: ['none', 'sample:one'] }], options: [{ id: 'density', range: [0, 10] }, { id: 'field', values: ['none', 'rings'] }], layers: Object.entries(CAN).map(([id, can]) => ({ id, can })), reflows: { headline: ['body', 'badge'] }, grounds: Object.fromEntries(Object.entries(THEMES).map(([k, v]) => [k, v.bg])) },
 			{ id: 'bare', kind: 'image', description: 'A headline alone.', sizes: ['og', 'story'], themes: ['Paper', 'Ink'], copy: [{ id: 'headline', required: true }], images: [], options: [], layers: [{ id: 'logo', can: CAN.logo }, { id: 'headline', can: CAN.headline }] },
 			{ id: 'cap', kind: 'merch', description: 'A cap.', sizes: ['og'], themes: ['Ink'], copy: [{ id: 'title' }], images: [], options: [], layers: [] },
 		],
@@ -30,10 +30,52 @@ function fake(over: Partial<{ extra: DrawnLayer[]; tamper: (l: DrawnLayer[]) => 
 		colors: () => Object.values(THEMES).flatMap((t) => [t.bg, t.ink]),
 		aliases: { sizes: { big: 'square' }, copy: { tagline: 'body' } },
 		sample: () => ({ headline: 'Sample headline' }),
+		compose: {
+			themes: Object.keys(THEMES),
+			grounds: Object.fromEntries(Object.entries(THEMES).map(([k, v]) => [k, v.bg])),
+			sizes: ['og', 'square', 'story', 'custom'],
+			blocks: () => [
+				{ type: 'headline', names: ['title'], kind: 'text', description: 'Big words.', copy: [{ id: 'text', required: true }], span: { cols: 12, rows: 3 }, place: 'top' },
+				{ type: 'body', kind: 'text', description: 'A line.', copy: [{ id: 'text', required: true }], span: { cols: 8, rows: 2 } },
+				{ type: 'logo', kind: 'logo', description: 'The logo.', copy: [], span: { cols: 3, rows: 1 }, place: 'top-left' },
+				{ type: 'art', kind: 'art', description: 'A square.', copy: [], span: { cols: 6, rows: 6 }, under: true, place: 'bottom-right' },
+			],
+			recipe: (template, _size, copy) => (template === 'plain' || template === 'bare' ? {
+				blocks: [{ id: 'logo', type: 'logo', at: { col: 0, row: 0, cols: 3, rows: 1 } }, { id: 'headline', type: 'headline', at: { col: 0, row: 2, cols: 12, rows: 3 } }, ...(copy.body ? [{ id: 'body', type: 'body', at: { col: 0, row: 5, cols: 8, rows: 2 } }] : [])],
+				copy: { 'headline.text': copy.headline!, ...(copy.body ? { 'body.text': copy.body } : {}) },
+			} : undefined),
+		},
 		async render(doc, _dir, out) {
 			const { width: W, height: H } = doc.size;
 			const th = THEMES[doc.theme!]!;
 			const layers: DrawnLayer[] = [];
+			if (doc.template === 'compose') {
+				for (const { block, rect } of blockRects(doc)) {
+					if (doc.layers[block.id]?.hidden) continue;
+					if (block.type === 'logo') layers.push({ id: block.id, kind: 'logo', box: { ...rect, h: Math.min(rect.h, 40), w: Math.min(rect.w, 160) }, logo: { clear: 8, min: 20 }, can: { scale: [0.5, 1.6], hide: true } });
+					else if (block.type === 'art') layers.push({ id: block.id, kind: 'art', box: rect, can: { scale: [0.5, 1.6], hide: true } });
+					else {
+						const v = doc.copy[`${block.id}.text`] ?? '';
+						const size = (block.type === 'headline' ? 48 : 24) * (doc.layers[block.id]?.scale ?? 1);
+						const per = Math.max(1, Math.floor(rect.w / (size * 0.5)));
+						const lines: string[] = [];
+						let line = '';
+						for (const w of v.split(/\s+/)) {
+							if (w.length > per) throw new Error(`The ${block.id} is too long for its cells. Shorten it.`);
+							if (line && line.length + 1 + w.length > per) {
+								lines.push(line);
+								line = w;
+							} else line = line ? `${line} ${w}` : w;
+						}
+						lines.push(line);
+						if (lines.length * size * 1.2 > rect.h) throw new Error(`The ${block.id} is too long for its cells. Shorten it.`);
+						const ink = lines.map((l, i) => ({ x: rect.x, y: rect.y + i * size * 1.2, w: l.length * size * 0.5, h: size }));
+						layers.push({ id: block.id, kind: 'text', box: { x: rect.x, y: rect.y, w: Math.max(...ink.map((r) => r.w)), h: lines.length * size * 1.2 }, ink, text: { asked: v, drawn: lines.join('\n'), size, color: th.ink, ground: [th.bg] }, can: { scale: [0.5, 1.6], hide: true } });
+					}
+				}
+				const data = new Uint8Array(W * H * 4).fill(255);
+				return { files: out.formats.includes('png') ? { png: encodePng({ width: W, height: H, data }) } : {}, layers };
+			}
 			const e = (id: string) => doc.layers[id] ?? {};
 			const pad = 60;
 			const top = doc.size.id === 'story' ? 260 : pad;
@@ -178,8 +220,9 @@ describe('design phrases', () => {
 		expect(refused('headline: Ship faster')).toMatch(/quotes/);
 	});
 	it('refuses what no brand allows, with the reason', () => {
-		expect(refused('make the headline red')).toMatch(/Colors come only from the brand's themes: Paper, Mid, Ink/);
-		expect(refused('#ff0000 background')).toMatch(/themes/);
+		expect(refused('make the headline red')).toMatch(/Colors outside the brand palette are refused. The palette: #ffffff, #1a1a1a/);
+		expect(refused('make the logo neon green')).toMatch(/Colors outside the brand palette/);
+		expect(refused('#ff0000 background')).toMatch(/palette/);
 		expect(refused('use Comic Sans')).toMatch(/Type comes from the brand/);
 		expect(refused('make the headline bold')).toMatch(/Type comes from the brand/);
 		expect(refused('stretch the logo')).toMatch(/stretched/);
@@ -289,6 +332,38 @@ describe('design check', () => {
 		const panel: DrawnLayer = { id: 'panel', kind: 'panel', box: { x: 50, y: 170, w: 500, h: 60 }, can: {} };
 		expect(await with_((l) => (l.push(panel), (layer(l, 'headline').over = ['panel']), undefined)), 'words past a panel edge').toContain('overlap');
 	});
+	it('a fade on a grained ground, crossed by a thin rule, still passes; a hard edge does not', () => {
+		const W = 400;
+		const H = 200;
+		const make = (hard: boolean) => {
+			const data = new Uint8Array(W * H * 4);
+			for (let i = 0; i < W * H; i++) {
+				const g = 240 + ((i * 2654435761) >>> 28);   // grain, 240 to 255
+				const x = i % W;
+				const y = Math.floor(i / W);
+				const art = hard && x >= 100 && x < 300 && y > 120;
+				const rule = x === 200;
+				const v = rule ? 20 : art ? 40 : g;
+				data.set([v, v, v, 255], i * 4);
+			}
+			return encodePng({ width: W, height: H, data });
+		};
+		const d = create(fake(), 'plain', 'custom', [{ op: 'copy', slot: 'headline', value: 'x' }], { width: W, height: H }).doc;
+		const layers: DrawnLayer[] = [
+			{ id: 'art', kind: 'art', box: { x: 100, y: 120, w: 200, h: 120 }, fades: true, can: {} },
+			{ id: 'field', kind: 'art', box: { x: 0, y: 0, w: W, h: H }, ink: [{ x: 200, y: 0, w: 1, h: H }], bleeds: true, can: {} },
+		];
+		const cut = (png: Uint8Array) => checkDesign({ doc: d, info: fake().templates()[0]!, layers, adapter: {}, png }).filter((f) => f.rule === 'cut');
+		expect(cut(make(false))).toEqual([]);
+		expect(cut(make(true)).map((f) => f.message)).toEqual(['The art should fade out before the bottom edge, but it is still drawn there.']);
+	});
+	it('compares words without the brand\'s markup when the adapter says how', () => {
+		const d = doc({ body: 'One *accent* word' });
+		const layers: DrawnLayer[] = [{ id: 'headline', kind: 'text', box: { x: 60, y: 200, w: 300, h: 70 }, text: { asked: 'Ship your next idea', drawn: 'Ship your next idea', size: 64, color: '#1a1a1a', ground: ['#ffffff'] }, can: {} }, { id: 'body', kind: 'text', box: { x: 60, y: 300, w: 300, h: 40 }, text: { asked: 'One *accent* word', drawn: 'One accent word', size: 32, color: '#1a1a1a', ground: ['#ffffff'] }, can: {} }];
+		const rules = (a: Partial<Adapter>) => errorsOf(checkDesign({ doc: d, info: adapter.templates()[0]!, layers, adapter: a })).map((f) => f.rule);
+		expect(rules({})).toContain('words');
+		expect(rules({ words: (t) => t.replace(/\*/g, '') })).toEqual([]);
+	});
 	it('keeps to the platform\'s safe area', async () => {
 		const d = create(adapter, 'bare', 'story', [{ op: 'copy', slot: 'headline', value: 'Ship your next idea' }]).doc;
 		expect(await found(adapter, d)).toEqual([]);
@@ -298,6 +373,16 @@ describe('design check', () => {
 		const a = fake({ tamper: (l) => (l.find((x) => x.id === 'art')!.box = { ...l.find((x) => x.id === 'headline')!.ink![0]! }) });
 		const d = applyEdits(doc(), [{ op: 'allow', rule: 'overlap' }], a).doc;
 		expect(await found(a, d)).toEqual([]);
+	});
+	it('counts large text where the picture is shown', async () => {
+		// 30 px on a 1200 px link preview shown 540 px wide is 13.5 px: small, so it needs 4.5:1. Grey on white is 3.5.
+		const a = fake({ tamper: (l) => Object.assign(l.find((x) => x.id === 'body')!.text!, { size: 30, color: '#888888', ground: ['#ffffff'] }) });
+		const c = (x: Adapter) => found({ ...x, colors: () => ['#888888', '#ffffff', '#1a1a1a', '#4a4a4a', '#101010'] }, doc({ body: 'One line about it' }));
+		expect(await c(a)).toContain('contrast');
+		const big = fake({ tamper: (l) => Object.assign(l.find((x) => x.id === 'body')!.text!, { size: 54, color: '#888888', ground: ['#ffffff'] }) });
+		expect(await c(big)).not.toContain('contrast');
+		const bold = fake({ tamper: (l) => Object.assign(l.find((x) => x.id === 'body')!.text!, { size: 42, color: '#888888', ground: ['#ffffff'], bold: true }) });
+		expect(await c(bold)).not.toContain('contrast');
 	});
 	it('measures contrast as WCAG does', () => {
 		expect(contrast('#000000', '#ffffff')).toBeCloseTo(21);
@@ -388,5 +473,62 @@ describe('design command', () => {
 		await run('new', 'plain', '--headline', 'Ship it', '-o', 'a.design.json');
 		expect((await run('sizes', 'a.design.json', '--to', 'og,square')).code).toBe(0);
 		expect((await run('sizes', 'a.design.json', '--to', 'story')).text).toMatch(/does not come in story/);
+	});
+});
+
+describe('compose', () => {
+	const empty = () => create(adapter, 'compose', 'og', []).doc;
+	const say2 = (text: string, d: DesignDoc) => applyEdits(d, parsePhrases(text, { adapter, doc: d, info: infoFor(adapter, d) }).edits, adapter, text).doc;
+	it('adds, moves, resizes, orders and removes blocks, in words and undoably', () => {
+		let d = say2('add a headline "Ship your next idea" at the top, add a logo top left, add art bottom right', empty());
+		expect(d.blocks!.map((b) => b.id)).toEqual(['headline', 'logo', 'art']);
+		expect(d.copy).toEqual({ 'headline.text': 'Ship your next idea' });
+		d = say2('move the logo to the bottom left, make the headline taller, send the art to the back', d);
+		expect(d.blocks!.map((b) => b.id)).toEqual(['art', 'headline', 'logo']);
+		expect(d.blocks!.find((b) => b.id === 'logo')!.at).toEqual({ col: 0, row: 11, cols: 3, rows: 1 });
+		d = say2('headline "Another line"', d);
+		expect(d.copy['headline.text']).toBe('Another line');
+		d = say2('add a body "One more" center, remove the art', d);
+		expect(d.blocks!.map((b) => b.id)).toEqual(['headline', 'logo', 'body']);
+		const back = undo(d, 2).doc;
+		expect(back.blocks!.map((b) => b.id)).toEqual(['art', 'headline', 'logo']);
+		expect(docText(parseDoc(docText(d), adapter))).toBe(docText(d));
+		expect(() => say2('move the quote to the top', d)).toThrow(/no block "quote"|quote/);
+		expect(() => say2('add a sparkle top left', d)).toThrow();
+	});
+	it('refuses blocks off the grid, twins and words in the wrong place', () => {
+		const d = empty();
+		expect(() => applyEdits(d, [{ op: 'block-add', type: 'headline', at: { col: 10, row: 0, cols: 6, rows: 2 } }], adapter)).toThrow(/runs off the grid/);
+		expect(() => applyEdits(d, [{ op: 'block-add', type: 'unicorn' }], adapter)).toThrow(/no block "unicorn"/);
+		const one = applyEdits(d, [{ op: 'block-add', type: 'headline', copy: { '': 'Hi' } }], adapter).doc;
+		expect(() => applyEdits(one, [{ op: 'block-add', type: 'body', id: 'headline' }], adapter)).toThrow(/already a block/);
+		expect(() => parseDoc(docText(one).replace('"type": "headline"', '"type": "headline", "color": "#f00"'), adapter)).toThrow(/copy/);
+		expect(() => parseDoc(docText(create(adapter, 'plain', 'og', [{ op: 'copy', slot: 'headline', value: 'x' }]).doc).replace('"layers": {}', '"layers": {},\n\t"blocks": []'), adapter)).toThrow(/compose/);
+	});
+	it('a grid change keeps each block\'s share of the canvas', () => {
+		const d = applyEdits(empty(), [{ op: 'block-add', type: 'art', at: { col: 6, row: 6, cols: 6, rows: 6 } }, { op: 'grid', cols: 6, rows: 4 }], adapter).doc;
+		expect(d.blocks![0]!.at).toEqual({ col: 3, row: 2, cols: 3, rows: 2 });
+	});
+	it('words that leave their cells are an error', async () => {
+		const d = applyEdits(empty(), [{ op: 'block-add', type: 'headline', copy: { '': 'Hi' } }], adapter).doc;
+		const r = await adapter.render(d, '.', { formats: ['png'], scale: 1 });
+		r.layers[0]!.ink = [{ x: -40, y: 10, w: 100, h: 40 }];
+		expect(errorsOf(checkDesign({ doc: d, info: infoFor(adapter, d), layers: r.layers, adapter })).map((f) => f.rule)).toContain('cells');
+	});
+	it('the command adds and moves blocks', async () => {
+		const cwd = mkdtempSync(join(tmpdir(), 'design-compose-'));
+		const run = async (...argv: string[]) => {
+			const out: string[] = [];
+			const code = await runDesign(argv, adapter, { cwd, bin: 'acme', out: (s) => out.push(s), err: (s) => out.push(s), paint });
+			return { code, text: out.join('\n') };
+		};
+		expect((await run('new', 'compose', '--size', 'square', '-o', 'c.design.json')).code).toBe(0);
+		expect((await run('compose', 'add', 'c.design.json', 'headline', 'Hello there', '--place', 'top')).code).toBe(0);
+		expect((await run('compose', 'add', 'c.design.json', 'logo', '--at', '0,11,3,1')).code).toBe(0);
+		expect((await run('compose', 'move', 'c.design.json', 'logo', '--place', 'top-right')).code).toBe(0);
+		expect((await run('compose', 'order', 'c.design.json', 'logo', '--back')).code).toBe(0);
+		expect((await run('compose', 'add', 'c.design.json', 'headline', 'x'.repeat(80), '--at', '0,5,2,1')).text).toMatch(/too long/);
+		expect(JSON.parse(readFileSync(join(cwd, 'c.design.json'), 'utf8')).blocks.map((b: { id: string }) => b.id)).toEqual(['logo', 'headline']);
+		expect((await run('variants', 'c.design.json', '--by', 'theme')).code).toBe(0);
 	});
 });

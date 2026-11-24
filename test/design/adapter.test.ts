@@ -124,3 +124,46 @@ describe('edits inside this brand\'s layouts', () => {
 		expect((await run(cwd, 'new', 'slide-bullets', '--set', 'cards=One\nA line.\n\nTwo', '-o', 'b')).code).toBe(0);
 	});
 });
+
+describe('compose and pages', () => {
+	const run = async (cwd: string, ...argv: string[]) => {
+		const lines: string[] = [];
+		const code = await runDesign([...argv, '--json'], adapter(), { cwd, bin: 'x', out: (s) => lines.push(s), err: (s) => lines.push(s), paint });
+		return { code, data: JSON.parse(lines.join('')) as Record<string, any> };
+	};
+
+	it('builds a graphic no template anticipated from blocks, and refuses what breaks a rule', { timeout: 120_000 }, async () => {
+		const cwd = mkdtempSync(join(tmpdir(), 'oc-compose-'));
+		expect((await run(cwd, 'new', 'compose', '--size', 'og', '-o', 'c')).code).toBe(0);
+		expect((await run(cwd, 'compose', 'add', 'c', 'headline', 'Agents can buy from any store', '--at', '0,1,12,3')).code).toBe(0);
+		expect((await run(cwd, 'compose', 'add', 'c', 'stat', '42%', '--set', 'label=of checkouts in one request', '--place', 'bottom-left')).code).toBe(0);
+		const chart = await run(cwd, 'compose', 'add', 'c', 'chart', '--set', 'value=Mon 12, Tue 18, Wed 15, Thu 24', '--place', 'bottom-right');
+		expect(chart.code, JSON.stringify(chart.data)).toBe(0);
+		expect((await run(cwd, 'compose', 'add', 'c', 'art')).code).toBe(0);
+		expect((await run(cwd, 'revise', 'c', 'send the art to the back, add a logo top left')).code).toBe(0);
+		const layers = (await run(cwd, 'show', 'c')).data.layers.map((l: { id: string }) => l.id);
+		expect(layers).toEqual(expect.arrayContaining(['art', 'headline', 'stat', 'chart', 'logo']));
+		// A block too small for its words is refused with what to do.
+		const small = await run(cwd, 'compose', 'add', 'c', 'body', 'Search, check out and track the order from one endpoint, at any store', '--at', '5,4,1,1');
+		expect(small.code).toBe(1);
+		expect(small.data.error.message).toMatch(/does not fit its cells/);
+		expect((await run(cwd, 'sizes', 'c', '--to', 'square,story')).code).toBe(0);
+	});
+
+	it('writes a page from an outline in React and plain HTML, with only the outline\'s words', { timeout: 60_000 }, async () => {
+		const cwd = mkdtempSync(join(tmpdir(), 'oc-page-'));
+		const outline = { title: 'Acme', sections: [{ type: 'hero', copy: { title: 'One endpoint for every online store', action: 'Get started', 'action-href': '/start' } }, { type: 'features', copy: { title: 'Built for agents' }, items: [{ title: 'Every store' }, { title: 'Checkout' }] }, { type: 'cta', copy: { title: 'Give your agent a checkout' } }] };
+		writeFileSync(join(cwd, 'o.json'), JSON.stringify(outline));
+		const r = await run(cwd, 'page', 'compose', 'o.json', '-o', 'out');
+		expect(r.code, JSON.stringify(r.data)).toBe(0);
+		const tsx = readFileSync(join(cwd, 'out', 'page.tsx'), 'utf8');
+		const html = readFileSync(join(cwd, 'out', 'index.html'), 'utf8');
+		for (const words of ['One endpoint for every online store', 'Built for agents', 'Give your agent a checkout']) {
+			expect(tsx).toContain(words);
+			expect(html).toContain(words);
+		}
+		expect(tsx).toContain('from "@/components/site/hero"');
+		writeFileSync(join(cwd, 'bad.json'), JSON.stringify({ sections: [{ type: 'hero', copy: { subtitle: 'no title' } }] }));
+		expect((await run(cwd, 'page', 'compose', 'bad.json')).data.error.message).toMatch(/needs "title"/);
+	});
+});

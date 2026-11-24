@@ -40,6 +40,7 @@ export function paint() {
 		codeKey: color('text-code-key'),
 		codeString: color('text-code-string'),
 		codeBand: color('bg-code-soft'),
+		series: ['chart-series-1', 'chart-series-2', 'chart-series-3', 'chart-series-4'].map(color),
 		radiusControl: step('--ds-radius-control'),
 		radiusPanel: step('--ds-radius-panel'),
 		radiusChip: step('--ds-radius-sm'),

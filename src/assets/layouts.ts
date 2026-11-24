@@ -216,11 +216,11 @@ function below(l: Local, logo: ReturnType<typeof cornerLogo> | null, r: Rect, ga
 	}
 	if (ay === 'middle') return r;
 	const air = Math.max(gap, logo.layers[0].logo?.clear ?? 0);
-	if (ay === 'top' && logo.box.y < l.ctx.H * 0.4) {
+	if (ay === 'top' && logo.box.y < r.y + r.h * 0.4) {
 		const y = Math.max(r.y, logo.box.y + logo.box.h + air);
 		return { ...r, y, h: r.y + r.h - y };
 	}
-	if (ay === 'bottom' && logo.box.y > l.ctx.H * 0.5) return { ...r, h: Math.min(r.y + r.h, logo.box.y - air) - r.y };
+	if (ay === 'bottom' && logo.box.y > r.y + r.h * 0.5) return { ...r, h: Math.min(r.y + r.h, logo.box.y - air) - r.y };
 	return r;
 }
 

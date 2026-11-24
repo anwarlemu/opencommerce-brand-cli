@@ -15,6 +15,7 @@ import { frameSvg, videoScene } from '../video/frames.js';
 import { templateDef, VIDEO_SIZES, VIDEO_TEMPLATES, type VideoSize } from '../video/motion.js';
 import { framesOf, renderFramePng, videoRequest } from '../video/render.js';
 import { paint as colors } from '../image/paint.js';
+import { composeAdapter, pageAdapter, renderCompose } from './blocks-adapter.js';
 import { PLATFORMS } from './platforms.js';
 import { sheetSvg, type Painter } from './sheet.js';
 import type { Adapter, Anchor, DesignDoc, DrawnLayer, Format, TemplateInfo } from './types.js';
@@ -79,6 +80,12 @@ const SLIDE_LAYERS: Record<string, LayerInfo[]> = {
 	end: IMAGES.closing.layers,
 };
 
+/** The layouts are columns and grids that stay centered: when one part grows, hides or moves, the rest close up round it. */
+const reflowsOf = (layers: LayerInfo[]): Record<string, string[]> => {
+	const ids = [...layers.map((l) => l.id), 'cards', 'card-headings', 'card-text', 'footer', 'label', 'code', 'picture', 'window', 'number'];
+	return Object.fromEntries(layers.map((l) => [l.id, [...new Set(ids.filter((x) => x !== l.id))]]));
+};
+
 const grounds = () => ({ white: colors().white, mist: colors().mist });
 
 function infos(): TemplateInfo[] {
@@ -95,6 +102,7 @@ function infos(): TemplateInfo[] {
 			images: k.image === 'none' ? [] : [{ id: 'picture', ...(k.image === 'needed' ? { required: true } : {}) }],
 			options: k.options ?? [],
 			layers: k.layers,
+			reflows: reflowsOf(k.layers),
 			formats: ['png', 'svg', 'jpg', 'webp', 'pdf'],
 		});
 	for (const type of slideTypes()) {
@@ -111,6 +119,7 @@ function infos(): TemplateInfo[] {
 			images: slideHolds(type) ? [{ id: 'picture', ...(need.has('image') ? { required: true } : {}) }] : [],
 			options: [],
 			layers: SLIDE_LAYERS[type] ?? [],
+			reflows: reflowsOf(SLIDE_LAYERS[type] ?? []),
 			formats: ['png', 'svg', 'jpg', 'webp', 'pdf'],
 			layouts: [type],
 		});
@@ -169,6 +178,10 @@ const templates = () => (cached ??= infos());
 const seeded = (id: string) => (id in IMAGES ? IMAGES[id].seeded : id.startsWith('slide-') ? (SLIDE_LAYERS[slideOf(id)] ?? []).some((l) => l.id === 'art') : id.startsWith('merch-') ? findItem(id.slice(6)).layers.some((l) => l.type === 'field' || l.type === 'hero') : id.startsWith('illustration-') ? ['field', 'window'].includes(id.slice(13)) : ['hero', 'window', 'closing', 'cards', 'field'].includes(id.slice(6)));
 
 function defaults(id: string, size: string): Pick<DesignDoc, 'size' | 'theme' | 'seed' | 'options'> {
+	if (id === 'compose') {
+		const p = PLATFORMS.find((x) => x.id === size);
+		return { size: { id: size, width: p?.width ?? 1200, height: p?.height ?? 800 }, theme: 'white', seed: imageData().templates.hero.seed ?? 3, options: {} };
+	}
 	const info = templates().find((t) => t.id === id)!;
 	const p = PLATFORMS.find((x) => x.id === size);
 	let box = p ? { width: p.width, height: p.height } : { width: 1200, height: 800 };
@@ -235,6 +248,7 @@ function slideSceneOf(doc: DesignDoc, dir: string): Scene {
 const imageFormats = (formats: Format[]) => formats.filter((f): f is ImageFormat => f !== 'mp4' && f !== 'gif');
 
 async function render(doc: DesignDoc, dir: string, out: { formats: Format[]; scale: number }): Promise<{ files: Record<string, Uint8Array>; layers: DrawnLayer[] }> {
+	if (doc.template === 'compose') return renderCompose(doc, dir, out);
 	if (doc.kind === 'image' || doc.kind === 'slide') {
 		const scene = doc.kind === 'image' ? imageScene(doc, dir) : slideSceneOf(doc, dir);
 		const { svg, layers, held } = sceneSvg(scene);
@@ -291,6 +305,8 @@ export function adapter(): Adapter {
 		render,
 		sample,
 		colors: wordColors,
+		compose: composeAdapter(),
+		page: pageAdapter,
 		aliases: { sizes: imageData().aliases, copy: COPY_ALIASES, layers: { text: 'body', button: 'action', key: 'action', glyphs: 'art', field: 'art', quote: 'body', stat: 'headline', screenshot: 'window' } },
 	};
 }

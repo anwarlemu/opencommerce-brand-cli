@@ -106,14 +106,17 @@ const inter = (a: Rect, b: Rect): Rect => {
 	return { x, y, w: Math.min(a.x + a.w, b.x + b.w) - x, h: Math.min(a.y + a.h, b.y + b.h) - y };
 };
 /** The platform size with these pixels, if there is one. */
-const platformAt = (W: number, H: number) => PLATFORMS.find((p) => p.width === W && p.height === H);
+/** The sizes a layout is drawn for, found by their pixels: social posts, banners, ads and the profile picture. Slides,
+ *  clips and print pages of the same pixels are not a meeting background or a page. */
+const LAID_OUT = new Set(['og', 'square', 'portrait', 'story', 'landscape', 'x-banner', 'linkedin', 'linkedin-banner', 'linkedin-page', 'youtube', 'youtube-thumbnail', 'email', 'avatar', 'pinterest', 'facebook-cover', 'facebook', 'ad-300x250', 'ad-336x280', 'ad-728x90', 'ad-300x600', 'ad-320x50', 'ad-160x600', 'ad-970x250']);
+const platformAt = (W: number, H: number) => PLATFORMS.find((p) => LAID_OUT.has(p.id) && p.width === W && p.height === H);
 
 export const sizes: Record<string, SizeDef> = Object.fromEntries(PLATFORMS.map((p) => [p.id, { width: p.width, height: p.height, description: `${p.label}, ${p.width}x${p.height}` }]));
 
 /** The smallest text at a size: 8 px at the width the picture is usually shown at. */
 export const floorFor = (W: number, H: number) => (SMALL_FLOOR * W) / (platformAt(W, H) ?? platformOf('custom', W, H)).shown;
 
-type Place = { safe: Rect; avoid: Rect[] };
+type Place = { safe: Rect; avoid: Rect[]; /** The lockup's own clear space: never given up, even for an edit. */ own?: Rect[] };
 /** Where words may go: the platform's safe area less the strips it crops, and the corners it covers. */
 export function placeFor(W: number, H: number): Place {
 	const p = platformAt(W, H);
@@ -140,13 +143,14 @@ type Plan = { score: number; inks: Rect[]; draw: () => void };
 const PAD = 10;
 
 function choose(l: Local, regions: Rect[], plan: (r: Rect, i: number) => Plan): Plan {
-	const plans: { plan: Plan; i: number; clear: boolean }[] = [];
+	const plans: { plan: Plan; i: number; clear: boolean; own: boolean }[] = [];
 	let failure: unknown;
 	for (const [i, r] of regions.entries()) {
 		if (r.w < 80 || r.h < 20) continue;
 		try {
 			const p = plan(r, i);
-			plans.push({ plan: p, i, clear: !p.inks.some((ink) => l.place.avoid.some((a) => hits(ink, a, PAD))) });
+			const own = !p.inks.some((ink) => (l.place.own ?? []).some((a) => hits(ink, a, PAD)));
+			plans.push({ plan: p, i, clear: own && !p.inks.some((ink) => l.place.avoid.some((a) => hits(ink, a, PAD))), own });
 		} catch (error) {
 			if (!(error instanceof FitError)) throw error;
 			failure = error;
@@ -155,7 +159,7 @@ function choose(l: Local, regions: Rect[], plan: (r: Rect, i: number) => Plan): 
 	const clear = plans.filter((p) => p.clear);
 	// Content may sit where the platform covers it only when an edit moved it there; the check names that.
 	const moved = Object.values(l.ctx.edits).some((e) => e.anchor || e.dx || e.dy);
-	const pool = clear.length || !moved ? clear : plans;
+	const pool = clear.length || !moved ? clear : plans.filter((p) => p.own);
 	if (!pool.length) throw failure ?? new FitError('The copy does not fit.');
 	const best = Math.max(...pool.map((p) => p.plan.score));
 	// The first region (the widest) that holds the copy within a tenth of the largest size wins.
@@ -166,7 +170,7 @@ function choose(l: Local, regions: Rect[], plan: (r: Rect, i: number) => Plan): 
  *  the top and the bottom first (a wide line reads better than a narrow column), then beside what covers the sides. */
 function regionsOf(l: Local, r: Rect): Rect[] {
 	const out = [r];
-	const met = l.place.avoid.filter((a) => hits(r, a, PAD));
+	const met = [...l.place.avoid, ...(l.place.own ?? [])].filter((a) => hits(r, a, PAD));
 	if (!met.length) return out;
 	const mid = r.y + r.h / 2;
 	const tops = met.filter((a) => a.y + a.h / 2 < mid);
@@ -203,10 +207,10 @@ function clearOf<T extends ReturnType<typeof cornerLogo> | null>(l: Local, logo:
 /** Takes the lockup's band (top or bottom) out of a region. */
 function below(l: Local, logo: ReturnType<typeof cornerLogo> | null, r: Rect, gap: number, corner = false): Rect {
 	if (!logo) return r;
+	// Words keep clear of the lockup wherever it went: what the band below does not cover, the regions do.
+	if (corner) l.place = { ...l.place, own: [...(l.place.own ?? []), grow(logo.box, Math.max(0, (logo.layers[0].logo?.clear ?? 0) - PAD + 1))] };
 	// A banner is too short to give the lockup a band of its own: it is a corner the words keep clear of.
 	if (corner && l.ctx.W / l.ctx.H >= 2.4 && down(logo.anchor) === 'top' && across(logo.anchor) !== 'center') {
-		const air = Math.max(gap, logo.layers[0].logo?.clear ?? 0);
-		l.place = { ...l.place, avoid: [...l.place.avoid, grow(logo.box, air - PAD)] };
 		return r;
 	}
 	const ay = down(logo.anchor);
@@ -379,7 +383,16 @@ function poster(l: Local) {
 	const mx = wide ? 72 * k : (84 * W) / 1080;
 	const my = wide ? 52 * k : (76 * W) / 1080;
 	const frame = frameOf(l, mx, my);
-	const logo = req.logo === false || editOf(ctx, 'logo').hidden ? null : clearOf(l, cornerLogo(ctx, 'mark-lockup', wide ? 44 * k : (52 * W) / 1080, frame, imageData().logo, 'top-left'));
+	const lockupOrMark = () => {
+		try {
+			return cornerLogo(ctx, 'mark-lockup', wide ? 44 * k : (52 * W) / 1080, frame, imageData().logo, 'top-left');
+		} catch (error) {
+			// A frame too narrow for the lockup (a skyscraper ad) carries the mark alone.
+			if (!(error instanceof FitError)) throw error;
+			return cornerLogo(ctx, 'mark', 32, frame, imageData().logo, 'top-left');
+		}
+	};
+	const logo = req.logo === false || editOf(ctx, 'logo').hidden ? null : clearOf(l, lockupOrMark());
 	const region = below(l, logo, frame, wide ? 28 * k : 40 * k, true);
 	const quote = req.template === 'quote';
 	const items: Item[] = [];
@@ -918,7 +931,7 @@ function fitMessage(req: Scene): string {
 	}
 	try {
 		layOut({ ...req, logo: false, edits: {}, dry: true, doc: undefined });
-		return `The lockup and this copy do not fit ${where} together. Use a larger size, or --no-logo.`;
+		return `The lockup and this copy do not fit ${where} together: shorten the copy, use a larger size, or --no-logo.`;
 	} catch {}
 	return `The copy does not fit ${where} at a readable size. Shorten ${slots.length ? `the ${slots.join(', ')}` : 'it'}, leave a slot out, or use a larger size.`;
 }

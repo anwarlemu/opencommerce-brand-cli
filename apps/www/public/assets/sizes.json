@@ -70,5 +70,88 @@
 		"description": "Profile picture, 800x800",
 		"zones": "Keeps clear of everything outside the circle it is cropped to.",
 		"limit": "Up to 2 MB."
+	},
+	{
+		"id": "pinterest",
+		"description": "Pinterest pin, 1000x1500",
+		"limit": "Up to 20 MB."
+	},
+	{
+		"id": "facebook-cover",
+		"description": "Facebook page cover, 1702x630",
+		"zones": "Keeps clear of the strip a phone crops at the left, the strip a phone crops at the right, the profile picture, lower left (approximate).",
+		"limit": "Up to 0.09765625 MB."
+	},
+	{
+		"id": "facebook",
+		"description": "Facebook post, 1080x1350",
+		"limit": "Up to 8 MB (approximate)."
+	},
+	{
+		"id": "ad-300x250",
+		"description": "Medium rectangle ad, 300x250",
+		"limit": "Up to 0.146484375 MB (approximate)."
+	},
+	{
+		"id": "ad-336x280",
+		"description": "Large rectangle ad, 336x280",
+		"limit": "Up to 0.146484375 MB (approximate)."
+	},
+	{
+		"id": "ad-728x90",
+		"description": "Leaderboard ad, 728x90",
+		"limit": "Up to 0.146484375 MB (approximate)."
+	},
+	{
+		"id": "ad-300x600",
+		"description": "Half page ad, 300x600",
+		"limit": "Up to 0.146484375 MB (approximate)."
+	},
+	{
+		"id": "ad-320x50",
+		"description": "Mobile banner ad, 320x50",
+		"limit": "Up to 0.146484375 MB (approximate)."
+	},
+	{
+		"id": "ad-160x600",
+		"description": "Wide skyscraper ad, 160x600",
+		"limit": "Up to 0.146484375 MB (approximate)."
+	},
+	{
+		"id": "ad-970x250",
+		"description": "Billboard ad, 970x250",
+		"limit": "Up to 0.146484375 MB (approximate)."
+	},
+	{
+		"id": "meeting",
+		"description": "Video call background, 1920x1080",
+		"zones": "Keeps clear of where the person sits (approximate)."
+	},
+	{
+		"id": "desktop",
+		"description": "Desktop wallpaper, 2880x1800"
+	},
+	{
+		"id": "phone-wallpaper",
+		"description": "Phone wallpaper, 1170x2532",
+		"zones": "Keeps clear of the clock, the home bar and controls (approximate)."
+	},
+	{
+		"id": "a4",
+		"description": "A4 page, 2480x3508"
+	},
+	{
+		"id": "letter",
+		"description": "US Letter page, 2550x3300"
+	},
+	{
+		"id": "business-card",
+		"description": "Business card, 1050x600",
+		"zones": "Keeps clear of the bleed and safe margin, the bleed and safe margin, the bleed and safe margin, the bleed and safe margin (approximate)."
+	},
+	{
+		"id": "email-signature",
+		"description": "Email signature, 1200x300",
+		"limit": "Up to 0.09765625 MB (approximate)."
 	}
 ]

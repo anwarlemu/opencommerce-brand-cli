@@ -38,12 +38,12 @@
 		},
 		{
 			"command": "design revise banner 'make the logo neon green'",
-			"answer": "Nothing was changed.\n\"make the logo neon green\": Effects are not part of the brand.\nThings you can say here: move the logo up; nudge the logo left 2%; hide the logo. Copy goes in quotes. For exact edits use `design edit`.",
+			"answer": "Nothing was changed.\n\"make the logo neon green\": Colors outside the brand palette are refused. The palette: #ffffff, #f9f9f9, #171818, #2e3ae8, #6b6b6b, #9e9e9e, #1520b8, #f0f1fd, #232424, #e3e3e3, #a1a6f5, #ccdbff, in the themes white, mist.\nThings you can say here: move the logo up; nudge the logo left 2%; hide the logo. Copy goes in quotes. For exact edits use `design edit`.",
 			"ok": false
 		},
 		{
 			"command": "design edit banner --layer headline.dx=-0.4",
-			"answer": "The headline has no room to go that far here: it would leave the picture, or go under what x-banner covers. The furthest is headline.dx -0.065 and headline.dy 0.",
+			"answer": "The headline has no room to go that far here: it would leave the picture, or go under what x-banner covers. The furthest is headline.dx -0.068 and headline.dy 0.",
 			"ok": false
 		},
 		{

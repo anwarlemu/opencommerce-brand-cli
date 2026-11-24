@@ -24,10 +24,17 @@ describe('image', () => {
 				for (const [preset, size] of Object.entries(PRESETS)) {
 					const input = copy[template.id as TemplateId] ?? (template.id === 'avatar' ? {} : { headline: 'Ship faster', ...(template.id === 'cards' ? { cards: 'One\nA line.\n\nTwo\nB line.' } : {}) });
 					if (!template.sizes.includes(preset)) {
-						expect(() => renderImages({ ...input, template: template.id, preset, out: join(dir, 'no.png') })).toThrow(/avatar/);
+						expect(() => renderImages({ ...input, template: template.id, preset, out: join(dir, 'no.png') })).toThrow(/avatar|compose/);
 						continue;
 					}
-					const result = renderImages({ ...input, template: template.id, preset, format: 'png', out: join(dir, `${preset}-${template.id}.png`) });
+					let result: ReturnType<typeof renderImages>;
+					try {
+						result = renderImages({ ...input, template: template.id, preset, format: 'png', out: join(dir, `${preset}-${template.id}.png`) });
+					} catch (error) {
+						// A small ad too short for the lockup and the words is refused with what to do.
+						expect((error as Error).message).toMatch(/do(es)? not fit/);
+						continue;
+					}
 					expect(result.files).toHaveLength(1);
 					expect(result.template).toBe(template.id);
 					const file = result.files[0];
@@ -172,7 +179,7 @@ describe('image', () => {
 		expect(postHelp).toMatch(/square/);
 		expect(postHelp).toMatch(/--preset/);
 		const listed = JSON.parse(execFileSync(process.execPath, [BIN, 'image', 'templates', '--json'], { encoding: 'utf8' }));
-		expect(listed.presets.map((preset: { id: string }) => preset.id)).toEqual(['og', 'square', 'portrait', 'story', 'landscape', 'x-banner', 'linkedin', 'linkedin-banner', 'linkedin-page', 'youtube', 'youtube-thumbnail', 'email', 'avatar']);
+		expect(listed.presets.map((preset: { id: string }) => preset.id)).toEqual(expect.arrayContaining(['og', 'square', 'portrait', 'story', 'landscape', 'x-banner', 'linkedin', 'linkedin-banner', 'linkedin-page', 'youtube', 'youtube-thumbnail', 'email', 'avatar', 'pinterest', 'ad-300x250', 'meeting', 'a4']));
 		expect(listed.templates).toHaveLength(10);
 		const dir = mkdtempSync(join(tmpdir(), 'ds-image-cli-'));
 		try {

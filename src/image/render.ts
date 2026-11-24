@@ -22,7 +22,12 @@ export type PresetId = string;
 
 export const sizeIds = () => Object.keys(sizes);
 /** The sizes a template draws: a profile picture is the mark alone, and the mark fills only a square. */
-export const sizesFor = (template: TemplateId) => (template === 'avatar' ? ['avatar', 'square'] : sizeIds().filter((id) => id !== 'avatar'));
+/** Social sizes every layout draws; ads for the layouts short enough for them. Print pages, wallpapers and meeting
+ *  backgrounds are compose sizes (and illustrations), not layouts. */
+export const SOCIAL = ['og', 'square', 'portrait', 'story', 'landscape', 'x-banner', 'linkedin', 'linkedin-banner', 'linkedin-page', 'youtube', 'youtube-thumbnail', 'email', 'pinterest', 'facebook-cover', 'facebook'];
+export const ADS = ['ad-300x250', 'ad-336x280', 'ad-728x90', 'ad-300x600', 'ad-320x50', 'ad-160x600', 'ad-970x250'];
+const ADS_TAKE: TemplateId[] = ['headline', 'lead', 'announcement', 'closing'];
+export const sizesFor = (template: TemplateId) => (template === 'avatar' ? ['avatar', 'square'] : [...SOCIAL, ...(ADS_TAKE.includes(template) ? ADS.filter((a) => template !== 'closing' || (a !== 'ad-320x50' && a !== 'ad-728x90')) : [])].filter((id) => id in sizes));
 
 export const templateInputs = (id: TemplateId): string[] => [...TEMPLATE_SLOTS[id].takes, ...(TEMPLATE_SLOTS[id].image ? ['image'] : [])];
 
@@ -113,6 +118,7 @@ function parseSizes(input: ImageInput, template: TemplateId): Target[] {
 export function assertSize(template: TemplateId, t: Target) {
 	if (t.id === 'avatar' && template !== 'avatar') throw new Error(`A profile picture holds no words: the avatar size takes the avatar template, not ${template}.`);
 	if (template === 'avatar' && t.width !== t.height) throw new Error(`The avatar template draws a square (avatar, square, or a custom size with equal sides), not ${t.id}.`);
+	if (t.id in sizes && t.id !== 'avatar' && !sizesFor(template).includes(t.id)) throw new Error(`The ${template} template does not come in ${t.id}. Make it with design new compose --size ${t.id} (any of the brand's blocks on a grid), or as a custom size, ${t.width}x${t.height}.`);
 }
 
 function parseTemplate(value: string | undefined, copy: Copy, image: boolean, size?: string): TemplateId {

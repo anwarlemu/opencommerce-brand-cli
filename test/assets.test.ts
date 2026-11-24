@@ -8,7 +8,7 @@ import { slideSvg, slideTypes } from '../src/assets/deck.js';
 import { merchItems, renderItem, PX_PER_IN } from '../src/assets/merch.js';
 import { checkFigmaValues } from '../src/figma/check.js';
 import { figmaTokens, figmaTokenScripts } from '../src/figma/tokens.js';
-import { loadImage, pngSize, PRESETS, renderImages } from '../src/image/render.js';
+import { loadImage, pngSize, PRESETS, renderImages, sizesFor, type TemplateId } from '../src/image/render.js';
 import { illustrate, subjects } from '../src/illustrate/render.js';
 import { renderFramePng } from '../src/video/render.js';
 
@@ -33,8 +33,8 @@ describe('image layouts from the brand tool', () => {
 			for (const template of ['hero', 'window', 'closing', 'cards']) {
 				const r = renderImages({ template, preset: 'all', format: 'both', sample: true, out: dir });
 				// Every size but the profile picture, less the ones too small for the sample, which are named.
-				expect(r.files.length + r.skipped.length * 2).toBe((Object.keys(PRESETS).length - 1) * 2);
-				for (const s of r.skipped) expect(s.reason).toMatch(/Shorten the (code|cards)/);
+				expect(r.files.length + r.skipped.length * 2).toBe(sizesFor(template as TemplateId).length * 2);
+				for (const s of r.skipped) expect(s.reason).toMatch(/Shorten the (code|cards)|--no-logo/);
 				for (const f of r.files.filter((x) => x.format === 'png')) expect(pngSize(readFileSync(f.path.startsWith('/') ? f.path : join(process.cwd(), f.path)))).toEqual({ width: f.width, height: f.height });
 				const svg = readFileSync(join(dir, `og-${template}.svg`), 'utf8');
 				expect(svg).not.toContain('font-family');

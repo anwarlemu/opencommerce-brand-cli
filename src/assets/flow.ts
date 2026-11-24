@@ -1,7 +1,7 @@
 import type { Font } from 'opentype.js';
 import type { DrawnLayer, LayerEdit } from '../design/types.js';
 import { assertDrawable, blockHeight, cleanText, getFaces, joinLines, measure, ratios, textPath, wrapLines, type Line } from '../image/fonts.js';
-import { drawMarkLockup, measureMarkLockup, trackingFor, type Paint } from '../image/paint.js';
+import { drawMarkLockup, logoMark, measureMarkLockup, trackingFor, type Paint } from '../image/paint.js';
 import { bracketMark, grow, lockup, markWidth, r2, roundRect, text, union, windowSvg, WINDOW, type Doc, type Picture, type Rect } from './kit.js';
 
 // The parts a layout stacks (text, the badge, the keys, the lockup, a window), and the fitting that sizes them. A part
@@ -453,18 +453,18 @@ export function at(region: Rect, w: number, h: number, anchor: Anchor9, bias = 0
 export const hits = (a: Rect, b: Rect, pad = 0) => a.x < b.x + b.w + pad && a.x + a.w > b.x - pad && a.y < b.y + b.h + pad && a.y + a.h > b.y - pad;
 
 /** The corner lockup (with or without the square mark), placed at an anchor of a frame. */
-export function cornerLogo(ctx: Ctx, kind: 'lockup' | 'mark-lockup', size: number, frame: Rect, rule: { min: number; clear: number }, anchor: Anchor9, over?: string[]): Out & { box: Rect; anchor: Anchor9 } {
+export function cornerLogo(ctx: Ctx, kind: 'lockup' | 'mark-lockup' | 'mark', size: number, frame: Rect, rule: { min: number; clear: number }, anchor: Anchor9, over?: string[]): Out & { box: Rect; anchor: Anchor9 } {
 	const e = editOf(ctx, 'logo');
-	const min = kind === 'lockup' ? rule.min : Math.ceil((rule.min * 32) / 17);
+	const min = kind === 'lockup' ? rule.min : kind === 'mark' ? 32 : Math.ceil((rule.min * 32) / 17);
 	const s0 = Math.max(size, min);
 	const s = Math.max(min, s0 * (e.scale ?? 1));
-	const w = kind === 'lockup' ? lockup(0, 0, s, ctx.c, 'measure').w : measureMarkLockup(s, ctx.c);
+	const w = kind === 'lockup' ? lockup(0, 0, s, ctx.c, 'measure').w : kind === 'mark' ? s : measureMarkLockup(s, ctx.c);
 	if (w > frame.w + 0.5 && s <= s0) throw new FitError('The lockup does not fit.');
 	const place = e.anchor ?? anchor;
 	const p = at(frame, w, s, place);
 	const box: Rect = { x: p.x + (e.dx ?? 0) * ctx.W, y: p.y + (e.dy ?? 0) * ctx.H, w, h: s };
-	const svg = kind === 'lockup' ? lockup(box.x, box.y, s, ctx.c).svg : drawMarkLockup(box.x, box.y, s, ctx.c);
-	const nameSize = kind === 'lockup' ? s : (s * 17) / 32;
+	const svg = kind === 'lockup' ? lockup(box.x, box.y, s, ctx.c).svg : kind === 'mark' ? logoMark(box.x, box.y, s) : drawMarkLockup(box.x, box.y, s, ctx.c);
+	const nameSize = kind === 'lockup' ? s : kind === 'mark' ? s * 0.3 : (s * 17) / 32;
 	const most = Math.min(frame.w / (w / s), frame.h / 3) / s0;
 	return {
 		id: 'logo',

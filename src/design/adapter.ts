@@ -6,7 +6,7 @@ import { imageData, sceneSvg, SLOTS, TEMPLATE_SLOTS, type Copy, type Scene, type
 import { findItem, itemSvg, merchDoc, merchItems, PX_PER_IN, renderItem, slotsOf } from '../assets/merch.js';
 import { COPY_ALIASES, wordColors } from '../image/check.js';
 import { picture as readPicture, rasterize } from '../image/load.js';
-import { encodeScene, sceneFor, settleCopy, sizesFor, THEMES, type Format as ImageFormat } from '../image/render.js';
+import { encodeScene, sceneFor, settleCopy, sizesFor, SOCIAL, THEMES, type Format as ImageFormat } from '../image/render.js';
 import { illustrate, illustrateData, subjects } from '../illustrate/render.js';
 import { brand } from '../lib/brand.js';
 import { pkgPath } from '../lib/paths.js';
@@ -144,7 +144,7 @@ function infos(): TemplateInfo[] {
 			id: `illustration-${s}`,
 			kind: 'illustration',
 			description: def.description,
-			sizes: ['default', ...PLATFORMS.map((p) => p.id).filter((id) => id !== 'avatar'), 'custom'],
+			sizes: ['default', ...SOCIAL, 'meeting', 'desktop', 'phone-wallpaper', 'custom'],
 			themes: [...THEMES, 'none'],
 			copy: s === 'window' ? [{ id: 'code' }, { id: 'label' }] : [],
 			images: def.image ? [{ id: 'picture', ...(def.needsImage ? { required: true } : {}) }] : [],

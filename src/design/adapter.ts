@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Resvg } from '@resvg/resvg-js';
-import { deckDoc, slideScene, slideTypes } from '../assets/deck.js';
+import { blocksSlide, deckDoc, isBlocks, slideScene, slideTypes } from '../assets/deck.js';
 import { imageData, sceneSvg, SLOTS, TEMPLATE_SLOTS, type Copy, type Scene, type Slot, type TemplateId } from '../assets/layouts.js';
 import { findItem, itemSvg, merchDoc, merchItems, PX_PER_IN, renderItem, slotsOf } from '../assets/merch.js';
 import { COPY_ALIASES, wordColors } from '../image/check.js';
@@ -79,6 +79,14 @@ const SLIDE_LAYERS: Record<string, LayerInfo[]> = {
 	image: IMAGES.window.layers,
 	end: IMAGES.closing.layers,
 };
+for (const [type, def] of Object.entries(deckDoc().slides))
+	if (def.layout === 'blocks')
+		SLIDE_LAYERS[type] = (def.blocks ?? []).flatMap((b) => [
+			{ id: b.id, can: { hide: true } },
+			// The parts a block reports under its own id: each card, the chart's labels, the table's cells, a stat's label.
+			...(b.type === 'cards' ? Array.from({ length: 6 }, (_, i) => ['face', 'title', 'text', 'number'].map((p) => ({ id: `${b.id}-${i + 1}-${p}`, can: {} }))).flat() : []),
+			...(b.type === 'chart' ? [{ id: `${b.id}-labels`, can: {} }] : b.type === 'table' ? [{ id: `${b.id}-cells`, can: {} }] : b.type === 'stat' ? [{ id: `${b.id}-label`, can: {} }] : b.type === 'quote' ? [{ id: `${b.id}-by`, can: {} }] : []),
+		]);
 
 /** The layouts are columns and grids that stay centered: when one part grows, hides or moves, the rest close up round it. */
 const reflowsOf = (layers: LayerInfo[]): Record<string, string[]> => {
@@ -131,7 +139,7 @@ function infos(): TemplateInfo[] {
 			description: `${item.name}: ${item.size[0]} by ${item.size[1]} in, ${item.method}. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included.`,
 			sizes: ['print'],
 			themes: item.variants,
-			copy: slotsOf(item).map((s) => ({ id: s, ...(s === 'headline' && item.layers.some((l) => l.type === 'hero') ? { required: true } : {}) })),
+			copy: slotsOf(item).map((s) => ({ id: s, ...((s === 'headline' && item.layers.some((l) => l.type === 'hero')) || item.layers.some((l) => l.type === 'text' && l.slot === s && l.required) ? { required: true } : {}) })),
 			images: [],
 			options: [],
 			layers: [],
@@ -249,6 +257,13 @@ const imageFormats = (formats: Format[]) => formats.filter((f): f is ImageFormat
 
 async function render(doc: DesignDoc, dir: string, out: { formats: Format[]; scale: number }): Promise<{ files: Record<string, Uint8Array>; layers: DrawnLayer[] }> {
 	if (doc.template === 'compose') return renderCompose(doc, dir, out);
+	if (doc.kind === 'slide' && isBlocks(slideOf(doc.template))) {
+		const type = slideOf(doc.template);
+		const given: Record<string, string> = {};
+		for (const s of slideSlots(type)) if (doc.copy[s.id]) given[s.own] = doc.copy[s.id];
+		const r = blocksSlide({ type, ...given, seed: doc.seed, theme: doc.theme as 'white' | 'mist', edits: doc.layers });
+		return { files: encodeScene(r.svg, doc.size.width, doc.size.height, imageFormats(out.formats), out.scale) as Record<string, Uint8Array>, layers: r.layers };
+	}
 	if (doc.kind === 'image' || doc.kind === 'slide') {
 		const scene = doc.kind === 'image' ? imageScene(doc, dir) : slideSceneOf(doc, dir);
 		const { svg, layers, held } = sceneSvg(scene);
@@ -277,7 +292,7 @@ async function render(doc: DesignDoc, dir: string, out: { formats: Format[]; sca
 	}
 	const req = videoRequest({ template: doc.template.slice(6), size: doc.size.id, theme: doc.theme, seed: doc.seed, ...doc.copy });
 	const n = framesOf(req.template);
-	const layers = templateDef(req.template).kind === 'art' ? [] : sceneSvg({ ...videoScene(req), dry: true }).layers;
+	const layers = ['art', 'reveal'].includes(templateDef(req.template).kind) ? [] : sceneSvg({ ...videoScene(req), dry: true }).layers;
 	const files: Record<string, Uint8Array> = {};
 	if (out.formats.includes('png')) files.png = rasterize(frameSvg(req, n - 1, templateDef(req.template).fps), out.scale === 1 ? {} : { width: Math.round(doc.size.width * out.scale) });
 	if (out.formats.includes('mp4')) files.mp4 = encodeMp4(Array.from({ length: n }, (_, i) => renderFramePng(req, i, n)), templateDef(req.template).fps);
@@ -290,7 +305,7 @@ function sample(id: string): Record<string, string> {
 	const takes = new Set(info.copy.map((c) => c.id));
 	let from: Record<string, string | undefined> = {};
 	if (id in IMAGES) from = { ...imageData().templates[IMAGES[id].template].sample, ...(id === 'frame-note' ? { body: imageData().templates.lead.sample.body } : {}) };
-	else if (info.kind === 'slide') for (const s of slideSlots(slideOf(id))) from[s.id] = s.own === 'items' ? deckDoc().slides.bullets.slots.items.split('|').map((x) => x.trim().replace(/:\s+/, '\n')).join('\n\n') : deckDoc().slides[slideOf(id)].slots[s.own];
+	else if (info.kind === 'slide') for (const s of slideSlots(slideOf(id))) from[s.id] = s.own === 'items' && slideOf(id) === 'bullets' ? deckDoc().slides.bullets.slots.items.split('|').map((x) => x.trim().replace(/:\s+/, '\n')).join('\n\n') : deckDoc().slides[slideOf(id)].slots[s.own];
 	else if (info.kind === 'merch') from = merchDoc().slots;
 	else if (info.kind === 'illustration') from = { code: imageData().templates.hero.sample.code, label: imageData().templates.hero.sample.label };
 	else from = templateDef(id.slice(6)).sample ?? imageData().templates[(id === 'video-product' ? 'frame' : id.slice(6)) as TemplateId]?.sample ?? {};

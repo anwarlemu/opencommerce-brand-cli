@@ -11,6 +11,8 @@ import { illustrate, subjects } from '../src/illustrate/render.js';
 import { adapter, paint } from '../src/design/adapter.js';
 import { PLATFORMS, runDesign } from '../src/design/index.js';
 import { renderVideo } from '../src/video/render.js';
+import { iconSet } from '../src/commands/icons.js';
+import { renderEmail, type EmailId } from '../src/commands/email.js';
 
 const root = join(import.meta.dirname, '..');
 const out = join(root, 'apps', 'www', 'public', 'assets');
@@ -102,6 +104,38 @@ writeFileSync(
 	await step(['history', 'banner']);
 	writeFileSync(join(out, 'designs', 'session.json'), `${JSON.stringify({ steps, file: readFileSync(join(work, 'banner.design.json'), 'utf8'), templates: adapter().templates().map((t) => ({ id: t.id, kind: t.kind, description: t.description })) }, null, '\t')}\n`);
 	rmSync(work, { recursive: true, force: true });
+}
+
+// The rest of what the CLI makes, for the docs' Coverage page: a compose card, the new slides, print items, the icon
+// set and the emails.
+{
+	const cov = join(out, 'coverage');
+	rmSync(cov, { recursive: true, force: true });
+	mkdirSync(cov, { recursive: true });
+	const work = mkdtempSync(join(tmpdir(), 'coverage-'));
+	const run = async (...argv: string[]) => runDesign(argv, adapter(), { cwd: work, bin: 'x', out: () => {}, err: (t) => console.error(t), paint });
+	await run('new', 'compose', '--size', 'og', '-o', 'card');
+	await run('compose', 'add', 'card', 'headline', 'Orders a day, since the endpoint opened', '--at', '0,0,7,4');
+	await run('compose', 'add', 'card', 'stat', '1,200+', '--set', 'label=stores an agent can buy from', '--at', '0,6,6,5');
+	await run('compose', 'add', 'card', 'chart', '--set', 'value=Mon 120, Tue 180, Wed 150, Thu 240, Fri 300', '--at', '7,0,5,11');
+	copyFileSync(join(work, 'card.png'), join(cov, 'compose-og.png'));
+	await run('new', 'compose', '--size', 'ad-300x250', '-o', 'ad');
+	await run('compose', 'add', 'ad', 'logo', '--at', '0,0,12,2');
+	await run('compose', 'add', 'ad', 'headline', 'Give your agent a checkout', '--at', '0,3,12,5');
+	await run('compose', 'add', 'ad', 'button', 'Get started', '--at', '0,9,8,3');
+	copyFileSync(join(work, 'ad.png'), join(cov, 'compose-ad-300x250.png'));
+	rmSync(work, { recursive: true, force: true });
+	for (const type of ['agenda', 'team', 'timeline', 'chart', 'comparison', 'qa']) writeFileSync(join(cov, `slide-${type}.png`), renderSlide({ type, sample: true }, { png: true }).png!);
+	for (const id of ['business-card-front', 'business-card-back', 'one-pager-letter', 'report-cover', 'certificate', 'event-badge', 'name-tag', 'sticker-sheet', 'mug-15oz', 'lanyard']) {
+		const r = renderItem(findItem(id), { sample: true, dpi: 72, svg: false, slots: id === 'certificate' ? { headline: 'Certificate of completion', name: 'Alex Acme' } : {} });
+		writeFileSync(join(cov, `${id}.png`), r.png!);
+	}
+	for (const [name, data] of Object.entries(iconSet())) if (/\.(png|svg)$/.test(name)) writeFileSync(join(cov, `icon-${name}`), data);
+	const emails: [EmailId, Record<string, string>][] = [
+		['announcement', { badge: 'Now available', headline: 'Agents can buy from any store', body: 'One endpoint for search, checkout and tracking.', action: 'Get started', href: 'https://example.com/start', footer: 'You get this because you signed up at example.com.' }],
+		['receipt', { headline: 'Your order', body: 'Acme confirmed it a moment ago.', items: 'Cup | $12\nShipping | $4\nTotal | $16' }],
+	];
+	for (const [id, copy] of emails) writeFileSync(join(cov, `email-${id}.html`), renderEmail(id, copy).html);
 }
 
 if (process.argv.includes('--video')) {

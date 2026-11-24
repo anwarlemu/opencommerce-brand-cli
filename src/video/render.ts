@@ -6,7 +6,7 @@ import { mergeCopy, readContent, type CopyInput } from '../image/content.js';
 import { pngSize, rasterize } from '../image/load.js';
 import { parseSeed, parseTheme } from '../image/render.js';
 import { unknownName } from '../lib/names.js';
-import { encodeMp4, encodeWebm } from './encode.js';
+import { encodeGif, encodeMp4, encodeWebm } from './encode.js';
 import { frameSvg, videoScene, type VideoFrame } from './frames.js';
 import { templateDef, VIDEO_SIZE_ALIASES, VIDEO_SIZES, VIDEO_TEMPLATES, type VideoSize, type VideoTemplate } from './motion.js';
 
@@ -57,16 +57,17 @@ function settleCopy(template: VideoTemplate, given: Copy, sampled: boolean): { c
 }
 
 /** mp4 or webm, from --format or the --out extension. */
-function formatOf(input: VideoInput): 'mp4' | 'webm' {
+function formatOf(input: VideoInput): 'mp4' | 'webm' | 'gif' {
 	const ext = input.out ? extname(input.out).slice(1).toLowerCase() : '';
 	if (input.format) {
-		const f = oneOf(input.format, ['mp4', 'webm'] as const, 'format');
+		const f = oneOf(input.format, ['mp4', 'webm', 'gif'] as const, 'format');
 		if (ext && ext !== f) throw new Error(`--out is a .${ext} file, but --format is ${f}.`);
 		return f;
 	}
 	if (!ext || ext === 'mp4') return 'mp4';
 	if (ext === 'webm') return 'webm';
-	throw new Error('--out must be an .mp4 or .webm file, or a directory.');
+	if (ext === 'gif') return 'gif';
+	throw new Error('--out must be an .mp4, .webm or .gif file, or a directory.');
 }
 
 function destination(size: VideoSize, template: VideoTemplate, format: string, out?: string) {
@@ -88,7 +89,8 @@ export function videoRequest(input: VideoInput): VideoFrame {
 	const { copy, sample } = settleCopy(template, given, !!input.sample);
 	const req: VideoFrame = { template, size, ground: parseTheme(input.theme, input.ground), copy, sample, seed: parseSeed(input.seed) };
 	// Copy that does not fit fails here, before any frame is drawn.
-	if (templateDef(template).kind !== 'art') sceneSvg({ ...videoScene(req), dry: true });
+	if (templateDef(template).kind === 'reveal' && template === 'stat') sceneSvg({ template: 'closing', width: VIDEO_SIZES[size].width, height: VIDEO_SIZES[size].height, copy, logo: false, textScale: 2, dry: true });
+	else if (!['art', 'reveal'].includes(templateDef(template).kind)) sceneSvg({ ...videoScene(req), dry: true });
 	return req;
 }
 
@@ -135,7 +137,7 @@ export function renderVideo(input: VideoInput, options?: { frames?: number }) {
 	const frames = options?.frames ?? all;
 	if (!Number.isInteger(frames) || frames < 1 || frames > all) throw new Error(`Frame count must be an integer from 1 to ${all}.`);
 	const pngs = Array.from({ length: frames }, (_, index) => renderFramePng(req, index, frames));
-	const data = format === 'webm' ? encodeWebm(pngs, def.fps) : encodeMp4(pngs, def.fps);
+	const data = format === 'webm' ? encodeWebm(pngs, def.fps) : format === 'gif' ? encodeGif(pngs, def.fps) : encodeMp4(pngs, def.fps);
 	const path = destination(req.size, req.template, format, input.out);
 	mkdirSync(dirname(path), { recursive: true });
 	writeFileSync(path, data);

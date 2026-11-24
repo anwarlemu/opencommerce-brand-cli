@@ -15,7 +15,7 @@ export type VideoSize = keyof typeof VIDEO_SIZES;
 /** The image sizes of the same shape. */
 export const VIDEO_SIZE_ALIASES: Record<string, VideoSize> = { reel: 'vertical', '1080x1080': 'square', '1080x1920': 'vertical', '1920x1080': 'landscape' };
 
-export type VideoTemplateDef = { id: string; description: string; inputs: string[]; fps: number; seconds: number; kind: 'poster' | 'product' | 'layout' | 'art'; source: string; required: string[]; sample?: Record<string, string> };
+export type VideoTemplateDef = { id: string; description: string; inputs: string[]; fps: number; seconds: number; kind: 'poster' | 'product' | 'layout' | 'art' | 'reveal'; source: string; required: string[]; sample?: Record<string, string> };
 
 export const VIDEO_TEMPLATES: VideoTemplateDef[] = [
 	{ id: 'social', description: 'Animated social clip. A label, a headline and an optional supporting line settle in.', inputs: ['headline', 'body', 'badge'], required: ['headline'], sample: { headline: 'Open router for commerce', body: 'One endpoint for agents to search, check out and track orders.' }, fps: VIDEO_FPS, seconds: VIDEO_SECONDS, kind: 'poster', source: 'CLI' },
@@ -25,6 +25,8 @@ export const VIDEO_TEMPLATES: VideoTemplateDef[] = [
 	{ id: 'window', description: 'The window layout: the words settle, the window rises and types its lines, the field drifts round it.', inputs: ['badge', 'headline', 'body', 'action', 'secondary', 'label', 'code'], required: ['headline'], fps: 30, seconds: 4, kind: 'layout', source: 'image tool window layout; the drift from scatter-stage.tsx' },
 	{ id: 'closing', description: 'The closing card: the lockup, words and keys settle on the mist card while the field drifts at its edges.', inputs: ['badge', 'headline', 'body', 'action', 'secondary'], required: ['headline'], fps: 30, seconds: 4, kind: 'layout', source: 'image tool closing layout; the drift from scatter-stage.tsx' },
 	{ id: 'cards', description: 'Numbered cards come in one after another under the title; the field drifts round them.', inputs: ['headline', 'cards', 'footer'], required: ['cards'], fps: 30, seconds: 4, kind: 'layout', source: 'image tool cards layout; the drift from scatter-stage.tsx' },
+	{ id: 'logo', description: 'The logo reveal: the mark settles from 97 percent as it fades in, the lockup follows 60ms later, then it rests; the field drifts behind.', inputs: [], required: [], fps: 30, seconds: 3, kind: 'reveal', source: 'the mark and the lockup from brand/logo; the press scale and the ease-out from the tokens' },
+	{ id: 'stat', description: 'An animated figure: the number counts up on the ease-out token while its label settles under it, then it rests.', inputs: ['headline', 'body'], required: ['headline'], sample: { headline: '1,200+', body: 'stores an agent can buy from' }, fps: 30, seconds: 3, kind: 'reveal', source: 'the stat slide (the closing card) and the motion tokens' },
 	{ id: 'field', description: 'The glyph field alone, drifting as the site draws it: a slow sideways slide and a gentle warp, about 12 redraws a second.', inputs: [], required: [], fps: 12, seconds: 6, kind: 'art', source: 'scatter-stage.tsx' },
 	{ id: 'mark', description: 'The [*] slab in characters, swaying gently as the hero\'s sun does.', inputs: [], required: [], fps: 30, seconds: 6, kind: 'art', source: 'merchant-orbit.tsx and lib/mark-3d.ts' },
 	{ id: 'orbit', description: 'The rings of dots round the swaying [*] slab (the hero without its stores).', inputs: [], required: [], fps: 30, seconds: 6, kind: 'art', source: 'merchant-orbit.tsx' },
@@ -100,7 +102,7 @@ export function videoSpec() {
 		templates: VIDEO_TEMPLATES.map((item) => ({ ...item, frames: Math.round(item.fps * item.seconds) })),
 		grounds: ['white', 'mist'],
 		themes: ['white', 'mist'],
-		formats: ['mp4', 'webm'],
+		formats: ['mp4', 'webm', 'gif'],
 		still: 'Pass --still <seconds> to write one PNG frame instead of a clip.',
 		motion: 'Entrances use the ease-out token at the duration tokens (160 to 300ms), staggered 60ms; the field drifts linearly (constant motion) and the mark sways on a slow sine, as the site does. Nothing eases in.',
 		defaults: { ground: 'white', format: 'mp4 (or the --out extension)' },

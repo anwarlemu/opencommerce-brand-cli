@@ -28,6 +28,10 @@ const words = (long: boolean) => (t: TemplateInfo) => {
 		number: '01',
 		stat: long ? '1,000,000+' : '42%',
 		url: 'acme.example',
+		value: 'Mon 12, Tue 18, Wed 24',
+		name: 'Alex Acme',
+		detail: 'Engineer, Acme',
+		rows: 'Step | Before\nCheckout | One request',
 	};
 	return Object.fromEntries(t.copy.filter((c) => of[c.id] !== undefined && !(t.images.some((i) => i.required) && c.id === 'code')).map((c) => [c.id, of[c.id]]));
 };

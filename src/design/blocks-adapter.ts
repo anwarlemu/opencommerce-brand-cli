@@ -142,6 +142,8 @@ export const SECTIONS: Section[] = [
 	{ type: 'pricing', description: 'Plans in windows: name, price, unit, a line, values (separated by |) and the key.', copy: [{ id: 'title', required: true }, { id: 'description' }], items: { count: [1, 4], copy: [{ id: 'name', required: true }, { id: 'price', required: true }, { id: 'unit' }, { id: 'blurb' }, { id: 'values' }, { id: 'action' }, { id: 'href' }, { id: 'featured' }] }, component: ['section', 'pricing'] },
 	{ type: 'testimonials', description: 'Customer windows: the customer\'s name, the quote and its context (Acme, not real people).', copy: [{ id: 'title' }, { id: 'description' }], items: { count: [1, 6], copy: [{ id: 'name', required: true }, { id: 'quote', required: true }, { id: 'context' }] }, component: ['section', 'testimonials'] },
 	{ type: 'logos', description: 'A strip of store names, set as words (no third-party marks are shipped).', copy: [{ id: 'label' }], items: { count: [3, 16], copy: [{ id: 'name', required: true }] }, component: ['logo-strip'] },
+	{ type: 'stats', description: 'Two to four figures in windows: the number, its label.', copy: [{ id: 'title' }, { id: 'description' }], items: { count: [2, 4], copy: [{ id: 'value', required: true }, { id: 'label', required: true }, { id: 'name' }] }, component: ['stats'] },
+	{ type: 'newsletter', description: 'The sign-up window: a heading, a line, the work email and the blue key.', copy: [{ id: 'title', required: true }, { id: 'description' }, { id: 'action', required: true }, { id: 'thanks' }], component: ['newsletter'] },
 	{ type: 'faq', description: 'Questions and answers in the accordion.', copy: [{ id: 'title' }, { id: 'lead' }], items: { count: [1, 12], copy: [{ id: 'question', required: true }, { id: 'answer', required: true }] }, component: ['faq'] },
 	{ type: 'prose', description: 'A heading and paragraphs (blank lines between them), for legal and about pages.', copy: [{ id: 'title' }, { id: 'body', required: true }], component: ['section', 'prose'] },
 	{ type: 'cta', description: 'The closing card: title, line and keys on the mist card with the field at its edges.', copy: [{ id: 'title', required: true }, { id: 'description' }, { id: 'action' }, { id: 'action-href' }, { id: 'secondary' }, { id: 'secondary-href' }], component: ['cta', 'button'] },
@@ -184,6 +186,12 @@ function reactSection(s: OutlineSection, n: number): { jsx: string; imports: Set
 		case 'logos':
 			im.add('LogoStrip:site/logo-strip');
 			return { imports: im, jsx: `<LogoStrip brands={${JSON.stringify(it.map((x) => ({ name: x.name })))}}${c.label ? ` label={${js(c.label)}}` : ''} />` };
+		case 'stats':
+			im.add('Stats:site/stats').add('SiteSection:site/section');
+			return { imports: im, jsx: `<SiteSection><Stats${c.title ? ` title={${js(c.title)}}` : ''}${c.description ? ` description={${js(c.description)}}` : ''} stats={${JSON.stringify(it.map((x) => ({ value: x.value, label: x.label, ...(x.name ? { name: x.name } : {}) })))}} /></SiteSection>` };
+		case 'newsletter':
+			im.add('Newsletter:site/newsletter').add('SiteSection:site/section');
+			return { imports: im, jsx: `<SiteSection><Newsletter title={${js(c.title)}}${c.description ? ` description={${js(c.description)}}` : ''}${c.action ? ` action={${js(c.action)}}` : ''}${c.thanks ? ` thanks={${js(c.thanks)}}` : ' thanks={null}'} /></SiteSection>` };
 		case 'faq':
 			im.add('Faq:site/faq');
 			return { imports: im, jsx: `<Faq items={${JSON.stringify(it.map((x) => ({ question: x.question, answer: x.answer })))}}${c.title ? ` title={${js(c.title)}}` : ''}${c.lead ? ` lead={${js(c.lead)}}` : ''} />` };
@@ -230,6 +238,10 @@ function htmlSection(s: OutlineSection): string {
 			return `<section class="ds-section">${head(c.title, c.description)}<ul class="ds-grid">${it.map((x) => `<li>${win(x.name, `<blockquote>${html(x.quote)}</blockquote>${x.context ? `<p>${html(x.context)}</p>` : ''}`)}</li>`).join('')}</ul></section>`;
 		case 'logos':
 			return `<section class="ds-logos">${c.label ? `<p class="ds-eyebrow">${html(c.label)}</p>` : ''}<ul>${it.map((x) => `<li>${html(x.name)}</li>`).join('')}</ul></section>`;
+		case 'stats':
+			return `<section class="ds-section">${head(c.title, c.description)}<ul class="ds-grid">${it.map((x, i) => `<li>${win(x.name || `figure-${i + 1}.live`, `<p class="ds-price">${html(x.value)}</p><p>${html(x.label)}</p>`)}</li>`).join('')}</ul></section>`;
+		case 'newsletter':
+			return `<section class="ds-section">${win('newsletter.signup', `<h3>${html(c.title)}</h3>${c.description ? `<p>${html(c.description)}</p>` : ''}<form class="ds-keys" style="justify-content:flex-start"><label>Work email <input type="email" name="email" required></label><button class="ds-key" type="submit">${html(c.action)}</button></form>`)}</section>`;
 		case 'faq':
 			return `<section class="ds-section">${head(c.title, c.lead)}${it.map((x) => `<details class="ds-faq"><summary>${html(x.question)}</summary><p>${html(x.answer)}</p></details>`).join('')}</section>`;
 		case 'prose':

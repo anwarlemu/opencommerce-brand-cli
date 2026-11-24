@@ -5,12 +5,14 @@ import { rasterRgb } from '../image/load.js';
 import { unknownName } from '../lib/names.js';
 import { pkgPath } from '../lib/paths.js';
 import type { Picture } from './kit.js';
+import { blockRects } from '../design/compose.js';
+import { blocksSvg, type PlacedBlock } from './blocks.js';
 import { sceneSvg, type Copy, type Scene, type TemplateId } from './layouts.js';
 
 // Deck slides at 1920 by 1080 (brand/assets/deck.json): each slide type is one of the image layouts, or the quote, set at
 // slide size with the slide's own copy. Only the copy a slide is given is drawn; `sample` fills the rest.
 
-type SlideDef = { name: string; layout: TemplateId; description: string; slots: Record<string, string>; required: string[]; seed: number };
+type SlideDef = { name: string; layout: TemplateId | 'blocks'; description: string; slots: Record<string, string>; required: string[]; seed: number; blocks?: { id: string; type: string; at: { col: number; row: number; cols: number; rows: number }; slots?: Record<string, string> }[] };
 type DeckDoc = { width: number; height: number; slides: Record<string, SlideDef> };
 
 let doc: DeckDoc | undefined;
@@ -73,6 +75,7 @@ export function slideScene(slide: Slide): Scene {
 	if (copy.code && slide.picture) throw new Error(`A ${slide.type} slide's window holds "code" or "image", not both.`);
 	const seed = typeof slide.seed === 'number' ? slide.seed : def.seed;
 	if (!Number.isInteger(seed) || seed < 0 || seed > 100000) throw new Error('"seed" takes a whole number from 0 to 100000.');
+	if (def.layout === 'blocks') throw new Error(`A ${slide.type} slide is drawn from blocks; use slideSvg or renderSlide.`);
 	const scene: Scene = { template: def.layout, width: D.width, height: D.height, theme: slide.theme ?? 'white', copy, picture: slide.picture ?? undefined, seed, sample, edits: slide.edits };
 	switch (slide.type) {
 		case 'section':
@@ -99,14 +102,40 @@ export function slideScene(slide: Slide): Scene {
 	}
 }
 
+/** A blocks slide: the compose blocks on the slide's grid, their words from the slide's slots. */
+export function blocksSlide(slide: Slide) {
+	const D = deckDoc();
+	const def = D.slides[slide.type];
+	const { slots: s } = slotsFor(slide.type, slide, slide.sample);
+	for (const k of def.required) if (!s[k]) throw new Error(`A ${slide.type} slide needs "${k}" (or "sample": true).`);
+	const size = { id: 'slide', width: D.width, height: D.height };
+	const blocks = (def.blocks ?? []).filter((b) => !b.slots || Object.values(b.slots).some((slot) => s[slot]));
+	const rects = blockRects({ size, blocks: blocks.map(({ id, type, at }) => ({ id, type, at })) });
+	const placed: PlacedBlock[] = rects.map(({ block, rect }) => {
+		const def2 = blocks.find((b) => b.id === block.id)!;
+		const copy = Object.fromEntries(Object.entries(def2.slots ?? {}).filter(([, slot]) => s[slot]).map(([k, slot]) => [k, s[slot]]));
+		return { id: block.id, type: block.type as PlacedBlock['type'], rect, copy, options: {} };
+	});
+	const seed = typeof slide.seed === 'number' ? slide.seed : def.seed;
+	const copy = Object.fromEntries(Object.entries(s).filter(([, v]) => v));
+	return { ...blocksSvg({ width: D.width, height: D.height, sizeId: 'slide', theme: slide.theme ?? 'white', seed, blocks: placed, edits: slide.edits }, s.title || def.name), copy, width: D.width, height: D.height };
+}
+
+export const isBlocks = (type: string) => deckDoc().slides[type]?.layout === 'blocks';
+
 export function slideSvg(slide: Slide): string {
+	if (isBlocks(slide.type)) return blocksSlide(slide).svg;
 	return sceneSvg(slideScene(slide)).svg;
 }
 
 export function renderSlide(slide: Slide, opts: { png?: boolean; svg?: boolean }) {
-	const scene = slideScene(slide);
-	const { svg, layers } = sceneSvg(scene);
-	assertScene({ template: slide.type, kind: 'slide', sizeId: 'slide', width: scene.width, height: scene.height, copy: scene.copy, edits: scene.edits }, layers);
+	if (!(slide.type in deckDoc().slides)) throw unknownName('slide type', String(slide.type), slideTypes());
+	const scene = isBlocks(slide.type) ? blocksSlide(slide) : (() => {
+		const sc = slideScene(slide);
+		return { ...sceneSvg(sc), copy: sc.copy as Record<string, string>, width: sc.width, height: sc.height };
+	})();
+	const { svg, layers } = scene;
+	assertScene({ template: slide.type, kind: 'slide', sizeId: 'slide', width: scene.width, height: scene.height, copy: scene.copy, edits: slide.edits }, layers);
 	const out: { svg?: string; png?: Buffer; rgb?: Buffer; layers: DrawnLayer[]; width: number; height: number } = { width: deckDoc().width, height: deckDoc().height, layers };
 	if (opts.svg) out.svg = svg;
 	if (opts.png) {

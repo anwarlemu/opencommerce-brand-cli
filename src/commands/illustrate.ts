@@ -2,6 +2,7 @@ import { extname, join, resolve } from 'node:path';
 import type { Command } from 'commander';
 import { display, num, write, type OutFile } from '../assets/io.js';
 import { picture as readPicture } from '../image/load.js';
+import { PLATFORMS, zonePx } from '../design/platforms.js';
 import { encodeScene, parseFormats, parseSize, parseTheme, type Format } from '../image/render.js';
 import { illustrate, illustrateData, subjects } from '../illustrate/render.js';
 import { cli } from '../lib/brand.js';
@@ -42,12 +43,16 @@ function run(subject: string | undefined, o: Opts) {
 	}
 	if (!subject) throw new Error(`Name a subject: ${subjects().join(', ')} (${cli()} illustrate --list).`);
 	if (!subjects().includes(subject)) throw unknownName('subject', subject, subjects());
+	let avoid: { x: number; y: number; w: number; h: number }[] | undefined;
 	let width: number | undefined;
 	let height: number | undefined;
 	if (typeof o.size === 'string') {
 		const size = parseSize(o.size);
 		width = size.width;
 		height = size.height;
+		// A meeting background keeps clear where the person sits; a wallpaper, the clock and the home bar.
+		const p = PLATFORMS.find((x) => x.id === size.id);
+		if (p) avoid = p.avoid.map((z) => zonePx(z, size.width, size.height));
 	}
 	const asked = (o.theme ?? o.ground) as string | undefined;
 	const ground = asked === 'none' ? ('none' as const) : parseTheme(asked);
@@ -56,7 +61,7 @@ function run(subject: string | undefined, o: Opts) {
 	const formats: Format[] = typeof o.format === 'string' || ext ? parseFormats(o.format as string | undefined, out) : ['svg', 'png'];
 	if (ext && (formats.length !== 1 || ext.slice(1).toLowerCase().replace('jpeg', 'jpg') !== formats[0])) throw new Error(`--out names one ${ext} file, but --format is ${formats.join(', ')}. Pass a directory for several.`);
 	const picture = typeof o.image === 'string' ? readPicture(o.image) : undefined;
-	const r = illustrate({ subject, width, height, seed: num('seed', o.seed, 0, 100000, { integer: true }), picture, label: typeof o.label === 'string' ? o.label : undefined, code: typeof o.code === 'string' ? o.code.replace(/\\n/g, '\n') : undefined, sample: !!o.sample, ground });
+	const r = illustrate({ subject, width, height, seed: num('seed', o.seed, 0, 100000, { integer: true }), picture, label: typeof o.label === 'string' ? o.label : undefined, code: typeof o.code === 'string' ? o.code.replace(/\\n/g, '\n') : undefined, sample: !!o.sample, ground, ...(avoid?.length ? { avoid } : {}) });
 	const base = ext ? out!.slice(0, -ext.length) : join(out ?? resolve(cwd, 'illustrations'), `${subject}-${r.width}x${r.height}`);
 	const files: OutFile[] = [];
 	const data = encodeScene(r.svg, r.width, r.height, formats);

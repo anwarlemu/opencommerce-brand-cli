@@ -12,12 +12,12 @@ import { emit } from '../lib/output.js';
 // `deck`: slides at 1920 by 1080 from a JSON file or flags, a PNG (or SVG) per slide and one PDF.
 
 type Opts = Record<string, string | boolean | undefined> & { json?: boolean };
-const SLOT_FLAGS = ['chip', 'title', 'body', 'number', 'items', 'stat', 'quote', 'attribution', 'label', 'code', 'primary', 'secondary', 'url'];
+const SLOT_FLAGS = ['chip', 'title', 'body', 'number', 'items', 'stat', 'quote', 'attribution', 'label', 'code', 'primary', 'secondary', 'url', 'cards', 'value', 'rows'];
 
 export function deckCommand(program: Command) {
 	program
 		.command('deck [slide]')
-		.description('Slides at 1920x1080 (cover, section, statement, bullets, stat, quote, image, end): a PNG per slide and one PDF')
+		.description('Slides at 1920x1080 (cover, section, statement, bullets, stat, quote, image, end, agenda, team, timeline, chart, comparison, qa): a PNG per slide and one PDF')
 		.option('-i, --input <file>', 'deck.json: { "slides": [ { "type": "cover", "title": "..." }, ... ] }')
 		.option('--slide <type>', 'one slide of this type, from flags')
 		.option('--chip <text>', 'cover: the chip above the title')
@@ -33,6 +33,9 @@ export function deckCommand(program: Command) {
 		.option('--primary <text>', 'end: the blue key')
 		.option('--secondary <text>', 'end: the white key')
 		.option('--url <text>', 'end: the address')
+		.option('--cards <text>', 'team and timeline: cards, blank lines between, a heading then a line')
+		.option('--value <text>', 'chart: "Label 12, Label 30"')
+		.option('--rows <text>', 'comparison: rows of cells separated by |, one row per line, the first the head')
 		.option('--image <file>', 'cover and image: a PNG, JPEG or SVG in the window')
 		.option('--headline <text>', 'the same as --title')
 		.option('--badge <text>', 'the same as --chip')

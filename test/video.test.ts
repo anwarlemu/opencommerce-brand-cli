@@ -29,7 +29,7 @@ describe('video', () => {
 		expect(() => renderVideo({ template: 'hero', size: 'square' }, { frames: 1 })).toThrow(/needs --headline/);
 		expect(() => renderVideo({ template: 'social', size: 'square', title: 'Hello', text: 'Too much to read in a clip. '.repeat(400) }, { frames: 1 })).toThrow(/does not fit .* Shorten the body/);
 		expect(() => renderVideo({ template: 'social', size: 'square', title: 'Hello', by: 'Ada' }, { frames: 1 })).toThrow(/do not take --by/);
-		expect(() => renderVideo({ template: 'announcement', size: 'square', title: 'Hello', out: 'clip.gif' }, { frames: 1 })).toThrow(/\.mp4/);
+		expect(() => renderVideo({ template: 'announcement', size: 'square', title: 'Hello', out: 'clip.mov' }, { frames: 1 })).toThrow(/\.mp4/);
 	});
 
 	it('renders every template at every size as a PNG of that size', { timeout: 120000 }, () => {
@@ -63,7 +63,7 @@ describe('video', () => {
 
 	it('lists templates from the CLI and rejects an unknown template', () => {
 		const listed = JSON.parse(execFileSync(process.execPath, [BIN, 'video', 'templates', '--json'], { encoding: 'utf8' }));
-		expect(listed.templates.map((item: { id: string }) => item.id)).toEqual(['social', 'announcement', 'product', 'hero', 'window', 'closing', 'cards', 'field', 'mark', 'orbit']);
+		expect(listed.templates.map((item: { id: string }) => item.id)).toEqual(['social', 'announcement', 'product', 'hero', 'window', 'closing', 'cards', 'logo', 'stat', 'field', 'mark', 'orbit']);
 		expect(listed.sizes.map((item: { id: string }) => item.id)).toEqual(['square', 'vertical', 'landscape']);
 		expect(listed.renderer.fps).toBe(12);
 		expect(listed.renderer.frames).toBe(24);

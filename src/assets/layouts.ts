@@ -81,6 +81,8 @@ export type Scene = {
 	/** Headline size against the template's own (a deck's stat), and the width of the words as a share of the image. */
 	textScale?: number;
 	textWidth?: number;
+	/** A part held at a size (a counting figure keeps the size of its last frame). */
+	hold?: Record<string, number>;
 	/** Cards: no footer. */
 	bare?: boolean;
 	/** Seconds into the field's drift (video); unset is still. */
@@ -341,7 +343,8 @@ function words(l: Local, o: { size: number; bodyRatio?: number; bodyShare?: numb
 	const size = o.size;
 	const items: Item[] = [];
 	if (copy.badge) items.push(badgeItem(ctx, copy.badge, { start: H / W > 1.15 ? 0.03 * W : 20 * k, gap: 0, over: o.over }));
-	if (copy.headline) items.push(textItem(ctx, { id: 'headline', value: copy.headline, face: 'display', start: size, min: Math.max(floor * 1.5, 24 * k * 0.8), gap: 28 * k, leading: c.leadingHeading, fill: c.ink, ground, over: o.over, even: true, ...(o.track === false ? {} : { tracking: () => c.trackingHero }), hide: false }));
+	const held = l.req.hold?.headline;
+	if (copy.headline) items.push(textItem(ctx, { id: 'headline', value: copy.headline, face: 'display', start: held ?? size, min: held ?? Math.max(floor * 1.5, 24 * k * 0.8), gap: 28 * k, leading: c.leadingHeading, fill: c.ink, ground, over: o.over, even: true, ...(o.track === false ? {} : { tracking: () => c.trackingHero }), hide: false }));
 	if (copy.body) items.push(textItem(ctx, { id: 'body', value: copy.body, face: 'sans', start: Math.max(floor, size * (o.bodyRatio ?? 0.33)), min: floor, gap: Math.max(12 * k, size * 0.34), leading: c.leadingLead, fill: c.secondary, ground, over: o.over, share: o.bodyShare ?? 0.9, even: true }));
 	if (key('action') || key('secondary')) items.push(keysItem(ctx, key('action'), key('secondary'), { start: H / W > 1.15 ? 0.028 * W : 17 * k, gap: 34 * k, over: o.over }));
 	return items;

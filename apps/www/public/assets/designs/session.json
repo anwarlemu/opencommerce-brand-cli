@@ -173,6 +173,36 @@
 			"description": "The closing card: the lockup, the title and line, the blue and white keys, and the address in the chip."
 		},
 		{
+			"id": "slide-agenda",
+			"kind": "slide",
+			"description": "The title and the points of the talk, one per line, after the blue numbers."
+		},
+		{
+			"id": "slide-team",
+			"kind": "slide",
+			"description": "The title and people as cards, a name then a line (a role), blank lines between; no photos."
+		},
+		{
+			"id": "slide-timeline",
+			"kind": "slide",
+			"description": "The title and steps in time as numbered cards in a row: a date then a line, blank lines between."
+		},
+		{
+			"id": "slide-chart",
+			"kind": "slide",
+			"description": "The title, a line, and a bar chart from \"Label 12, Label 30\", in the library's chart style."
+		},
+		{
+			"id": "slide-comparison",
+			"kind": "slide",
+			"description": "The title and a table in a window: cells separated by |, the first row the head."
+		},
+		{
+			"id": "slide-qa",
+			"kind": "slide",
+			"description": "The closing question slide: the title on the mist card with a line under it (a contact)."
+		},
+		{
 			"id": "merch-tee-front",
 			"kind": "merch",
 			"description": "T-shirt front: 12 by 16 in, DTG or screen print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
@@ -211,6 +241,86 @@
 			"id": "merch-poster",
 			"kind": "merch",
 			"description": "Poster, 18 by 24 in: 18 by 24 in, digital or offset print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-business-card-front",
+			"kind": "merch",
+			"description": "Business card, front: 3.5 by 2 in, digital or offset print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-business-card-back",
+			"kind": "merch",
+			"description": "Business card, back: 3.5 by 2 in, digital or offset print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-letterhead-letter",
+			"kind": "merch",
+			"description": "Letterhead, US Letter: 8.5 by 11 in, office or digital print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-letterhead-a4",
+			"kind": "merch",
+			"description": "Letterhead, A4: 8.27 by 11.69 in, office or digital print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-one-pager-letter",
+			"kind": "merch",
+			"description": "One-pager, US Letter: 8.5 by 11 in, digital print or PDF. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-one-pager-a4",
+			"kind": "merch",
+			"description": "One-pager, A4: 8.27 by 11.69 in, digital print or PDF. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-report-cover",
+			"kind": "merch",
+			"description": "Report or case-study cover, US Letter: 8.5 by 11 in, digital print or PDF. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-certificate",
+			"kind": "merch",
+			"description": "Certificate, US Letter landscape: 11 by 8.5 in, digital print or PDF. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-event-badge",
+			"kind": "merch",
+			"description": "Event badge, 4 by 3 in: 4 by 3 in, digital print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-name-tag",
+			"kind": "merch",
+			"description": "Name tag, 3.5 by 2.25 in: 3.5 by 2.25 in, label printer or adhesive sheet. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-sticker-sheet",
+			"kind": "merch",
+			"description": "Sticker sheet, US Letter: 8.5 by 11 in, kiss-cut vinyl sheet. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-poster-11x17",
+			"kind": "merch",
+			"description": "Poster, 11 by 17 in (tabloid): 11 by 17 in, digital print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-poster-24x36",
+			"kind": "merch",
+			"description": "Poster, 24 by 36 in: 24 by 36 in, large-format print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-mug-15oz",
+			"kind": "merch",
+			"description": "Mug wrap, 15 oz: 9.5 by 4 in, sublimation. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-notebook",
+			"kind": "merch",
+			"description": "Notebook cover, 5.5 by 8.5 in: 5.5 by 8.5 in, digital print. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
+		},
+		{
+			"id": "merch-lanyard",
+			"kind": "merch",
+			"description": "Lanyard, 0.75 by 36 in: 36 by 0.75 in, dye sublimation. PNG at 100 px per inch (render --scale 3 for 300) and SVG at physical size, bleed included."
 		},
 		{
 			"id": "illustration-field",
@@ -271,6 +381,16 @@
 			"id": "video-cards",
 			"kind": "video",
 			"description": "Numbered cards come in one after another under the title; the field drifts round them. 4 seconds at 30 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-logo",
+			"kind": "video",
+			"description": "The logo reveal: the mark settles from 97 percent as it fades in, the lockup follows 60ms later, then it rests; the field drifts behind. 3 seconds at 30 fps. The PNG is the frame it rests on."
+		},
+		{
+			"id": "video-stat",
+			"kind": "video",
+			"description": "An animated figure: the number counts up on the ease-out token while its label settles under it, then it rests. 3 seconds at 30 fps. The PNG is the frame it rests on."
 		},
 		{
 			"id": "video-field",

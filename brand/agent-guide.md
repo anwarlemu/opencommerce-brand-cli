@@ -9,6 +9,27 @@ Use this system to build {{brand}} pages and interfaces from the user's brief. T
 3. Run `{{cli}} manifest --json` (or `describe --json`) before inventing anything. It lists every command, token, font, logo, template, size, component and rule. Unknown names are errors.
 4. Reuse the library's components and variants. Do not recreate them from screenshots or guess their props. `{{cli}} component inspect <name> --json` returns the props and states that exist. `{{cli}} component emit` returns example code or JSX for values you checked.
 
+## I need X
+
+| I need | Run |
+| --- | --- |
+| A link preview, social post, story, banner or ad (X, LinkedIn, Instagram, Facebook, Threads, Pinterest, YouTube, the IAB ads) | `{{cli}} image <template> --size <id>` (`image templates --json` lists both) |
+| Several posts in a set | `{{cli}} image carousel slides.json` |
+| To change an image until it is right | `{{cli}} design new <template> ...`, then `design revise <file> "..."` |
+| A layout no template has (a stat card, a chart, a comparison, a quote card) at any size | `{{cli}} design new compose --size <id>`, then `design compose add <file> <block> ...` |
+| A profile picture | `{{cli}} image avatar` |
+| Favicons, app icons and the default share image | `{{cli}} icons` |
+| Slides | `{{cli}} deck --input deck.json` (cover, section, statement, bullets, stat, quote, image, end, agenda, team, timeline, chart, comparison, qa) |
+| A one-pager, report cover, letterhead, business card, certificate, badge or name tag | `{{cli}} merch <item> --format pdf,png` |
+| Merch | `{{cli}} merch <item>` (`merch --list`) |
+| A clip, a loop, a GIF, a logo reveal or a counting figure | `{{cli}} video <template> --size <id> [--format gif]` |
+| A wallpaper, a meeting background or the brand art at any size | `{{cli}} illustrate <subject> --size meeting|desktop|phone-wallpaper|WxH` |
+| An email | `{{cli}} email announcement|newsletter|receipt|password-reset` |
+| A component or section for a site | `{{cli}} component list`, then `add <names...>` |
+| A whole page | `{{cli}} design page compose outline.json --flavor react,html` |
+
+Nothing here invents copy: every command draws only the words you pass (`--sample` fills sample words on purpose).
+
 ## Install and prepare a project
 
 Requires Node.js 20 or later. Run commands from the consuming project root, not the design-system repository.
@@ -146,6 +167,12 @@ Principles: `site` is the page system. `product` explains that this brand has no
 `component list` is the full catalog. `list` and `search` filter that catalog by words. `inspect` returns exports, parsed props, example state names, constraints and source. `emit --state` copies that example. `emit --props` checks every key and value against the parsed schema and errors on anything unknown. Pass `--text` for the child text. Do not pass `--state` and `--props` together. If a component has no parsed prop schema, emit a state instead of inventing JSX.
 
 `show` and `view` remain the full registry record. Prefer `inspect` and `emit` when you need props and a snippet.
+
+## Compose and pages
+
+`design new compose --size <id>` starts an empty design built from the brand's blocks on a 12 by 12 grid inside the platform's safe area: headline, body, badge, logo, button, picture, window (code), art (the field, the mark, the orbit), panel, card, cards, stat, quote, list, chart (bar, line or donut from "Label 12, Label 30"), table (cells separated by |), divider and icon. `design compose add <file> <block> ["words"] --place top-left` (or `--at col,row,cols,rows`), `compose move|remove|order|span|grid`, and plain words ("add a stat "42%" top right", "send the art to the back") all work, with the same check, undo, variants and sizes. Every image template can be rebuilt from blocks.
+
+`design page compose outline.json --flavor react,html` writes a whole page from the site's sections in order (header, hero, page-header, features, steps, pricing, testimonials, logos, stats, newsletter, faq, prose, cta, footer): React from the library (add the components it lists) and a plain HTML file with the brand stylesheet. The outline is checked first; only its words go on the page.
 
 ## Make slides, print files and illustrations
 

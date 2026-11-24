@@ -216,6 +216,8 @@ export type IllustrateRequest = {
 	sample?: boolean;
 	/** Seconds into the motion (video): the field drifts, the mark sways. Unset is the still frame. */
 	t?: number;
+	/** Areas the field keeps clear of: where a person sits on a meeting background, a phone's clock. */
+	avoid?: Rect[];
 	/** Ground: white (default), mist or none (transparent). */
 	ground?: 'white' | 'mist' | 'none';
 };
@@ -277,7 +279,7 @@ export function illustrate(req: IllustrateRequest): Illustration {
 	const ink: Rect[] = [];
 	const layers: DrawnLayer[] = [];
 	if (req.subject === 'field') {
-		const o: FieldOptions = { box: { x: 0, y: 0, w: W, h: H }, z: 1.3 * k, seed, t: req.t, fade: (nx, ny) => smooth(clamp01((1 - Math.max(Math.abs(nx), Math.abs(ny))) / 0.35)), keep: [], density: 0.04, ink };
+		const o: FieldOptions = { box: { x: 0, y: 0, w: W, h: H }, z: 1.3 * k, seed, t: req.t, fade: (nx, ny) => smooth(clamp01((1 - Math.max(Math.abs(nx), Math.abs(ny))) / 0.35)), keep: req.avoid ?? [], density: 0.04, ink };
 		body = glyphField(doc, o, c);
 	} else if (req.subject === 'window') {
 		const z = 1.3 * k;

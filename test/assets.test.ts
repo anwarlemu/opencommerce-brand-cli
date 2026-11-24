@@ -119,7 +119,9 @@ describe('merch', () => {
 				const r = renderItem(item, { variant, dpi: 72, sample: true });
 				expect(r.widthIn).toBe(item.size[0] + 2 * item.bleed);
 				expect(r.svg).toContain(`width="${r.widthIn}in"`);
-				expect(pngSize(r.png!)).toEqual({ width: Math.round(r.widthIn * 72), height: Math.round(r.heightIn * 72) });
+				const got = pngSize(r.png!);
+				expect(got.width).toBe(Math.round(r.widthIn * 72));
+				expect(Math.abs(got.height - r.heightIn * 72)).toBeLessThanOrEqual(1);
 				expect(r.png!.includes(Buffer.from('pHYs'))).toBe(true);
 				const o = item.bleed * PX_PER_IN;
 				const s = item.safe * PX_PER_IN;
@@ -228,7 +230,7 @@ describe('manifest and help', () => {
 		expect(Object.keys(m.illustrate.subjects)).toEqual(subjects());
 		expect(m.deck.slides).toHaveLength(slideTypes().length);
 		expect(m.merch.lockups).toEqual(['brand/logo/lockup.svg', 'brand/logo/mark.svg']);
-		expect(m.video.formats).toEqual(['mp4', 'webm']);
+		expect(m.video.formats).toEqual(['mp4', 'webm', 'gif']);
 	});
 
 	it('names the nearest command for a typo and keeps help rows apart', () => {

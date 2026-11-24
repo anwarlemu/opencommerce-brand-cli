@@ -1,5 +1,10 @@
 import { sceneSvg, type Scene, type TemplateId } from '../assets/layouts.js';
 import { illustrate } from '../illustrate/render.js';
+import { lockup } from '../assets/kit.js';
+import { logoMark, paint } from '../image/paint.js';
+const paintOf = () => paint();
+const logoMarkAt = (x: number, y: number, s: number) => logoMark(x, y, s);
+const lockupAt = (x: number, y: number, s: number) => lockup(x, y, s, paint()).svg;
 import { tokens } from '../lib/brand.js';
 import type { Copy } from '../assets/layouts.js';
 import { duration, played, templateDef, VIDEO_SIZES, type VideoSize, type VideoTemplate } from './motion.js';
@@ -40,6 +45,7 @@ export function videoScene(req: VideoFrame): Scene {
 export function frameSvg(req: VideoFrame, frame: number, fps = 12) {
 	const def = templateDef(req.template);
 	const size = VIDEO_SIZES[req.size];
+	if (def.kind === 'reveal') return revealFrame(req, frame, fps);
 	if (def.kind === 'art') return illustrate({ subject: req.template, width: size.width, height: size.height, t: frame / fps, seed: req.seed, ground: req.ground }).svg;
 	const ms = (frame / fps) * 1000;
 	const fast = duration('--ds-duration-fast');
@@ -74,4 +80,41 @@ export function frameSvg(req: VideoFrame, frame: number, fps = 12) {
 	};
 	const lines = still ? (i: number) => played(ms, fast + i * 60, base) : (i: number) => played(ms, 360 + i * 60, fast);
 	return sceneSvg({ ...scene, enter, lines, ...(still ? {} : { t: frame / fps }) }).svg;
+}
+
+/** The logo reveal and the counting figure: the closing card's parts, brought in on the ease-out token. */
+function revealFrame(req: VideoFrame, frame: number, fps: number) {
+	const size = VIDEO_SIZES[req.size];
+	const ms = (frame / fps) * 1000;
+	const fast = duration('--ds-duration-fast');
+	const slow = duration('--ds-duration-slow');
+	const W = size.width;
+	const H = size.height;
+	if (req.template === 'logo') {
+		const u = lockup(0, 0, 100, paint(), 'measure').w / 100;
+		const s = Math.min(Math.min(W, H) * 0.12, (W * 0.8) / (1.5 + 0.62 * u));
+		const lw = lockup(0, 0, s * 0.62, paint(), 'measure').w;
+		const total = s + s * 0.5 + lw;
+		const x = (W - total) / 2;
+		const y = (H - s) / 2;
+		const mark = played(ms, 120, slow);
+		const word = played(ms, 180, slow);
+		const scale = 0.97 + 0.03 * mark;
+		const cx = x + s / 2;
+		const cy = y + s / 2;
+		const c = paintOf();
+		const lockupSvg = lockupAt(x + s * 1.5, y + s * 0.18, s * 0.62);
+		const field = illustrate({ subject: 'field', width: W, height: H, t: frame / fps, seed: req.seed, ground: req.ground }).svg;
+		const body = field.replace(/<\/svg>\s*$/, '');
+		return `${body}<g opacity="${mark.toFixed(3)}" transform="translate(${cx} ${cy}) scale(${scale.toFixed(4)}) translate(${-cx} ${-cy})"><rect x="${x - s * 0.3}" y="${y - s * 0.3}" width="${total + s * 0.6}" height="${s * 1.6}" rx="${s * 0.2}" fill="${req.ground === 'mist' ? c.mist : c.white}"/>${logoMarkAt(x, y, s)}</g><g opacity="${word.toFixed(3)}" transform="translate(0 ${((1 - word) * s * 0.12).toFixed(2)})">${lockupSvg}</g>\n</svg>\n`;
+	}
+	// The figure counts from zero to its value, keeping the words around the number as they were written.
+	const m = /^(\D*)(\d[\d,]*(?:\.\d+)?)(.*)$/.exec(req.copy.headline ?? '');
+	const target = m ? Number(m[2].replace(/,/g, '')) : 0;
+	const decimals = m && m[2].includes('.') ? m[2].split('.')[1].length : 0;
+	const amount = played(ms, fast, 600);
+	const now = m ? `${m[1]}${(target * amount).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals, useGrouping: m[2].includes(',') })}${m[3]}` : req.copy.headline ?? '';
+	const base = { template: 'closing' as const, width: W, height: H, theme: req.ground, logo: false, textScale: 2, seed: req.seed };
+	const last = sceneSvg({ ...base, copy: { headline: req.copy.headline, ...(req.copy.body ? { body: req.copy.body } : {}) }, dry: true }).layers.find((y) => y.id === 'headline')?.text?.size;
+	return sceneSvg({ ...base, hold: last ? { headline: last } : undefined, template: 'closing', width: W, height: H, theme: req.ground, copy: { headline: now, ...(req.copy.body ? { body: req.copy.body } : {}) }, logo: false, textScale: 2, seed: req.seed, t: frame / fps, enter: (id) => (id === 'body' ? { alpha: played(ms, fast + 600, slow), drop: 12 } : id === 'headline' ? { alpha: played(ms, 0, fast) } : undefined) }).svg;
 }

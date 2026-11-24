@@ -120,6 +120,19 @@ npx opencommerce-ds design sizes banner --to og,square,story,x-banner
 
 Plain words are read by rules, with no model and no API key; a part that is not understood changes nothing. Edits are applied inside the layout, so text wraps again and the art keeps clear. Every write is checked, and an off-brand or broken result is refused and changes nothing. Slides, print files, illustrations and clips work the same way (`design templates`). `src/design/` is shared by every brand's CLI except `adapter.ts`.
 
+## Compose, pages, icons and email
+
+```sh
+npx opencommerce-ds design new compose --size og -o card
+npx opencommerce-ds design compose add card stat "42%" --set label="of checkouts finish in one request" --place left
+npx opencommerce-ds design compose add card chart --set value="Mon 12, Tue 18, Wed 24" --place right
+npx opencommerce-ds design page compose outline.json --flavor react,html
+npx opencommerce-ds icons
+npx opencommerce-ds email announcement --headline "Agents can buy from any store" --action "Get started" --href https://example.com
+```
+
+`compose` places the brand's blocks on a grid at any size (every platform size, the IAB ads, A4 and Letter, business cards, wallpapers); `page compose` writes a page from the site's sections; `icons` writes the favicon set and app icons from the mark; `email` writes table-based HTML that survives mail clients. `manifest --json` has an "I need X" table (`need`).
+
 ## Slides, print files, illustrations and Figma
 
 ```sh

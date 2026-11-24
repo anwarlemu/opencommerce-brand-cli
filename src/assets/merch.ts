@@ -21,7 +21,8 @@ type Layer =
 	| { type: 'mark'; box: Box; bleedFill?: boolean }
 	| { type: 'field'; box: Box; seed: number; glyph: number; fade?: 'edges' }
 	| { type: 'window'; box: Box }
-	| { type: 'text'; slot: string; box: Box; size: number; maxLines?: number }
+	| { type: 'text'; slot: string; box: Box; size: number; maxLines?: number; face?: 'display' | 'sans' | 'mono'; align?: 'left' | 'center'; required?: boolean }
+	| { type: 'tile'; box: Box; of: 'mark' | 'lockup'; cols: number; rows: number }
 	| { type: 'hero'; box: Box };
 export type MerchItem = { id: string; name: string; size: [number, number]; bleed: number; safe: number; method: string; source: string; cut?: { radius: number }; variants: string[]; layers: Layer[] };
 type MerchDoc = { dpi: number; slots: Record<string, string>; variants: Record<string, { ground: boolean; description: string }>; items: MerchItem[] };
@@ -51,7 +52,7 @@ export function merchCatalog() {
 			pixels: { width: Math.round((i.size[0] + 2 * i.bleed) * PX_PER_IN), height: Math.round((i.size[1] + 2 * i.bleed) * PX_PER_IN), dpi: PX_PER_IN },
 			dieCut: Boolean(i.cut),
 			slots: slotsOf(i),
-			required: i.layers.some((l) => l.type === 'hero') ? ['headline'] : [],
+			required: [...(i.layers.some((l) => l.type === 'hero') ? ['headline'] : []), ...i.layers.flatMap((l) => (l.type === 'text' && l.required ? [l.slot] : []))],
 			source: i.source,
 		})),
 		variants: Object.entries(merchDoc().variants).map(([id, v]) => ({ id, ...v })),
@@ -161,27 +162,60 @@ export function itemSvg(item: MerchItem, req: MerchRequest = {}) {
 		} else if (l.type === 'text') {
 			const b = px(l.box);
 			const value = (slots[l.slot] ?? '').trim();
+			if (!value && l.required) throw new Error(`${item.id} needs --${l.slot} (or --sample for sample copy).`);
 			if (!value) continue;
-			const display = getFaces().display;
+			const face = l.face ?? 'display';
+			const display = getFaces()[face];
+			const tracking = face === 'display' ? c.trackingHero : 0;
+			const leading = face === 'display' ? c.leadingHeading : c.leadingLead;
+			const fill = face === 'display' ? c.ink : c.secondary;
+			const left = l.align === 'left';
 			const { cap, desc } = ratios(display);
-			const min = Math.max(MIN_TEXT * 2, l.size * 0.3) * PX_PER_IN;
+			const min = Math.max(face === 'display' ? MIN_TEXT * 2 : MIN_TEXT, l.size * 0.3) * PX_PER_IN;
 			let size = l.size * PX_PER_IN;
-			const fit = () => wrapLines(display, value, size, b.w, c.trackingHero, true);
+			const fit = () => wrapLines(display, value, size, b.w, tracking, face === 'display');
 			let lines = fit();
-			const heightOf = () => (cap + desc) * size + (lines.length - 1) * size * c.leadingHeading;
+			const heightOf = () => (cap + desc) * size + (lines.length - 1) * size * leading;
 			while ((heightOf() > b.h || lines.some((x) => x.glued)) && size > min) {
 				size = Math.max(min, size * 0.95);
 				lines = fit();
 			}
 			if (heightOf() > b.h + 0.5) throw new Error(`${item.id}: --${l.slot} does not fit at a readable size (${value.length} characters). Shorten it.`);
-			const top = b.y + (b.h - heightOf()) / 2;
+			// Left-set text reads from the top of its box, as a page does; centered text sits in the middle.
+			const top = left ? b.y : b.y + (b.h - heightOf()) / 2;
 			const ink = lines.map((line, i) => {
-				const w = measure(display, line.text, size, c.trackingHero);
-				return { x: b.x + b.w / 2 - w / 2, y: top + i * size * c.leadingHeading, w, h: (cap + desc) * size };
+				const w = measure(display, line.text, size, tracking);
+				return { x: left ? b.x : b.x + b.w / 2 - w / 2, y: top + i * size * leading, w, h: (cap + desc) * size };
 			});
-			lines.forEach((line, i) => later.push(text(display, line.text, b.x + b.w / 2, top + cap * size + i * size * c.leadingHeading, size, c.trackingHero, c.ink, 'center')));
+			lines.forEach((line, i) => later.push(text(display, line.text, left ? b.x : b.x + b.w / 2, top + cap * size + i * size * leading, size, tracking, fill, left ? 'left' : 'center')));
 			keep.push(union(ink));
-			layers.push({ id: l.slot, kind: 'text', box: union(ink), ink, text: { asked: value, drawn: joinLines(lines), size: r2(size), color: c.ink, ground: [ground], ...mark(l.slot) }, can: {} });
+			layers.push({ id: l.slot, kind: 'text', box: union(ink), ink, text: { asked: value, drawn: joinLines(lines), size: r2(size), color: fill, ground: [ground], ...mark(l.slot) }, can: {} });
+		} else if (l.type === 'tile') {
+			// A sheet of stickers or a lanyard: the logo file repeated in a grid, each whole and clear of the next.
+			const b = px(l.box);
+			const cw = b.w / l.cols;
+			const ch = b.h / l.rows;
+			for (let row = 0; row < l.rows; row++)
+				for (let col = 0; col < l.cols; col++) {
+					const cell = { x: b.x + col * cw, y: b.y + row * ch, w: cw, h: ch };
+					if (l.of === 'mark') {
+						const s = Math.min(cw, ch) * 0.78;
+						const x = cell.x + (cw - s) / 2;
+						const y = cell.y + (ch - s) / 2;
+						later.push(squareMark(x, y, s));
+						placed.push({ kind: 'mark', rect: { x, y, w: s, h: s } });
+						layers.push({ id: `logo-${row * l.cols + col + 1}`, kind: 'logo', box: { x, y, w: s, h: s }, logo: { clear: r2(s * 0.1), min: 32 }, can: {} });
+					} else {
+						const unitW = lockup(0, 0, 100, c, 'measure').w / 100;
+						const size = Math.min(ch * 0.6, (cw * 0.8) / unitW);
+						const w = unitW * size;
+						const x = cell.x + (cw - w) / 2;
+						const y = cell.y + (ch - size) / 2;
+						later.push(lockup(x, y, size, c).svg);
+						placed.push({ kind: 'lockup', rect: { x, y, w, h: size } });
+						layers.push({ id: `logo-${row * l.cols + col + 1}`, kind: 'logo', box: { x, y, w, h: size }, logo: { clear: r2(rule.clear * size), min: rule.min }, can: {} });
+					}
+				}
 		} else if (l.type === 'hero') {
 			if (!slots.headline) throw new Error(`${item.id} needs --headline (or --sample for sample copy).`);
 			const copy: Copy = { headline: slots.headline, body: slots.body, badge: slots.badge, code: slots.code, label: slots.label, ...(sampled.has('code') ? { highlight: imageData().templates.hero.sample.highlight } : {}) };

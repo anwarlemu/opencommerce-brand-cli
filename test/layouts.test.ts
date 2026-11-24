@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { merchItems, itemSvg } from '../src/assets/merch.js';
-import { slideScene, slideTypes } from '../src/assets/deck.js';
+import { isBlocks, slideScene, slideTypes } from '../src/assets/deck.js';
 import { findingsOf } from '../src/image/check.js';
 import { errorsOf } from '../src/design/index.js';
 import { floorFor, placeFor, sceneSvg, TEMPLATE_IDS, TEMPLATE_SLOTS, type Copy, type Scene, type Slot } from '../src/assets/layouts.js';
@@ -238,7 +238,7 @@ describe('every layout', () => {
 describe('slides and print files', () => {
 	it('keeps the rules on every slide type', () => {
 		const given: Record<string, Record<string, unknown>> = { image: { title: 'Watch', picture: { data: rasterize('<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600"><rect width="900" height="600" fill="#CCDBFF"/></svg>'), mime: 'image/png', width: 900, height: 600 } } };
-		for (const type of slideTypes()) {
+		for (const type of slideTypes().filter((t) => !isBlocks(t))) {
 			const scene = slideScene({ type, sample: true, ...(given[type] ?? {}) });
 			expect(problems(scene, sceneSvg(scene).layers), type).toEqual([]);
 		}
@@ -249,9 +249,11 @@ describe('slides and print files', () => {
 	it('keeps words and logos inside the safe area of every print item, and draws no unasked copy', () => {
 		for (const item of merchItems()) {
 			const hero = item.layers.some((y) => y.type === 'hero');
-			const r = itemSvg(item, { slots: hero ? { headline: LONG } : {} });
+			const needs = item.layers.flatMap((l) => (l.type === 'text' && l.required ? [l.slot] : []));
+			const slots = Object.fromEntries([...(hero ? ['headline'] : []), ...needs].map((k) => [k, k === 'name' ? 'Alex Acme' : LONG]));
+			const r = itemSvg(item, { slots });
 			const words = r.layers.filter((y) => y.text);
-			expect(words.map((y) => y.text!.drawn), item.id).toEqual(hero ? [LONG] : []);
+			expect(words.map((y) => y.text!.drawn).sort(), item.id).toEqual(Object.values(slots).sort());
 			const s = itemSvg(item, { sample: true });
 			for (const y of s.layers.filter((l) => (l.text || l.kind === 'logo') && !l.bleeds)) {
 				expect(y.box.x, `${item.id} ${y.id}`).toBeGreaterThanOrEqual(s.safe.x - 1);

@@ -21,6 +21,8 @@ Render on-brand images with `npx {{bin}} image <template>`. `image templates --j
 
 Revise with `npx {{bin}} design`: `design new hero --size x-banner --headline "..." -o banner`, look at banner.png, `design revise banner "bigger headline, logo top right"` (plain words) or `design edit banner --layer logo.anchor=top-right` (exact), look again, and repeat until the person is happy. Each write is checked against the brand and errors change nothing; `undo`, `variants`, `sizes`, `compare` and `check` work on the same file. Never hand-edit the PNG or SVG.
 
+For a layout no template has, `design new compose --size <id>` and `design compose add` (the brand's blocks on a grid); for a page, `design page compose outline.json`. `icons` writes favicons and app icons; `email <template>` writes emails. `manifest --json` has a `need` table: what to run for what you need.
+
 Make slides with `npx {{bin}} deck` (1920x1080, a PNG per slide and a PDF; `deck --list`), print files with `npx {{bin}} merch` (`merch --list`; sizes are vendor conventions), and illustrations in the brand style with `npx {{bin}} illustrate` (field, window, mark, orbit, halftone of `--image`; rules in `brand/illustration.md`). For Figma, `npx {{bin}} figma tokens|push|pull|check` writes files and prints the Figma MCP steps; the CLI never calls Figma.
 
 Render a short video with `npx {{bin}} video`. `video templates --json` lists the templates (hero, window, closing, cards, field, mark, orbit, social, announcement, product) and the sizes `square`, `vertical` and `landscape`. Pass `--template` and `--size`; `.webm` or `--format webm` for WebM; `--still <seconds>` for one PNG. Encoded without a browser from the bundled fonts and logo files.

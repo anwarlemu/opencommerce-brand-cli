@@ -12,6 +12,25 @@ import { listComponents, componentSummary } from './components.js';
 import { fontRecords, gaps, loadSystem, logoRecords } from './load.js';
 import { groupedTokens } from './tokens.js';
 
+/** I need X: the command that makes it. */
+export const NEED: { need: string; command: string }[] = [
+	{ need: 'A link preview, social post, story, banner or ad', command: 'image <template> --size <id> (image templates lists both)' },
+	{ need: 'Several posts in a set (a carousel)', command: 'image carousel slides.json' },
+	{ need: 'To change an image until it is right', command: 'design new <template> ..., then design revise <file> "..."' },
+	{ need: 'A layout no template has (stat card, chart, comparison, quote card, any size)', command: 'design new compose --size <id>; design compose add ...' },
+	{ need: 'A profile picture', command: 'image avatar' },
+	{ need: 'Favicons, app icons, the default share image', command: 'icons' },
+	{ need: 'Slides (cover to Q&A, agenda, team, timeline, chart, comparison)', command: 'deck --input deck.json' },
+	{ need: 'A one-pager, report cover, letterhead, business card, certificate, badge, name tag (print and PDF)', command: 'merch <item> --format pdf,png' },
+	{ need: 'Merch: tees, hoodie, cap, tote, mugs, stickers, posters, notebook, lanyard', command: 'merch <item> (merch --list)' },
+	{ need: 'A short clip, loop or GIF; a logo reveal; a counting figure', command: 'video <template> --size <id> [--format gif]' },
+	{ need: 'A wallpaper, a meeting background, the brand art at any size', command: 'illustrate <subject> --size meeting|desktop|phone-wallpaper|WxH' },
+	{ need: 'An email (announcement, newsletter, receipt, password reset)', command: 'email <template>' },
+	{ need: 'A component or a section for a site', command: 'component list, then add <names...>' },
+	{ need: 'A whole page from sections', command: 'design page compose outline.json --flavor react,html' },
+	{ need: 'Figma files', command: 'figma tokens|push|pull|check' },
+];
+
 export function manifest() {
 	const b = brand();
 	const version = JSON.parse(readFileSync(pkgPath('package.json'), 'utf8')).version as string;
@@ -42,6 +61,10 @@ export function manifest() {
 			{ id: 'image', usage: `${bin} image --template hero --preset og --title "..." --json`, readOnly: false, summary: 'Share images and social posts: ten templates (hero, window, closing, cards, headline, lead, frame, quote, announcement, avatar) at thirteen sizes or WIDTHxHEIGHT; PNG, SVG, JPG, WebP and PDF; only the copy you pass, whole. image templates lists them.' },
 			{ id: 'image carousel', usage: `${bin} image carousel slides.json --json`, readOnly: false, summary: 'Several images at one size from one JSON file, consistent and numbered.' },
 			{ id: 'design', usage: `${bin} design new hero --headline "..." -o banner.design.json`, readOnly: false, summary: 'Make a design, then revise it: design revise <file> "bigger headline, logo top right" in plain words, design edit for exact changes, undo, redo, variants, sizes, compare, render, check. Every write is checked; errors change nothing.' },
+			{ id: 'icons', usage: `${bin} icons --json`, readOnly: false, summary: 'The favicon set (ico, svg, 16, 32), app icons (180, 192, 512, maskable), the web manifest and the default share image, from the mark file.' },
+			{ id: 'email', usage: `${bin} email announcement --headline "..." --json`, readOnly: false, summary: 'Emails as plain HTML tables with inline styles and a plain-text part: announcement, newsletter, receipt, password-reset. email --list shows what each takes.' },
+			{ id: 'design new compose', usage: `${bin} design new compose --size og -o c && ${bin} design compose add c headline "..."`, readOnly: false, summary: 'A graphic no template anticipated: the brand blocks (headline, body, badge, logo, button, picture, window, art, panel, card, cards, stat, quote, list, chart, table, divider, icon) on a 12 by 12 grid at any size.' },
+			{ id: 'design page compose', usage: `${bin} design page compose outline.json --flavor react,html`, readOnly: false, summary: 'A whole page from the site sections in order (header, hero, page-header, features, steps, pricing, testimonials, logos, stats, newsletter, faq, prose, cta, footer), as React from the library and as plain HTML.' },
 			{ id: 'video', usage: `${bin} video --template hero --size landscape --json`, readOnly: false, summary: 'Short MP4 or WebM clips (hero, window, closing, cards, field, mark, orbit, social, announcement, product) at square, vertical and landscape; --still <seconds> for one PNG. video templates lists them.' },
 			{ id: 'deck', usage: `${bin} deck --input deck.json --json`, readOnly: false, summary: 'Slides at 1920x1080 (cover, section, statement, bullets, stat, quote, image, end): PNG or SVG per slide and one PDF. deck --list shows the slots.' },
 			{ id: 'merch', usage: `${bin} merch tee-front --json`, readOnly: false, summary: 'Print files with bleed and safe area (tee front and back, hoodie, cap, tote, mug wrap, die-cut sticker, poster): SVG at physical size and PNG at a dpi. merch --list shows sizes; they are vendor conventions.' },
@@ -75,6 +98,7 @@ export function manifest() {
 		merch: merchCatalog(),
 		illustrate: { ...illustrateData(), rules: 'brand/illustration.md' },
 		design: designCatalog(),
+		need: NEED,
 		figma: { actions: [...FIGMA_ACTIONS], pushKinds: [...PUSH_KINDS], note: 'The CLI never calls Figma: each action writes files and prints the Figma MCP tool calls to make, in order.' },
 		unknownNames: 'Every command, template, size, slot, subject, item, variant and slide type is checked against a fixed list; an unknown name exits 1 and names the nearest choices.',
 		gaps: gaps(),

@@ -158,31 +158,57 @@ function choose(l: Local, regions: Rect[], plan: (r: Rect, i: number) => Plan): 
 	const pool = clear.length || !moved ? clear : plans;
 	if (!pool.length) throw failure ?? new FitError('The copy does not fit.');
 	const best = Math.max(...pool.map((p) => p.plan.score));
+	// The first region (the widest) that holds the copy within a tenth of the largest size wins.
 	return pool.find((p) => p.plan.score >= best * 0.9)!.plan;
 }
 
-/** The whole region first, then the parts of it beside and clear above what the platform covers. */
+/** The whole region first, then the parts of it clear of what the platform covers: the full width between what covers
+ *  the top and the bottom first (a wide line reads better than a narrow column), then beside what covers the sides. */
 function regionsOf(l: Local, r: Rect): Rect[] {
 	const out = [r];
 	const met = l.place.avoid.filter((a) => hits(r, a, PAD));
 	if (!met.length) return out;
+	const mid = r.y + r.h / 2;
+	const tops = met.filter((a) => a.y + a.h / 2 < mid);
+	const bottoms = met.filter((a) => a.y + a.h / 2 >= mid);
+	const y0 = Math.max(r.y, ...tops.map((a) => a.y + a.h + PAD));
+	const y1 = Math.min(r.y + r.h, ...bottoms.map((a) => a.y - PAD));
+	out.push({ ...r, y: y0, h: y1 - y0 });
 	const lefts = met.filter((a) => a.x + a.w / 2 < r.x + r.w / 2);
 	const rights = met.filter((a) => a.x + a.w / 2 >= r.x + r.w / 2);
 	const x0 = Math.max(r.x, ...lefts.map((a) => a.x + a.w + PAD * 2));
 	const x1 = Math.min(r.x + r.w, ...rights.map((a) => a.x - PAD * 2));
-	const y1 = Math.min(...met.map((a) => a.y - PAD));
-	out.push({ x: x0, y: r.y, w: x1 - x0, h: r.h });
-	if (lefts.length && rights.length) {
-		out.push({ x: x0, y: r.y, w: r.x + r.w - x0, h: Math.min(r.y + r.h, ...rights.map((a) => a.y - PAD)) - r.y });
-		out.push({ x: r.x, y: r.y, w: x1 - r.x, h: Math.min(r.y + r.h, ...lefts.map((a) => a.y - PAD)) - r.y });
+	for (const side of [bottoms, tops]) {
+		// Clear of one side's corners only, over the full height of the other.
+		if (!side.length || side.length === met.length) continue;
+		const ya = side === bottoms ? r.y : y0;
+		const yb = side === bottoms ? y1 : r.y + r.h;
+		out.push({ ...r, y: ya, h: yb - ya });
 	}
-	out.push({ ...r, h: y1 - r.y });
+	out.push({ x: x0, y: r.y, w: x1 - x0, h: r.h });
 	return out;
 }
 
+/** A corner lockup moved out from under what the platform covers: along its edge, past the covered corner. */
+function clearOf<T extends ReturnType<typeof cornerLogo> | null>(l: Local, logo: T): T {
+	if (!logo) return logo;
+	const hit = l.place.avoid.find((a) => hits(logo.box, a, PAD));
+	if (!hit) return logo;
+	const left = hit.x + hit.w / 2 < l.ctx.W / 2;
+	const dx = left ? hit.x + hit.w + PAD * 2 - logo.box.x : hit.x - PAD * 2 - (logo.box.x + logo.box.w);
+	const box = { ...logo.box, x: logo.box.x + dx };
+	return { ...logo, box, svg: `<g transform="translate(${r2(dx)} 0)">${logo.svg}</g>`, layers: logo.layers.map((y) => ({ ...y, box })) };
+}
+
 /** Takes the lockup's band (top or bottom) out of a region. */
-function below(l: Local, logo: ReturnType<typeof cornerLogo> | null, r: Rect, gap: number): Rect {
+function below(l: Local, logo: ReturnType<typeof cornerLogo> | null, r: Rect, gap: number, corner = false): Rect {
 	if (!logo) return r;
+	// A banner is too short to give the lockup a band of its own: it is a corner the words keep clear of.
+	if (corner && l.ctx.W / l.ctx.H >= 2.4 && down(logo.anchor) === 'top' && across(logo.anchor) !== 'center') {
+		const air = Math.max(gap, logo.layers[0].logo?.clear ?? 0);
+		l.place = { ...l.place, avoid: [...l.place.avoid, grow(logo.box, air - PAD)] };
+		return r;
+	}
 	const ay = down(logo.anchor);
 	if (logo.anchor === 'left') {
 		const x = Math.max(r.x, logo.box.x + logo.box.w + Math.max(gap, logo.layers[0].logo?.clear ?? 0));
@@ -353,18 +379,18 @@ function poster(l: Local) {
 	const mx = wide ? 72 * k : (84 * W) / 1080;
 	const my = wide ? 52 * k : (76 * W) / 1080;
 	const frame = frameOf(l, mx, my);
-	const logo = req.logo === false || editOf(ctx, 'logo').hidden ? null : cornerLogo(ctx, 'mark-lockup', wide ? 44 * k : (52 * W) / 1080, frame, imageData().logo, 'top-left');
-	const region = below(l, logo, frame, wide ? 28 * k : 40 * k);
+	const logo = req.logo === false || editOf(ctx, 'logo').hidden ? null : clearOf(l, cornerLogo(ctx, 'mark-lockup', wide ? 44 * k : (52 * W) / 1080, frame, imageData().logo, 'top-left'));
+	const region = below(l, logo, frame, wide ? 28 * k : 40 * k, true);
 	const quote = req.template === 'quote';
 	const items: Item[] = [];
 	if (copy.badge) items.push(textItem(ctx, { id: 'badge', value: copy.badge, face: 'mono', start: Math.max(floor, tall ? 0.03 * W : 15 * k), min: floor, gap: 0, leading: 1.3, fill: req.template === 'announcement' ? c.label : c.secondary, ground: [ctx.ground], even: true }));
 	const head = quote ? copy.body : copy.headline;
-	const size = (tall ? 0.2 * W : wide ? (quote ? 56 : 68) * k : 0.115 * W) * (!wide && quote ? 0.62 : 1) * (req.textScale ?? 1);
+	const size = (tall ? 0.2 * W : wide ? (quote ? 56 : 68) * k * (W / H >= 2.4 ? 1.35 : 1) : 0.115 * W) * (!wide && quote ? 0.62 : 1) * (req.textScale ?? 1);
 	items.push(textItem(ctx, { id: quote ? 'body' : 'headline', value: head, face: 'display', start: size, min: Math.max(floor * 1.4, 22 * k * 0.8), gap: 22 * k, leading: c.leadingHeading, fill: c.ink, ground: [ctx.ground], even: true, hide: false }));
 	if (quote && copy.by) items.push(textItem(ctx, { id: 'by', value: copy.by, face: 'sans', start: Math.max(floor, tall ? 0.034 * W : 20 * k), min: floor, gap: 28 * k, leading: 1.35, fill: c.secondary, ground: [ctx.ground], even: true }));
 	if (!quote && copy.body) items.push(textItem(ctx, { id: 'body', value: copy.body, face: 'sans', start: Math.max(floor, tall ? 0.04 * W : (wide ? 22 : 24) * k), min: floor, gap: 24 * k, leading: c.leadingLead, fill: c.secondary, ground: [ctx.ground], share: wide ? 0.7 : 0.86, even: true }));
 	if (copy.action && !editOf(ctx, 'action').hidden) items.push(keysItem(ctx, copy.action, '', { start: tall ? 0.03 * W : 17 * k, gap: 34 * k }));
-	const maxW = wide ? Math.min(region.w, 1000 * k) : region.w;
+	const maxW = wide && W / H < 2.4 ? Math.min(region.w, 1000 * k) : region.w;
 	const plan = choose(l, regionsOf(l, region), (r) => flowPlan(l, items, r, { anchor: 'center', bias: 0.46, maxW, ...(tall ? { fill: 0.78 } : {}) }));
 	plan.draw();
 	if (logo) push(l, logo);
@@ -390,7 +416,10 @@ function sides(l: Local, frame: Rect, o: { size: number; what: WindowContent; z:
 			const winW = r.w * share - o.gap / 2;
 			const wordW = r.w - winW - o.gap;
 			const wordR: Rect = { x: flip ? r.x + winW + o.gap : r.x, y: r.y, w: wordW, h: r.h };
-			const winR: Rect = { x: flip ? r.x : r.x + wordW + o.gap, y: r.y, w: winW, h: r.h };
+			// Over the full width, the window's column keeps the frame's full height: what a platform covers in a corner
+			// limits the words beside it, not the window across from it.
+			const tall = r.w >= frame.w - 1 && !flip ? frame : r;
+			const winR: Rect = { x: flip ? r.x : r.x + wordW + o.gap, y: tall.y, w: winW, h: tall.h };
 			try {
 				const wordItems = words(l, { size: o.size, bodyShare: 1 });
 				const plans: Plan[] = [];
@@ -466,8 +495,8 @@ function hero(l: Local) {
 	const tall = H / W > 1.15;
 	const frame = frameOf(l, Math.max(44 * k, W * 0.05), l.wide ? 44 * k : 60 * k);
 	const what = content(l, { pad: 22, rise: true });
-	const logo = (req.logo ?? def.logo) || (editOf(ctx, 'logo').hidden === false && ctx.edits.logo) ? cornerLogo(ctx, 'lockup', 24 * k, frame, imageData().logo, 'top-left') : null;
-	const region = below(l, logo, frame, 24 * k);
+	const logo = (req.logo ?? def.logo) || (editOf(ctx, 'logo').hidden === false && ctx.edits.logo) ? clearOf(l, cornerLogo(ctx, 'lockup', 24 * k, frame, imageData().logo, 'top-left')) : null;
+	const region = below(l, logo, frame, 24 * k, true);
 	const size = (tall ? (what ? 0.145 : 0.18) * W : (def.textSize ?? 90) * k) * (req.textScale ?? 1);
 	const maxW = (req.textWidth ?? (l.wide ? def.textWidth!.wide : 0.94)) * W;
 	const column = stacked(l, region, { size, gap: tall ? 60 * k : 44 * k, what, rise: what?.kind === 'picture' && H / W < 1.5, maxW, z: 1.45 * k, codeStart: (tall ? 24 : 21) * k, pictureStart: tall ? W * 0.84 : W * 0.68, minW: Math.min(region.w, tall ? region.w * 0.8 : W * 0.5) });
@@ -493,8 +522,8 @@ function split(l: Local) {
 	const { W, H, k, kc } = ctx;
 	const tall = H / W > 1.15;
 	const frame = frameOf(l, 48 * k, 48 * k);
-	const logo = (req.logo ?? def.logo) && !editOf(ctx, 'logo').hidden ? cornerLogo(ctx, 'lockup', 24 * k, frame, imageData().logo, 'top-left') : null;
-	const region = below(l, logo, frame, l.wide ? 26 * k : 36 * k);
+	const logo = (req.logo ?? def.logo) && !editOf(ctx, 'logo').hidden ? clearOf(l, cornerLogo(ctx, 'lockup', 24 * k, frame, imageData().logo, 'top-left')) : null;
+	const region = below(l, logo, frame, l.wide ? 26 * k : 36 * k, true);
 	const what = content(l, { pad: 22 });
 	const size = (l.wide ? (def.textSize ?? 54) * k : (what ? 0.115 : 0.15) * W) * (req.textScale ?? 1);
 	let box: Rect = { x: 0, y: 0, w: W, h: H };
@@ -502,7 +531,7 @@ function split(l: Local) {
 	else if (what) choose(l, regionsOf(l, region), stacked(l, region, { size, gap: 46 * k, what, z: 1.3 * k, codeStart: 24 * k, pictureStart: region.w, minW: region.w * 0.86 })).draw();
 	else {
 		// No window: the words on the left, the field gathering on the right.
-		const items = words(l, { size: size * (tall ? 1.15 : 1.1), bodyShare: 1 });
+		const items = words(l, { size: size * (tall ? 1.15 : W / H >= 2.4 ? 1.4 : 1.1), bodyShare: 1 });
 		const maxW = (req.textWidth ?? (l.wide ? 0.55 : 0.94)) * W;
 		choose(l, regionsOf(l, region), (r) => flowPlan(l, items, r, { anchor: l.wide ? 'left' : 'center', maxW })).draw();
 		if (l.wide) box = { x: W * 0.47, y: 0, w: W * 0.53, h: H };
@@ -525,7 +554,7 @@ function closing(l: Local) {
 	const show = (req.logo ?? def.logo ?? true) && !editOf(ctx, 'logo').hidden;
 	const rule = imageData().logo;
 	const tall = H / W > 1.15;
-	const size = (tall ? 0.15 * W : (def.textSize ?? 64) * k) * (req.textScale ?? 1);
+	const size = (tall ? 0.15 * W : (def.textSize ?? 64) * k * (W / H >= 2.4 ? 1.35 : 1)) * (req.textScale ?? 1);
 	const maxW = (req.textWidth ?? (l.wide ? def.textWidth!.wide : 1)) * W;
 	const arrange = (corner: ReturnType<typeof cornerLogo> | null) => {
 		const region = below(l, corner, inner, 32 * k);
@@ -536,7 +565,7 @@ function closing(l: Local) {
 		}
 		return choose(l, regionsOf(l, region), (r) => flowPlan(l, items, r, { anchor: 'center', maxW }));
 	};
-	const place = (anchor: Anchor9) => cornerLogo(ctx, 'lockup', 26 * k, inter(inset(card, 40 * k), l.place.safe), rule, anchor, ['panel']);
+	const place = (anchor: Anchor9) => clearOf(l, cornerLogo(ctx, 'lockup', 26 * k, inter(inset(card, 40 * k), l.place.safe), rule, anchor, ['panel']));
 	let corner = show && editOf(ctx, 'logo').anchor ? place('top-left') : null;
 	let plan: Plan;
 	try {
@@ -598,7 +627,7 @@ function cards(l: Local) {
 	const showLogo = (req.logo ?? def.logo ?? true) && !editOf(ctx, 'logo').hidden;
 
 	const plan = (R: Rect): Plan => {
-		const logo = showLogo ? cornerLogo(ctx, 'lockup', 24 * k, R, rule, 'bottom-left') : null;
+		const logo = showLogo ? clearOf(l, cornerLogo(ctx, 'lockup', 24 * k, R, rule, 'bottom-left')) : null;
 		const footSize = Math.max(floor, 20 * k);
 		const footW = address ? measure(display, address, footSize, 0) : 0;
 		const footEdit = editOf(ctx, 'footer');
@@ -757,7 +786,7 @@ function frameLayout(l: Local) {
 	const mx = wide ? 72 * k : (84 * W) / 1080;
 	const my = wide ? 52 * k : (76 * W) / 1080;
 	const frame = frameOf(l, mx, my);
-	const logo = req.logo === false || editOf(ctx, 'logo').hidden ? null : cornerLogo(ctx, 'mark-lockup', wide ? 44 * k : (52 * W) / 1080, frame, imageData().logo, 'top-left');
+	const logo = req.logo === false || editOf(ctx, 'logo').hidden ? null : clearOf(l, cornerLogo(ctx, 'mark-lockup', wide ? 44 * k : (52 * W) / 1080, frame, imageData().logo, 'top-left'));
 	const what: WindowContent = req.picture ? { kind: 'picture', picture: req.picture, pad: 0, rise: false } : copy.code.trim() ? { kind: 'code', code: copy.code, highlight: copy.highlight === 'none' ? '' : copy.highlight, dark: true, lineAlpha: req.lines } : { kind: 'prose', text: copy.body, lineAlpha: req.lines };
 	const region = below(l, logo, frame, wide ? 24 * k : 40 * k);
 	const head = copy.headline ? [textItem(ctx, { id: 'headline', value: copy.headline, face: 'display', start: tall ? 0.085 * W : (wide ? 40 : 46) * k, min: Math.max(floor * 1.3, 20 * k), gap: 0, leading: c.leadingHeading, fill: c.ink, ground: [ctx.ground], even: true })] : [];

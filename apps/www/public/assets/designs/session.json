@@ -8,9 +8,9 @@
 		},
 		{
 			"command": "design revise banner 'bigger headline'",
-			"answer": "banner.design.json  hero, x-banner 1500x500 (X header), white\n  headline 20% bigger\nbanner.png\nCheck: no errors",
+			"answer": "The headline is too long to be 1.2 times its size here: it fits at 0.4 to 1.12. Shorten the words, hide something, or ask for 1.12 (--layer headline.scale=1.12).",
 			"picture": "2-bigger.png",
-			"ok": true
+			"ok": false
 		},
 		{
 			"command": "design revise banner 'badge \"Product by Agentcard\", darker theme'",
@@ -43,7 +43,7 @@
 		},
 		{
 			"command": "design edit banner --layer headline.dx=-0.4",
-			"answer": "The headline has no room to go that far here: it would leave the picture, or go under what x-banner covers. The furthest is headline.dx -0.145 and headline.dy 0.",
+			"answer": "The headline has no room to go that far here: it would leave the picture, or go under what x-banner covers. The furthest is headline.dx -0.065 and headline.dy 0.",
 			"ok": false
 		},
 		{
@@ -60,17 +60,17 @@
 		},
 		{
 			"command": "design compare banner banner-og",
-			"answer": "banner-vs-banner-og.png\n  size: x-banner 1500x500 (X header) -> og 1200x630 (Link preview)\n  art: 1500x500 at 0,0 -> 1200x630 at 0,0\n  badge: 226x38 at 804,122 -> 226x38 at 487,170\n  headline: 686x184 at 574,184 -> 790x212 at 205,236\n  body: 702x24 at 566,395 -> 809x28 at 196,480\n  logo: 235x21 at 1190,60 -> 270x24 at 870,44",
+			"answer": "banner-vs-banner-og.png\n  size: x-banner 1500x500 (X header) -> og 1200x630 (Link preview)\n  art: 1500x500 at 0,0 -> 1200x630 at 0,0\n  badge: 226x38 at 637,71 -> 226x38 at 487,188\n  headline: 1135x74 at 182,134 -> 659x177 at 271,254\n  body: 702x24 at 399,234 -> 809x28 at 196,462\n  logo: 235x21 at 1190,60 -> 270x24 at 870,44",
 			"picture": "9-compare.png",
 			"ok": true
 		},
 		{
 			"command": "design history banner",
-			"answer": "  1  bigger headline\n  2  badge \"Product by Agentcard\", darker theme\n  3  show the logo, logo top right\n  -  hide the art, headline left (undone; design redo brings it back)",
+			"answer": "  1  badge \"Product by Agentcard\", darker theme\n  2  show the logo, logo top right\n  -  hide the art, headline left (undone; design redo brings it back)",
 			"ok": true
 		}
 	],
-	"file": "{\n\t\"version\": 1,\n\t\"brand\": \"opencommerce-ds\",\n\t\"kind\": \"image\",\n\t\"template\": \"hero\",\n\t\"size\": {\n\t\t\"id\": \"x-banner\",\n\t\t\"width\": 1500,\n\t\t\"height\": 500\n\t},\n\t\"theme\": \"mist\",\n\t\"copy\": {\n\t\t\"badge\": \"Product by Agentcard\",\n\t\t\"body\": \"Search, check out and track orders from a single request.\",\n\t\t\"headline\": \"One endpoint for every online store\"\n\t},\n\t\"images\": {},\n\t\"seed\": 3,\n\t\"options\": {\n\t\t\"glyph-size\": 1\n\t},\n\t\"layers\": {\n\t\t\"headline\": {\n\t\t\t\"scale\": 1.2\n\t\t},\n\t\t\"logo\": {\n\t\t\t\"anchor\": \"top-right\",\n\t\t\t\"hidden\": false\n\t\t}\n\t},\n\t\"history\": [\n\t\t{\n\t\t\t\"change\": \"bigger headline\",\n\t\t\t\"before\": {\n\t\t\t\t\"layers\": {}\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"change\": \"badge \\\"Product by Agentcard\\\", darker theme\",\n\t\t\t\"before\": {\n\t\t\t\t\"theme\": \"white\",\n\t\t\t\t\"copy\": {\n\t\t\t\t\t\"body\": \"Search, check out and track orders from a single request.\",\n\t\t\t\t\t\"headline\": \"One endpoint for every online store\"\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"change\": \"show the logo, logo top right\",\n\t\t\t\"before\": {\n\t\t\t\t\"layers\": {\n\t\t\t\t\t\"headline\": {\n\t\t\t\t\t\t\"scale\": 1.2\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t],\n\t\"future\": [\n\t\t{\n\t\t\t\"change\": \"hide the art, headline left\",\n\t\t\t\"after\": {\n\t\t\t\t\"layers\": {\n\t\t\t\t\t\"art\": {\n\t\t\t\t\t\t\"hidden\": true\n\t\t\t\t\t},\n\t\t\t\t\t\"headline\": {\n\t\t\t\t\t\t\"anchor\": \"left\",\n\t\t\t\t\t\t\"scale\": 1.2\n\t\t\t\t\t},\n\t\t\t\t\t\"logo\": {\n\t\t\t\t\t\t\"anchor\": \"top-right\",\n\t\t\t\t\t\t\"hidden\": false\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
+	"file": "{\n\t\"version\": 1,\n\t\"brand\": \"opencommerce-ds\",\n\t\"kind\": \"image\",\n\t\"template\": \"hero\",\n\t\"size\": {\n\t\t\"id\": \"x-banner\",\n\t\t\"width\": 1500,\n\t\t\"height\": 500\n\t},\n\t\"theme\": \"mist\",\n\t\"copy\": {\n\t\t\"badge\": \"Product by Agentcard\",\n\t\t\"body\": \"Search, check out and track orders from a single request.\",\n\t\t\"headline\": \"One endpoint for every online store\"\n\t},\n\t\"images\": {},\n\t\"seed\": 3,\n\t\"options\": {\n\t\t\"glyph-size\": 1\n\t},\n\t\"layers\": {\n\t\t\"logo\": {\n\t\t\t\"anchor\": \"top-right\",\n\t\t\t\"hidden\": false\n\t\t}\n\t},\n\t\"history\": [\n\t\t{\n\t\t\t\"change\": \"badge \\\"Product by Agentcard\\\", darker theme\",\n\t\t\t\"before\": {\n\t\t\t\t\"theme\": \"white\",\n\t\t\t\t\"copy\": {\n\t\t\t\t\t\"body\": \"Search, check out and track orders from a single request.\",\n\t\t\t\t\t\"headline\": \"One endpoint for every online store\"\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"change\": \"show the logo, logo top right\",\n\t\t\t\"before\": {\n\t\t\t\t\"layers\": {}\n\t\t\t}\n\t\t}\n\t],\n\t\"future\": [\n\t\t{\n\t\t\t\"change\": \"hide the art, headline left\",\n\t\t\t\"after\": {\n\t\t\t\t\"layers\": {\n\t\t\t\t\t\"art\": {\n\t\t\t\t\t\t\"hidden\": true\n\t\t\t\t\t},\n\t\t\t\t\t\"headline\": {\n\t\t\t\t\t\t\"anchor\": \"left\"\n\t\t\t\t\t},\n\t\t\t\t\t\"logo\": {\n\t\t\t\t\t\t\"anchor\": \"top-right\",\n\t\t\t\t\t\t\"hidden\": false\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t]\n}\n",
 	"templates": [
 		{
 			"id": "hero",

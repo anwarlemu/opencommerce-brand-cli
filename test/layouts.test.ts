@@ -262,3 +262,35 @@ describe('slides and print files', () => {
 		}
 	});
 });
+
+describe('the logo', () => {
+	it('keeps its clear space from every word at every anchor it offers', { timeout: 240000 }, () => {
+		const found: string[] = [];
+		const anchors = ['top-left', 'top', 'top-right', 'bottom-left', 'bottom', 'bottom-right'] as const;
+		for (const template of ['headline', 'lead', 'quote', 'announcement', 'hero', 'window', 'closing', 'cards', 'frame'] as TemplateId[]) {
+			for (const id of ['og', 'square', 'story', 'x-banner', 'linkedin-banner']) {
+				const size = parseSize(id);
+				const copy = copyFor(template, COPIES.long);
+				if (!copy) continue;
+				for (const anchor of anchors) {
+					const req: Scene = { template, width: size.width, height: size.height, copy, logo: true, edits: { logo: { anchor, hidden: false } } };
+					let layers: DrawnLayer[];
+					try {
+						layers = sceneSvg(req).layers;
+					} catch (error) {
+						expect((error as Error).message, `${template} ${id} ${anchor}`).toMatch(/do(es)? not fit/);
+						continue;
+					}
+					const logo = layers.find((y) => y.kind === 'logo');
+					if (!logo) {
+						found.push(`${template} ${id} ${anchor}: no logo drawn`);
+						continue;
+					}
+					const clear = errorsOf(findingsOf({ template, sizeId: id, width: size.width, height: size.height, copy }, layers)).filter((f) => f.rule === 'logo-clear' || f.rule === 'logo-whole' || f.rule === 'safe-area');
+					for (const f of clear) found.push(`${template} ${id} ${anchor}: ${f.message}`);
+				}
+			}
+		}
+		expect(found).toEqual([]);
+	});
+});

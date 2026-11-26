@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "name": "badge",
+  "useFor": "Use chip for a plan tag, a count or an endpoint (Every merchant, POST /buy). Use the status pills for an order or route (Processing, then Confirmed in brand). Use tag, tag-ink and tag-heart for added, improved and fixed updates.",
+  "constraints": [
+    "Badges as buttons",
+    "Caps",
+    "Filled color badges",
+    "More than one tone per row"
+  ],
+  "documentation": "",
+  "source": "opencommerce-agentcard-web src/components/pricing.tsx (the plan chip), features.tsx and globals.css (.feat-pill, .feat-pill-wait, .feat-pill-done)",
+  "exports": [
+    "Badge",
+    "badgeVariants"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/badge",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/badge.md",
+  "examples": [
+    {
+      "path": "examples/badge.tsx",
+      "content": "import { Badge } from \"@/components/ui/badge\";\n\nexport function Site() {\n  return (\n    <div className=\"grid gap-6\">\n      <div className=\"flex flex-wrap items-center gap-2\">\n        <Badge variant=\"chip\">Every merchant</Badge>\n        <Badge variant=\"chip\">4000+ stores</Badge>\n        <Badge variant=\"chip\">POST /buy</Badge>\n      </div>\n      <div className=\"flex flex-wrap items-center gap-2\">\n        <Badge>Processing</Badge>\n        <Badge variant=\"brand\">Confirmed</Badge>\n        <Badge variant=\"success\">Operational</Badge>\n        <Badge variant=\"warning\">Degraded</Badge>\n        <Badge variant=\"destructive\">Down</Badge>\n      </div>\n      <div className=\"flex flex-wrap items-center gap-2\">\n        <Badge variant=\"tag\">Added</Badge>\n        <Badge variant=\"tag-ink\">Improved</Badge>\n        <Badge variant=\"tag-heart\">Fixed</Badge>\n      </div>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "badge"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/badge/Site"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Badge",
+  "description": "Mono chips for counts and tags, small pills for an order or route status.",
+  "surface": "site",
+  "kinds": [
+    "chip"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-slot",
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/badge.tsx",
+      "content": "import * as React from \"react\";\nimport { Slot } from \"@radix-ui/react-slot\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { cn } from \"@/lib/utils\";\n\n// A short label. `chip` is the brand's tag (the pricing card's \"Every merchant\", globals.css .rounded-chip; computed):\n// the 11.5px platform mono in the blue on the pale blue, 2px corners, 4px by 8px. The status badges are the order card's\n// pills (.feat-pill): a 10px pill at 500, gray while something waits (`default`), blue on sky once it is done\n// (`brand`), and success, warning and destructive told apart by a dot and the color of their text. The tags (`tag`,\n// `tag-ink`, `tag-heart`) are the chip's outlined kin for a changelog: the mono on a 1px rule in the text's own color,\n// sentence case like everything else (the brand sets no caps).\nconst STATUS = \"h-5.5 gap-1.5 rounded-pill px-2 font-sans text-micro font-medium leading-none\";\nconst DOT = \"border border-line bg-surface before:size-1.5 before:shrink-0 before:rounded-pill before:bg-current\";\n\nconst TAG = \"rounded-chip border border-current px-2 py-0.75 font-mono text-bar leading-snug\";\n\nconst badgeVariants = cva(\"inline-flex w-fit shrink-0 items-center justify-center gap-1 whitespace-nowrap [&>svg]:pointer-events-none [&>svg]:size-3\", {\n  variants: {\n    variant: {\n      default: `${STATUS} bg-wash-pill text-fg-muted`,\n      brand: `${STATUS} bg-sky text-fg-brand`,\n      success: `${STATUS} ${DOT} text-success`,\n      warning: `${STATUS} ${DOT} text-warning`,\n      destructive: `${STATUS} ${DOT} text-danger`,\n      tag: `${TAG} text-fg-brand`,\n      \"tag-ink\": `${TAG} text-fg`,\n      \"tag-heart\": `${TAG} text-heart`,\n      chip: \"rounded-chip bg-blue-5 px-2 py-1 font-mono text-bar leading-snug text-fg-brand\",\n    },\n  },\n  defaultVariants: { variant: \"default\" },\n});\n\nfunction Badge({ className, variant, asChild = false, ...props }: React.ComponentProps<\"span\"> & VariantProps<typeof badgeVariants> & { asChild?: boolean }) {\n  const Comp = asChild ? Slot : \"span\";\n  return <Comp data-slot=\"badge\" className={cn(badgeVariants({ variant }), className)} {...props} />;\n}\n\nexport { Badge, badgeVariants };\n"
+    }
+  ]
+}

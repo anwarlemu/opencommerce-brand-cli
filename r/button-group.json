@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "name": "button-group",
+  "useFor": "Use to join related actions into one control (a split action, a pager, a copy key beside a field). Put Buttons, Inputs, Selects or ButtonGroupText inside; nest ButtonGroups for separated clusters; use orientation vertical for a stack.",
+  "constraints": [
+    "Gaps between joined keys",
+    "Mixing blue and white keys without a separator",
+    "More than one primary key in a group"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (the keys and the header's trays)",
+  "exports": [
+    "ButtonGroup",
+    "ButtonGroupSeparator",
+    "ButtonGroupText",
+    "buttonGroupVariants"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/button-group",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/button-group.md",
+  "examples": [
+    {
+      "path": "examples/button-group.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { ChevronDown, ChevronLeft, ChevronRight, Copy, RefreshCw } from \"lucide-react\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from \"@/components/ui/button-group\";\nimport { Input } from \"@/components/ui/input\";\n\nexport function Site() {\n  const [page, setPage] = React.useState(1);\n  return (\n    <div className=\"flex flex-wrap items-center gap-4\">\n      <ButtonGroup aria-label=\"Order actions\">\n        <Button variant=\"secondary\" size=\"sm\">Reorder</Button>\n        <Button variant=\"secondary\" size=\"sm\">Track</Button>\n        <Button variant=\"secondary\" size=\"sm\">Refund</Button>\n      </ButtonGroup>\n      <ButtonGroup aria-label=\"Pages\">\n        <Button variant=\"secondary\" size=\"sm\" aria-label=\"Previous page\" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>\n          <ChevronLeft />\n        </Button>\n        <ButtonGroupText>Page {page} of 12</ButtonGroupText>\n        <Button variant=\"secondary\" size=\"sm\" aria-label=\"Next page\" disabled={page === 12} onClick={() => setPage((p) => p + 1)}>\n          <ChevronRight />\n        </Button>\n      </ButtonGroup>\n    </div>\n  );\n}\n\nexport function Split() {\n  return (\n    <div className=\"flex flex-wrap items-center gap-4\">\n      <ButtonGroup aria-label=\"Checkout\">\n        <Button size=\"sm\">Buy now</Button>\n        <ButtonGroupSeparator />\n        <Button size=\"sm\" aria-label=\"More checkout options\">\n          <ChevronDown />\n        </Button>\n      </ButtonGroup>\n      <ButtonGroup aria-label=\"Refresh\">\n        <Button variant=\"secondary\" size=\"sm\">\n          <RefreshCw />\n          Refresh\n        </Button>\n        <ButtonGroupText>2m ago</ButtonGroupText>\n      </ButtonGroup>\n    </div>\n  );\n}\n\nexport function WithInput() {\n  return (\n    <ButtonGroup className=\"w-full max-w-110\" aria-label=\"Webhook\">\n      <ButtonGroupText>POST</ButtonGroupText>\n      <Input aria-label=\"Webhook URL\" defaultValue=\"https://acme.com/hooks/orders\" />\n      <Button variant=\"secondary\" size=\"sm\" aria-label=\"Copy URL\" className=\"h-9\">\n        <Copy />\n      </Button>\n    </ButtonGroup>\n  );\n}\n\nexport function Vertical() {\n  return (\n    <ButtonGroup orientation=\"vertical\" aria-label=\"Zoom\" className=\"w-fit\">\n      <Button variant=\"secondary\" size=\"sm\">Zoom in</Button>\n      <Button variant=\"secondary\" size=\"sm\">Zoom out</Button>\n      <Button variant=\"secondary\" size=\"sm\">Reset</Button>\n    </ButtonGroup>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Split",
+        "WithInput",
+        "Vertical"
+      ],
+      "requires": [
+        "button-group",
+        "button",
+        "input"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/button-group/Site"
+        },
+        {
+          "name": "Split",
+          "url": "https://opencommerce-ds.vercel.app/preview/button-group/Split"
+        },
+        {
+          "name": "WithInput",
+          "url": "https://opencommerce-ds.vercel.app/preview/button-group/WithInput"
+        },
+        {
+          "name": "Vertical",
+          "url": "https://opencommerce-ds.vercel.app/preview/button-group/Vertical"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Button Group",
+  "description": "Keys joined into one bar with shared edges, with mist mono text segments and fields.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-slot",
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/button-group.tsx",
+      "content": "import * as React from \"react\";\nimport { Slot } from \"@radix-ui/react-slot\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { cn } from \"@/lib/utils\";\n\n// Keys joined into one control (extrapolated from the brand's keys and the header's trays): inner corners square off and\n// the shared edges merge, so white keys read as one bar with 8px outer corners; a field, select or text segment can sit in\n// the bar. ButtonGroupText is the mist segment with the platform mono at 64 percent ink (a prefix, a unit, a count);\n// ButtonGroupSeparator is a 1px rule between blue keys, white at 30 percent.\nconst buttonGroupVariants = cva(\n  \"group/button-group flex w-fit items-stretch *:focus-visible:relative *:focus-visible:z-10 has-[>[data-slot=button-group]]:gap-2 has-[>input]:[&>[data-slot=button]]:h-9 has-[>input]:[&>[data-slot=button-group-text]]:h-9 [&>input]:flex-1\",\n  {\n    variants: {\n      orientation: {\n        horizontal: \"[&>*:not(:first-child)]:rounded-l-none [&>*:not(:first-child)]:border-l-0 [&>*:not(:last-child)]:rounded-r-none\",\n        vertical: \"flex-col [&>*:not(:first-child)]:rounded-t-none [&>*:not(:first-child)]:border-t-0 [&>*:not(:last-child)]:rounded-b-none\",\n      },\n    },\n    defaultVariants: { orientation: \"horizontal\" },\n  },\n);\n\nfunction ButtonGroup({ className, orientation, ...props }: React.ComponentProps<\"div\"> & VariantProps<typeof buttonGroupVariants>) {\n  return <div role=\"group\" data-slot=\"button-group\" data-orientation={orientation ?? \"horizontal\"} className={cn(buttonGroupVariants({ orientation }), className)} {...props} />;\n}\n\nfunction ButtonGroupText({ className, asChild = false, ...props }: React.ComponentProps<\"div\"> & { asChild?: boolean }) {\n  const Comp = asChild ? Slot : \"div\";\n  return (\n    <Comp\n      data-slot=\"button-group-text\"\n      className={cn(\"flex items-center gap-2 rounded-control border border-hairline bg-subtle px-3 font-mono text-caption whitespace-nowrap text-fg-muted [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-3.5\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction ButtonGroupSeparator({ className, orientation = \"vertical\", ...props }: React.ComponentProps<\"div\"> & { orientation?: \"horizontal\" | \"vertical\" }) {\n  return (\n    <div\n      role=\"separator\"\n      aria-orientation={orientation}\n      data-slot=\"button-group-separator\"\n      data-orientation={orientation}\n      className={cn(\"relative shrink-0 self-stretch bg-white/30\", orientation === \"vertical\" ? \"w-px\" : \"h-px\", className)}\n      {...props}\n    />\n  );\n}\n\nexport { ButtonGroup, ButtonGroupSeparator, ButtonGroupText, buttonGroupVariants };\n"
+    }
+  ]
+}

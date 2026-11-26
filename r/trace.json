@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "name": "trace",
+  "useFor": "Use to show what an agent did or is doing: one TraceLine per step with a TraceIcon, TraceTitle and TraceDescription (a duration). Set status running, pending or error. Wrap a step in TraceCollapsible with a trigger and content to reveal its detail (the request, the response).",
+  "constraints": [
+    "Spinners on every line",
+    "Colored backgrounds for steps",
+    "Details open by default for every step"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (in-action.tsx steps, monitoring.tsx log, the rule)",
+  "exports": [
+    "Trace",
+    "TraceCollapsible",
+    "TraceCollapsibleContent",
+    "TraceCollapsibleTrigger",
+    "TraceDescription",
+    "TraceIcon",
+    "TraceLine",
+    "TraceTitle"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/trace",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/trace.md",
+  "examples": [
+    {
+      "path": "examples/trace.tsx",
+      "content": "\"use client\";\n\nimport { CircleCheck, CircleX, CreditCard, Search, ShoppingCart, Truck } from \"lucide-react\";\n\nimport { Trace, TraceCollapsible, TraceCollapsibleContent, TraceCollapsibleTrigger, TraceDescription, TraceIcon, TraceLine, TraceTitle } from \"@/components/ui/trace\";\n\nexport function Site() {\n  return (\n    <Trace className=\"mx-auto max-w-xl\">\n      <TraceLine>\n        <TraceIcon>\n          <Search strokeWidth={1.5} />\n        </TraceIcon>\n        <TraceTitle>Searched 4 stores for a USB-C hub</TraceTitle>\n        <TraceDescription>1.2s</TraceDescription>\n      </TraceLine>\n      <TraceCollapsible>\n        <TraceCollapsibleTrigger>\n          <TraceLine>\n            <TraceIcon>\n              <ShoppingCart strokeWidth={1.5} />\n            </TraceIcon>\n            <TraceTitle>Filled the cart at Best Buy</TraceTitle>\n            <TraceDescription>2.8s</TraceDescription>\n          </TraceLine>\n        </TraceCollapsibleTrigger>\n        <TraceCollapsibleContent>\n          <p>Anker 7-in-1 USB-C hub, $34.99. Route warmed, so the cart was ready on the first request.</p>\n        </TraceCollapsibleContent>\n      </TraceCollapsible>\n      <TraceLine>\n        <TraceIcon>\n          <CreditCard strokeWidth={1.5} />\n        </TraceIcon>\n        <TraceTitle>Paid with the office card</TraceTitle>\n        <TraceDescription>0.9s</TraceDescription>\n      </TraceLine>\n      <TraceLine status=\"running\">\n        <TraceIcon>\n          <Truck strokeWidth={1.5} />\n        </TraceIcon>\n        <TraceTitle>Waiting for the confirmation number</TraceTitle>\n      </TraceLine>\n      <TraceLine status=\"pending\">\n        <TraceIcon>\n          <CircleCheck strokeWidth={1.5} />\n        </TraceIcon>\n        <TraceTitle>Report back to Jordan</TraceTitle>\n      </TraceLine>\n    </Trace>\n  );\n}\n\nexport function Failed() {\n  return (\n    <Trace className=\"mx-auto max-w-xl\">\n      <TraceLine>\n        <TraceIcon>\n          <ShoppingCart strokeWidth={1.5} />\n        </TraceIcon>\n        <TraceTitle>Filled the cart at Staples</TraceTitle>\n        <TraceDescription>3.1s</TraceDescription>\n      </TraceLine>\n      <TraceCollapsible defaultOpen>\n        <TraceCollapsibleTrigger>\n          <TraceLine status=\"error\">\n            <TraceIcon>\n              <CircleX strokeWidth={1.5} />\n            </TraceIcon>\n            <TraceTitle>Payment was declined</TraceTitle>\n          </TraceLine>\n        </TraceCollapsibleTrigger>\n        <TraceCollapsibleContent>\n          <p>\n            The card reached its daily limit. <span className=\"font-mono text-snippet\">card_limit_reached</span>\n          </p>\n        </TraceCollapsibleContent>\n      </TraceCollapsible>\n    </Trace>\n  );\n}\n\nexport function Linked() {\n  return (\n    <Trace className=\"mx-auto max-w-xl\">\n      <a href=\"#order-A-10293\">\n        <TraceLine>\n          <TraceIcon>\n            <Truck strokeWidth={1.5} />\n          </TraceIcon>\n          <TraceTitle>Order #A-10293 delivered</TraceTitle>\n          <TraceDescription>Thu</TraceDescription>\n        </TraceLine>\n      </a>\n      <button type=\"button\">\n        <TraceLine>\n          <TraceIcon>\n            <Search strokeWidth={1.5} />\n          </TraceIcon>\n          <TraceTitle>Search again</TraceTitle>\n        </TraceLine>\n      </button>\n    </Trace>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Failed",
+        "Linked"
+      ],
+      "requires": [
+        "trace"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/trace/Site"
+        },
+        {
+          "name": "Failed",
+          "url": "https://opencommerce-ds.vercel.app/preview/trace/Failed"
+        },
+        {
+          "name": "Linked",
+          "url": "https://opencommerce-ds.vercel.app/preview/trace/Linked"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Trace",
+  "description": "An agent's steps as lines of muted 14px text with glyphs, mono durations, a breathing running step and details that open from a hairline.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-collapsible",
+    "lucide-react"
+  ],
+  "files": [
+    {
+      "path": "components/ui/trace.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as CollapsiblePrimitive from \"@radix-ui/react-collapsible\";\nimport { ChevronRight } from \"lucide-react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// An agent's steps as it works, in the voice of the site's step list and live logs (in-action.tsx, monitoring.tsx;\n// computed): each line is 14px Inter at 64 percent ink with a 16px lucide glyph (stroke 1.5) 8px before it, and its\n// figure (a duration, a count) in the 11.5px platform mono at 42 percent ink. A line that is a link or a button turns\n// ink under the pointer (160ms). A running step's title breathes, held still with reduced motion; a pending one is\n// faded; a failed one is red. A step that can open shows a chevron after its title that turns a quarter when open; its\n// detail hangs from a 9 percent rule 16px in, in 14px ink, and opens with its height (200ms, the strong ease-out; it\n// closes in 160ms).\nfunction Trace({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"trace\"\n      className={cn(\n        \"flex w-full min-w-0 flex-col gap-2 *:has-[>[data-slot=trace-line]]:flex *:has-[>[data-slot=trace-line]]:w-fit *:has-[>[data-slot=trace-line]]:max-w-full *:has-[>[data-slot=trace-line]]:min-w-0 *:has-[>[data-slot=trace-line]]:rounded-chip *:has-[>[data-slot=trace-line]]:text-left *:has-[>[data-slot=trace-line]]:outline-none *:has-[>[data-slot=trace-line]]:focus-visible:outline-2 *:has-[>[data-slot=trace-line]]:focus-visible:outline-offset-2 *:has-[>[data-slot=trace-line]]:focus-visible:outline-solid *:has-[>[data-slot=trace-line]]:focus-visible:outline-focus-ring\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nfunction TraceLine({ className, status, ...props }: React.ComponentProps<\"span\"> & { status?: \"running\" | \"error\" | \"pending\" }) {\n  return (\n    <span\n      data-slot=\"trace-line\"\n      data-status={status}\n      className={cn(\n        \"flex w-fit max-w-full min-w-0 items-center gap-2 font-sans text-body-sm leading-relaxed text-fg-muted transition-[color] duration-160 ease-out in-[a,button]:cursor-pointer in-[a:hover,button:hover]:text-fg data-[status=error]:text-danger data-[status=error]:in-[a:hover,button:hover]:text-danger data-[status=pending]:opacity-60 data-[status=running]:*:data-[slot=trace-title]:animate-pulse-soft motion-reduce:transition-none motion-reduce:data-[status=running]:*:data-[slot=trace-title]:animate-none\",\n        className,\n      )}\n      {...props}\n    />\n  );\n}\n\nfunction TraceIcon({ className, ...props }: React.ComponentProps<\"span\">) {\n  return (\n    <span\n      data-slot=\"trace-icon\"\n      aria-hidden=\"true\"\n      className={cn(\"flex size-4 shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [[data-slot=trace-title]~&]:-ml-1\", className)}\n      {...props}\n    />\n  );\n}\n\nfunction TraceTitle({ className, ...props }: React.ComponentProps<\"span\">) {\n  return <span data-slot=\"trace-title\" className={cn(\"min-w-0 truncate\", className)} {...props} />;\n}\n\n/** A step's figure at its end: a duration or a count, in the mono at 42 percent ink with even figures. */\nfunction TraceDescription({ className, ...props }: React.ComponentProps<\"span\">) {\n  return <span data-slot=\"trace-description\" className={cn(\"shrink-0 font-mono text-bar text-fg-faint tabular-nums\", className)} {...props} />;\n}\n\nfunction TraceCollapsible({ className, ...props }: Omit<React.ComponentProps<typeof CollapsiblePrimitive.Root>, \"asChild\">) {\n  return <CollapsiblePrimitive.Root data-slot=\"trace-collapsible\" className={cn(\"flex w-full min-w-0 flex-col\", className)} {...props} />;\n}\n\nfunction TraceCollapsibleTrigger({ className, children, ...props }: Omit<React.ComponentProps<typeof CollapsiblePrimitive.Trigger>, \"asChild\">) {\n  return (\n    <CollapsiblePrimitive.Trigger\n      data-slot=\"trace-collapsible-trigger\"\n      className={cn(\n        \"group/trace-collapsible-trigger flex w-fit max-w-full min-w-0 cursor-pointer items-center gap-1 rounded-chip text-left text-fg-muted outline-none transition-[color] duration-160 ease-out hover:text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-solid focus-visible:outline-focus-ring has-[[data-status=error]]:text-danger motion-reduce:transition-none\",\n        className,\n      )}\n      {...props}\n    >\n      {children}\n      <TraceIcon className=\"transition-[rotate] duration-200 ease-out group-aria-expanded/trace-collapsible-trigger:rotate-90 motion-reduce:transition-none\">\n        <ChevronRight strokeWidth={1.75} className=\"size-3.5\" />\n      </TraceIcon>\n    </CollapsiblePrimitive.Trigger>\n  );\n}\n\n// Radix sets the content's measured height as --radix-collapsible-content-height; the shared open and close keyframes\n// read the accordion's name for it, so it is passed on under that name.\nconst HEIGHT = { \"--radix-accordion-content-height\": \"var(--radix-collapsible-content-height)\" } as React.CSSProperties;\n\nfunction TraceCollapsibleContent({ className, children, style, ...props }: Omit<React.ComponentProps<typeof CollapsiblePrimitive.Content>, \"asChild\">) {\n  return (\n    <CollapsiblePrimitive.Content\n      data-slot=\"trace-collapsible-content\"\n      style={{ ...HEIGHT, ...style }}\n      className=\"min-w-0 overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down motion-reduce:animate-none\"\n      {...props}\n    >\n      <div data-slot=\"trace-collapsible-content-inner\" className={cn(\"mt-2 mb-1 ml-2 min-w-0 border-l border-line pr-1 pl-4 font-sans text-body-sm leading-relaxed [overflow-wrap:anywhere] text-fg\", className)}>\n        {children}\n      </div>\n    </CollapsiblePrimitive.Content>\n  );\n}\n\nexport { Trace, TraceCollapsible, TraceCollapsibleContent, TraceCollapsibleTrigger, TraceDescription, TraceIcon, TraceLine, TraceTitle };\n"
+    }
+  ]
+}

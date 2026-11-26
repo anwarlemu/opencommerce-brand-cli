@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "aspect-ratio",
+  "useFor": "Use around images, video and screens that must keep their shape (a product shot, a merchant's preview). Round and clip the media inside with the window's corners and edge.",
+  "constraints": [
+    "Stretching media to fill the ratio",
+    "A ratio frame with its own border style"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (the windows' framed screens)",
+  "exports": [
+    "AspectRatio"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/aspect-ratio",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/aspect-ratio.md",
+  "examples": [
+    {
+      "path": "examples/aspect-ratio.tsx",
+      "content": "import { AspectRatio } from \"@/components/ui/aspect-ratio\";\n\nexport function Site() {\n  return (\n    <div className=\"w-full max-w-110 overflow-hidden rounded-panel border border-line-window bg-surface shadow-card\">\n      <AspectRatio ratio={16 / 9}>\n        <div className=\"flex size-full flex-col justify-end gap-1 bg-subtle p-4\">\n          <span className=\"font-mono text-caption text-fg-muted\">order.preview</span>\n          <span className=\"font-sans text-body-sm text-fg\">Standing desk, oak, 48 in</span>\n        </div>\n      </AspectRatio>\n    </div>\n  );\n}\n\nexport function Square() {\n  return (\n    <div className=\"grid w-full max-w-110 grid-cols-3 gap-3\">\n      {[\"Wayfair\", \"Staples\", \"Best Buy\"].map((store) => (\n        <AspectRatio key={store} ratio={1} className=\"grid place-items-center rounded-control border border-line bg-surface\">\n          <span className=\"font-sans text-body-sm text-fg-muted\">{store}</span>\n        </AspectRatio>\n      ))}\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Square"
+      ],
+      "requires": [
+        "aspect-ratio"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/aspect-ratio/Site"
+        },
+        {
+          "name": "Square",
+          "url": "https://opencommerce-ds.vercel.app/preview/aspect-ratio/Square"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Aspect Ratio",
+  "description": "Holds media at a fixed shape so the layout does not jump while it loads.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme"
+  ],
+  "packages": [
+    "@radix-ui/react-aspect-ratio"
+  ],
+  "files": [
+    {
+      "path": "components/ui/aspect-ratio.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as AspectRatioPrimitive from \"@radix-ui/react-aspect-ratio\";\n\n// Holds media at a fixed shape (a product shot, a store's logo tile, a screen in a window). The frame takes no style of\n// its own; round and clip the media inside it with the window's corners and edge.\nfunction AspectRatio(props: React.ComponentProps<typeof AspectRatioPrimitive.Root>) {\n  return <AspectRatioPrimitive.Root data-slot=\"aspect-ratio\" {...props} />;\n}\n\nexport { AspectRatio };\n"
+    }
+  ]
+}

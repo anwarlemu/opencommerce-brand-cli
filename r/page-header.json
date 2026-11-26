@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "name": "page-header",
+  "useFor": "Place below SiteHeader on company, form, legal or update pages. Put supporting title content in children.",
+  "constraints": [
+    "A tinted ground behind it",
+    "Centered",
+    "A second title under it",
+    "More than one per page"
+  ],
+  "documentation": "`PageHeader` props: `eyebrow`, `title`, `lead`, `rule` (default true), `children` (inside the head, under the title).\nThe live /about sets its lead at 24px (18px on phones), not 19px; the component follows the live page.",
+  "source": "Extension in the opencommerce site's voice (.h-hero type, mono labels and hairlines; opencommerce-agentcard-web src/app/globals.css)",
+  "exports": [
+    "PageHeader"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/page-header",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/page-header.md",
+  "examples": [
+    {
+      "path": "examples/page-header.tsx",
+      "content": "import { PageHeader } from \"@/components/site/page-header\";\nimport { SiteHeader } from \"@/components/site/site-header\";\n\nconst ACTION = { label: \"Get started\", href: \"https://app.agentcard.sh\" };\n\nexport function Site() {\n  return (\n    <div className=\"relative bg-surface pb-24\">\n      <SiteHeader fixed={false} action={ACTION} />\n      <PageHeader\n        eyebrow=\"Changelog\"\n        title=\"What’s new\"\n        lead=\"New stores, faster routes and the changes to the SDK, as they ship.\"\n      />\n    </div>\n  );\n}\n\nexport function Short() {\n  return (\n    <div className=\"relative bg-surface pb-24\">\n      <SiteHeader fixed={false} action={ACTION} />\n      <PageHeader eyebrow=\"Get started\" title=\"Let your agent buy\">\n        <p className=\"mt-3 text-body-sm text-fg-muted\">A few answers, then a call</p>\n      </PageHeader>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Short"
+      ],
+      "requires": [
+        "page-header",
+        "site-header"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/page-header/Site"
+        },
+        {
+          "name": "Short",
+          "url": "https://opencommerce-ds.vercel.app/preview/page-header/Short"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Page header",
+  "description": "Title, optional label and introduction for an inner page.",
+  "surface": "site",
+  "kinds": [
+    "eyebrow"
+  ],
+  "requires": [
+    "theme",
+    "section",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/page-header.tsx",
+      "content": "import * as React from \"react\";\n\nimport { Eyebrow } from \"@/components/site/section\";\nimport { cn } from \"@/lib/utils\";\n\n// An inner page's opening, in the home page's voice: on the 800px column, left aligned, 72px under the header (96px on\n// wide screens): the small mono label, the 48px display title tracked -0.03em 12px under it (36px on phones), anything\n// short that belongs to the title (`children`), then a hairline 28px below. The lead, when given, opens the page 32px\n// under the rule in 20px muted text.\nfunction PageHeader({\n  eyebrow,\n  title,\n  lead,\n  rule = true,\n  className,\n  children,\n  ...props\n}: Omit<React.ComponentProps<\"div\">, \"title\"> & {\n  eyebrow?: React.ReactNode;\n  title: React.ReactNode;\n  lead?: React.ReactNode;\n  /** The hairline under the title. */\n  rule?: boolean;\n}) {\n  return (\n    <div data-slot=\"page-header\" className={cn(\"mx-auto w-(--ds-frame-column) max-w-(--ds-layout-medium) pt-18 md:pt-24\", className)} {...props}>\n      <header className={cn(rule && \"border-b border-line pb-7\")}>\n        {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}\n        <h1 className={cn(\"font-display text-h1 leading-heading font-medium tracking-hero text-balance\", eyebrow && \"mt-3\")}>{title}</h1>\n        {children}\n      </header>\n      {lead && <p className=\"mt-8 max-w-(--ds-layout-heading) text-h4 leading-snug text-pretty text-fg-muted\">{lead}</p>}\n    </div>\n  );\n}\n\nexport { PageHeader };\n"
+    }
+  ]
+}

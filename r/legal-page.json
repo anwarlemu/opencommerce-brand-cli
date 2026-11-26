@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "legal-page",
+  "useFor": "Use as a starting point for terms, privacy or other policy pages. Replace the sample text with your counsel's and keep each heading's id in the contents.",
+  "constraints": [
+    "Centered long text",
+    "Body text wider than 576px",
+    "Bold headings or table headers"
+  ],
+  "documentation": "Composed from `SiteHeader`, `PageHeader`, `Item` (the contents' links), `Prose` and `SiteFooter`. The contents stay in\nview on wide screens and sit over the text on a phone.",
+  "source": "Extension in the opencommerce site's voice; the structure from agentcard.sh/terms",
+  "exports": [
+    "LegalPage"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/legal-page",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/legal-page.md",
+  "examples": [
+    {
+      "path": "examples/legal-page.tsx",
+      "content": "import { LegalPage } from \"@/components/blocks/legal-page\";\n\nexport function Block() {\n  return <LegalPage />;\n}\n",
+      "exports": [
+        "Block"
+      ],
+      "requires": [
+        "legal-page"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Block",
+          "url": "https://opencommerce-ds.vercel.app/preview/legal-page/Block"
+        }
+      ]
+    }
+  ],
+  "type": "block",
+  "title": "Legal page",
+  "description": "Legal page template (terms or privacy) with the header, the title and last updated date, contents beside the text, and the footer.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "page-header",
+    "prose",
+    "section",
+    "site-footer",
+    "site-header",
+    "item"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/blocks/legal-page.tsx",
+      "content": "import * as React from \"react\";\n\nimport { PageHeader } from \"@/components/site/page-header\";\nimport { Prose } from \"@/components/site/prose\";\nimport { Eyebrow } from \"@/components/site/section\";\nimport { SiteFooter } from \"@/components/site/site-footer\";\nimport { SiteHeader } from \"@/components/site/site-header\";\nimport { Item } from \"@/components/ui/item\";\n\n// A legal page (terms or privacy) in the home page's voice: the glass header, the page's opening on the 800px column\n// with the date it last changed in the platform mono, then the contents at the left (held in view on wide screens,\n// over the text on a phone) and the text in the 576px reading column (Prose), each section's heading the target of its\n// link. Sample text in the shape of terms; have counsel write the real ones.\n\nconst SIGNUP = \"https://app.agentcard.sh\";\nconst DOCS = \"https://docs.agentcard.sh\";\n\nconst LINKS = [\n  { label: \"Home\", href: \"/\" },\n  { label: \"Features\", href: \"/features\" },\n  { label: \"Pricing\", href: \"/pricing\" },\n  { label: \"Docs\", href: DOCS },\n];\n\nconst FOOTER = [\n  { title: \"Product\", links: [{ label: \"Features\", href: \"/features\" }, { label: \"Pricing\", href: \"/pricing\" }, { label: \"Changelog\", href: \"/changelog\" }] },\n  { title: \"Developers\", links: [{ label: \"Docs\", href: DOCS }, { label: \"SDK\", href: \"https://www.npmjs.com/package/@agentcard/sdk\" }] },\n  { title: \"Legal\", links: [{ label: \"Terms\", href: \"/terms\" }, { label: \"Privacy\", href: \"/privacy\" }, { label: \"Contact\", href: \"/contact\" }] },\n];\n\nconst SECTIONS = [\n  {\n    id: \"the-service\",\n    title: \"The service\",\n    body: (\n      <>\n        <p>opencommerce lets software agents search online stores, place orders and follow them through one endpoint. These terms cover your use of the API, the SDK and the dashboard.</p>\n        <p>By creating an account you agree to them on behalf of yourself and the company you represent.</p>\n      </>\n    ),\n  },\n  {\n    id: \"accounts\",\n    title: \"Accounts and keys\",\n    body: (\n      <>\n        <p>Keep your client secret private. You are responsible for every call made with it.</p>\n        <ul>\n          <li>Rotate a key as soon as you think it has been exposed.</li>\n          <li>Give each environment its own key.</li>\n          <li>Tell us within a day of any unauthorized use.</li>\n        </ul>\n      </>\n    ),\n  },\n  {\n    id: \"purchases\",\n    title: \"Purchases your agents make\",\n    body: (\n      <>\n        <p>Each order is a purchase between your customer and the store. We route it and report on it; the store fulfills it under its own terms.</p>\n        <p>Your customers set spending limits. An agent may not place an order past them, and we decline any order that would.</p>\n      </>\n    ),\n  },\n  {\n    id: \"fees\",\n    title: \"Fees\",\n    body: (\n      <>\n        <p>\n          The Standard plan charges 1% of each completed order. Failed and cancelled orders cost nothing. Current prices are on the <a href=\"/pricing\">pricing page</a>.\n        </p>\n        <table>\n          <thead>\n            <tr>\n              <th>Plan</th>\n              <th>Fee</th>\n              <th>Billed</th>\n            </tr>\n          </thead>\n          <tbody>\n            <tr>\n              <td>Free</td>\n              <td>None</td>\n              <td>Never</td>\n            </tr>\n            <tr>\n              <td>Standard</td>\n              <td>1% per completed order</td>\n              <td>Monthly</td>\n            </tr>\n          </tbody>\n        </table>\n      </>\n    ),\n  },\n  {\n    id: \"acceptable-use\",\n    title: \"Acceptable use\",\n    body: <p>Do not use the service to buy goods a store or the law forbids, to resell access to it, or to load stores beyond what an ordinary shopper would.</p>,\n  },\n  {\n    id: \"changes\",\n    title: \"Changes to these terms\",\n    body: <p>We will post changes here and email account owners at least 30 days before they take effect.</p>,\n  },\n  {\n    id: \"contact\",\n    title: \"Contact\",\n    body: (\n      <p>\n        Questions about these terms go to <a href=\"mailto:legal@agentcard.sh\">legal@agentcard.sh</a>.\n      </p>\n    ),\n  },\n];\n\nexport function LegalPage() {\n  return (\n    <div className=\"bg-surface text-fg\">\n      <SiteHeader href=\"/\" links={LINKS} spy={false} action={{ label: \"Get started\", href: SIGNUP }} />\n      <main>\n        <PageHeader eyebrow=\"Legal\" title=\"Terms of service\">\n          <p className=\"mt-3 font-mono text-caption leading-body text-fg-muted\">\n            Last updated <time dateTime=\"2026-11-01\">November 1, 2026</time>\n          </p>\n        </PageHeader>\n        <div className=\"mx-auto grid w-(--ds-frame-column) max-w-(--ds-layout-medium) gap-10 pt-10 pb-18 md:grid-cols-[12rem_minmax(0,1fr)] md:gap-8 md:pb-30\">\n          <nav aria-label=\"Contents\" className=\"md:sticky md:top-24 md:self-start\">\n            <Eyebrow className=\"mb-2 px-2\">Contents</Eyebrow>\n            <ol className=\"m-0 flex list-none flex-col gap-0.5 p-0\">\n              {SECTIONS.map((section) => (\n                <li key={section.id}>\n                  <Item asChild size=\"xs\" className=\"text-fg-muted\">\n                    <a href={`#${section.id}`}>{section.title}</a>\n                  </Item>\n                </li>\n              ))}\n            </ol>\n          </nav>\n          <Prose className=\"mx-0\">\n            {SECTIONS.map((section) => (\n              <React.Fragment key={section.id}>\n                <h2 id={section.id} className=\"scroll-mt-24\">\n                  {section.title}\n                </h2>\n                {section.body}\n              </React.Fragment>\n            ))}\n          </Prose>\n        </div>\n      </main>\n      <SiteFooter description=\"The open router for commerce. Buy from any online store from a single endpoint.\" legal={<span>© 2026 Agentcard, Inc.</span>} groups={FOOTER} />\n    </div>\n  );\n}\n"
+    }
+  ]
+}

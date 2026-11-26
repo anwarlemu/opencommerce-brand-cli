@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "name": "popover",
+  "useFor": "Use for explanations, filters or small controls. Use variant=\"glass\" over imagery or the header. Keep longer tasks in Dialog or Sheet.",
+  "constraints": [
+    "Forms longer than a few fields (use a dialog)",
+    "Popovers that open on hover (use a tooltip)",
+    "Gray panels"
+  ],
+  "documentation": "Long content scrolls inside the panel (which keeps its drop) and fades at an edge with more past it (fade-y), with room for focus rings.",
+  "source": "Extension from opencommerce-agentcard-web src/app/globals.css (.nav-tray, .win)",
+  "exports": [
+    "Popover",
+    "PopoverAnchor",
+    "PopoverContent",
+    "PopoverTrigger"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/popover",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/popover.md",
+  "examples": [
+    {
+      "path": "examples/popover.tsx",
+      "content": "import { Button } from \"@/components/ui/button\";\nimport { Popover, PopoverContent, PopoverTrigger } from \"@/components/ui/popover\";\nimport { Surface } from \"@/lib/surface\";\n\nfunction Limits({ defaultOpen }: { defaultOpen?: boolean }) {\n  return (\n    <Popover defaultOpen={defaultOpen}>\n      <PopoverTrigger asChild>\n        <Button variant=\"secondary\">What are limits?</Button>\n      </PopoverTrigger>\n      <PopoverContent className=\"grid gap-2\">\n        <p className=\"font-display text-body-sm font-medium text-fg\">Spending limits</p>\n        <p className=\"text-body-sm leading-relaxed text-fg-muted\">Each card stops at its per purchase and monthly limits, whatever the agent tries to buy.</p>\n      </PopoverContent>\n    </Popover>\n  );\n}\n\nexport function Site() {\n  return <Limits />;\n}\n\nexport function Open() {\n  return (\n    <div className=\"h-48\">\n      <Limits defaultOpen />\n    </div>\n  );\n}\n\nexport function Glass() {\n  return (\n    <Surface ground=\"mist\" className=\"h-60 rounded-panel p-8\">\n      <Popover defaultOpen>\n        <PopoverTrigger asChild>\n          <Button variant=\"secondary\">About monitoring</Button>\n        </PopoverTrigger>\n        <PopoverContent variant=\"glass\" className=\"grid gap-1.5\">\n          <p className=\"font-display text-body-sm font-medium\">Every route, around the clock</p>\n          <p className=\"text-body-sm leading-relaxed text-fg-muted\">Each store your agents buy from is exercised every few minutes, so a broken checkout is caught first.</p>\n        </PopoverContent>\n      </Popover>\n    </Surface>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Open",
+        "Glass"
+      ],
+      "requires": [
+        "popover",
+        "button",
+        "surface"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/popover/Site"
+        },
+        {
+          "name": "Open",
+          "url": "https://opencommerce-ds.vercel.app/preview/popover/Open"
+        },
+        {
+          "name": "Glass",
+          "url": "https://opencommerce-ds.vercel.app/preview/popover/Glass"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Popover",
+  "description": "Anchored panel for contextual details or controls.",
+  "surface": "site",
+  "kinds": [
+    "popover-panel"
+  ],
+  "requires": [
+    "theme",
+    "surface",
+    "utils"
+  ],
+  "packages": [
+    "@radix-ui/react-popover"
+  ],
+  "files": [
+    {
+      "path": "components/ui/popover.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as PopoverPrimitive from \"@radix-ui/react-popover\";\n\nimport { usePortalContainer } from \"@/lib/surface\";\nimport { cn } from \"@/lib/utils\";\n\n// The brand's floating panel: white, a 9 percent ink edge, 8px corners and a soft drop, 6px off its trigger, growing out\n// of the side nearest the trigger (scale 0.97 and a fade, 160ms ease-out). `glass` is the header's tray as a panel: white\n// at 72 percent under a light sheen and a blur, a 10 percent ink edge. Reduced motion keeps only the fade.\nconst VARIANTS = {\n  default: \"border-line bg-surface text-fg shadow-floating\",\n  glass: \"border-line-glass bg-glass bg-(image:--ds-glass-sheen) text-fg shadow-floating [backdrop-filter:var(--ds-glass-blur)]\",\n} as const;\n\n// Layout classes (display, gaps, alignment, grid tracks, child selectors) passed to PopoverContent lay out the content,\n// so they go to the scrolling body; the rest (width, padding, colors) style the panel.\nconst LAYOUT = /^(?:[\\w-]+:)*(?:block|flex|grid|inline-(?:block|flex|grid)|flow-root|flex-(?:row|col)(?:-reverse)?|flex-(?:wrap|nowrap)|gap(?:-[xy])?-.+|space-[xy]-.+|divide-.+|items-.+|justify-.+|place-.+|grid-(?:cols|rows|flow)-.+|auto-(?:cols|rows)-.+|content-(?:start|end|center|between|around|evenly|stretch|normal|baseline)|\\*.*|\\[&>.*)$/;\nconst splitLayout = (className?: string) => {\n  const parts = (className ?? \"\").split(/\\s+/).filter(Boolean);\n  return [parts.filter((part) => !LAYOUT.test(part)).join(\" \"), parts.filter((part) => LAYOUT.test(part)).join(\" \")];\n};\n\nfunction Popover(props: React.ComponentProps<typeof PopoverPrimitive.Root>) {\n  return <PopoverPrimitive.Root data-slot=\"popover\" {...props} />;\n}\n\nfunction PopoverTrigger(props: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {\n  return <PopoverPrimitive.Trigger data-slot=\"popover-trigger\" {...props} />;\n}\n\nfunction PopoverContent({ className, align = \"start\", sideOffset = 6, collisionPadding = 8, variant = \"default\", children, ...props }: React.ComponentProps<typeof PopoverPrimitive.Content> & { variant?: keyof typeof VARIANTS }) {\n  const [panel, layout] = splitLayout(className);\n  return (\n    <PopoverPrimitive.Portal container={usePortalContainer()}>\n      <PopoverPrimitive.Content\n        data-slot=\"popover-content\"\n        data-variant={variant}\n        align={align}\n        sideOffset={sideOffset}\n        collisionPadding={collisionPadding}\n        className={cn(\"z-50 w-72 max-w-(--radix-popover-content-available-width) max-h-(--radix-popover-content-available-height) flex flex-col overflow-hidden origin-(--radix-popover-content-transform-origin) animate-pop-in motion-reduce:animate-none rounded-control border p-4 text-body-sm outline-none\", VARIANTS[variant], panel)}\n        {...props}\n      >\n        {/* The content scrolls inside the panel (so its drop stays) and fades at an edge with more past it; 6px of the\n            panel's padding moves inside the scroller so focus rings near an edge are not clipped. */}\n        <div data-slot=\"popover-body\" className={cn(\"-m-1.5 min-h-0 flex-1 overflow-y-auto overscroll-contain fade-y p-1.5\", layout)}>\n          {children}\n        </div>\n      </PopoverPrimitive.Content>\n    </PopoverPrimitive.Portal>\n  );\n}\n\nfunction PopoverAnchor(props: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {\n  return <PopoverPrimitive.Anchor data-slot=\"popover-anchor\" {...props} />;\n}\n\nexport { Popover, PopoverAnchor, PopoverContent, PopoverTrigger };\n"
+    }
+  ]
+}

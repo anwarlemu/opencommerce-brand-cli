@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "name": "outline-wordmark",
+  "useFor": "Use once, along the bottom edge of the site footer, with the product's name in its own case.",
+  "constraints": [
+    "A filled wordmark",
+    "The wordmark anywhere but the footer",
+    "A tagline in place of the name",
+    "A colored outline at rest"
+  ],
+  "documentation": "`OutlineWordmark` props: `text`, plus paragraph props. It is decorative (hidden from screen readers); the footer\ncarries the name in text.",
+  "source": "opencommerce-agentcard-web src/components/footer-wordmark.tsx, src/app/globals.css (THE FOOTER WORDMARK)",
+  "exports": [
+    "OutlineWordmark"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/outline-wordmark",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/outline-wordmark.md",
+  "examples": [
+    {
+      "path": "examples/outline-wordmark.tsx",
+      "content": "import { OutlineWordmark } from \"@/components/visuals/outline-wordmark\";\n\nexport function Site() {\n  return (\n    <div className=\"pt-10\">\n      <OutlineWordmark text=\"opencommerce\" />\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "outline-wordmark"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/outline-wordmark/Site"
+        }
+      ]
+    }
+  ],
+  "type": "visual",
+  "title": "Outline wordmark",
+  "description": "The name set as wide as the page in a faint outline, lit in blue under the pointer.",
+  "surface": "site",
+  "kinds": [
+    "footer"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/visuals/outline-wordmark.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The footer's big name (the opencommerce site's footer wordmark): the word set as wide as the page in the display face,\n// drawn as a faint outline. While a mouse is over it, a soft spotlight follows the pointer and draws the letters under\n// it in the brand blue, feathering out to nothing. Two copies share one box so they line up glyph for glyph: the\n// outline, and the lit copy masked to a circle at the pointer (--x, --y). The pointer only writes those two\n// properties, so nothing re-renders. Touch screens have no hover and keep the plain outline. The spotlight fades in\n// and out (200ms ease-out); with reduced motion it simply appears.\n\nconst SPOT = \"radial-gradient(circle clamp(5.625rem,14vw,13.75rem) at var(--x,50%) var(--y,50%),var(--ds-color-ink) 0%,color-mix(in srgb,var(--ds-color-ink) 55%,transparent) 40%,transparent 100%)\";\n\nfunction OutlineWordmark({ text, className, ...props }: Omit<React.ComponentProps<\"p\">, \"children\"> & { text: string }) {\n  const ref = React.useRef<HTMLParagraphElement>(null);\n  const track = (e: React.PointerEvent<HTMLParagraphElement>) => {\n    const el = ref.current;\n    if (!el || e.pointerType === \"touch\") return;\n    const r = el.getBoundingClientRect();\n    el.style.setProperty(\"--x\", `${e.clientX - r.left}px`);\n    el.style.setProperty(\"--y\", `${e.clientY - r.top}px`);\n  };\n  return (\n    <p\n      ref={ref}\n      aria-hidden\n      data-slot=\"outline-wordmark\"\n      onPointerEnter={track}\n      onPointerMove={track}\n      className={cn(\n        \"group/wordmark relative overflow-x-clip text-center font-display text-[clamp(3.5rem,13.2vw,var(--ds-text-display))] leading-none font-medium tracking-display whitespace-nowrap text-transparent select-none\",\n        className,\n      )}\n    >\n      <span className=\"block [-webkit-text-stroke:1px_color-mix(in_srgb,var(--ds-color-ink)_13%,transparent)]\">{text}</span>\n      <span\n        style={{ maskImage: SPOT, WebkitMaskImage: SPOT }}\n        className=\"pointer-events-none absolute inset-0 bg-[color-mix(in_srgb,var(--ds-color-brand)_6%,transparent)] bg-clip-text opacity-0 transition-opacity duration-(--ds-duration-base) ease-out [-webkit-text-stroke:1.25px_var(--ds-color-brand)] motion-reduce:transition-none [@media(hover:hover)]:group-hover/wordmark:opacity-100\"\n      >\n        {text}\n      </span>\n    </p>\n  );\n}\n\nexport { OutlineWordmark };\n"
+    }
+  ]
+}

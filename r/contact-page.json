@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "name": "contact-page",
+  "useFor": "Use as a starting point for a contact or sales page. Pass onSubmit to send the form's data to your endpoint, and replace the addresses.",
+  "constraints": [
+    "More than one blue key",
+    "Required fields without the mark",
+    "Placeholder text in place of labels"
+  ],
+  "documentation": "`ContactPage` props: `onSubmit` (receives the form's `FormData`). After it resolves, the form thanks the sender in\nplace. Composed from `SiteHeader`, `PageHeader`, `Window`, `Field`, `Input`, `NativeSelect`, `Textarea`, `Button`,\n`Item` and `SiteFooter`.",
+  "source": "Extension in the opencommerce site's voice (opencommerce-agentcard-web src/components/monitoring.tsx field, globals.css .win)",
+  "exports": [
+    "ContactPage"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/contact-page",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/contact-page.md",
+  "examples": [
+    {
+      "path": "examples/contact-page.tsx",
+      "content": "import { ContactPage } from \"@/components/blocks/contact-page\";\n\nexport function Block() {\n  return <ContactPage />;\n}\n",
+      "exports": [
+        "Block"
+      ],
+      "requires": [
+        "contact-page"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Block",
+          "url": "https://opencommerce-ds.vercel.app/preview/contact-page/Block"
+        }
+      ]
+    }
+  ],
+  "type": "block",
+  "title": "Contact page",
+  "description": "Contact page template with the header, the page's opening, a form in a window beside other ways to reach the team, and the footer.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "page-header",
+    "section",
+    "site-footer",
+    "site-header",
+    "button",
+    "field",
+    "input",
+    "item",
+    "native-select",
+    "textarea",
+    "window"
+  ],
+  "packages": [
+    "lucide-react"
+  ],
+  "files": [
+    {
+      "path": "components/blocks/contact-page.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { BookOpen, CalendarDays, Mail } from \"lucide-react\";\n\nimport { PageHeader } from \"@/components/site/page-header\";\nimport { Eyebrow } from \"@/components/site/section\";\nimport { SiteFooter } from \"@/components/site/site-footer\";\nimport { SiteHeader } from \"@/components/site/site-header\";\nimport { Button } from \"@/components/ui/button\";\nimport { Field } from \"@/components/ui/field\";\nimport { Input } from \"@/components/ui/input\";\nimport { Item, ItemContent, ItemDescription, ItemGroup, ItemMedia, ItemTitle } from \"@/components/ui/item\";\nimport { NativeSelect, NativeSelectOption } from \"@/components/ui/native-select\";\nimport { Textarea } from \"@/components/ui/textarea\";\nimport { Window } from \"@/components/ui/window\";\n\n// A contact page in the home page's voice: the glass header, the page's opening on the 800px column, then the form in\n// a window (contact.form: name, work email, company, topic and message, the blue key) beside the other ways to reach\n// the team as small white cards. The form holds its own state and thanks the sender in place; wire `onSubmit` to your\n// own endpoint. Sample addresses; replace them with your own.\n\nconst SIGNUP = \"https://app.agentcard.sh\";\nconst DOCS = \"https://docs.agentcard.sh\";\n\nconst LINKS = [\n  { label: \"Home\", href: \"/\" },\n  { label: \"Features\", href: \"/features\" },\n  { label: \"Pricing\", href: \"/pricing\" },\n  { label: \"Contact\", href: \"/contact\", current: true },\n  { label: \"Docs\", href: DOCS },\n];\n\nconst FOOTER = [\n  { title: \"Product\", links: [{ label: \"Features\", href: \"/features\" }, { label: \"Pricing\", href: \"/pricing\" }, { label: \"Changelog\", href: \"/changelog\" }] },\n  { title: \"Developers\", links: [{ label: \"Docs\", href: DOCS }, { label: \"SDK\", href: \"https://www.npmjs.com/package/@agentcard/sdk\" }] },\n  { title: \"Company\", links: [{ label: \"About\", href: \"/about\" }, { label: \"Blog\", href: \"/blog\" }, { label: \"Contact\", href: \"/contact\" }] },\n];\n\nconst OPTIONS = [\n  { title: \"Book a call\", description: \"Thirty minutes with the team to plan your agent’s first purchase.\", href: \"https://cal.com/agentcard\", icon: <CalendarDays strokeWidth={1.5} /> },\n  { title: \"Email support\", description: \"hello@agentcard.sh. We reply within a day.\", href: \"mailto:hello@agentcard.sh\", icon: <Mail strokeWidth={1.5} /> },\n  { title: \"Read the docs\", description: \"Guides, the API reference and the SDK.\", href: DOCS, icon: <BookOpen strokeWidth={1.5} /> },\n];\n\nexport function ContactPage({ onSubmit }: { onSubmit?: (data: FormData) => void | Promise<void> }) {\n  const [sent, setSent] = React.useState(false);\n\n  async function submit(event: React.FormEvent<HTMLFormElement>) {\n    event.preventDefault();\n    await onSubmit?.(new FormData(event.currentTarget));\n    setSent(true);\n  }\n\n  return (\n    <div className=\"bg-surface text-fg\">\n      <SiteHeader href=\"/\" links={LINKS} spy={false} action={{ label: \"Get started\", href: SIGNUP }} />\n      <main>\n        <PageHeader eyebrow=\"Contact\" title=\"Talk to us\" lead=\"Planning an agent that buys for real? Tell us what it needs to do and we will help you get there.\" />\n        <div className=\"mx-auto grid w-(--ds-frame-column) max-w-(--ds-layout-medium) gap-10 pt-12 pb-18 md:grid-cols-[minmax(0,1fr)_16rem] md:pb-30\">\n          <Window name=\"contact.form\">\n            <form onSubmit={submit} className=\"grid gap-4 p-6 md:p-8\">\n              <div className=\"grid gap-4 sm:grid-cols-2\">\n                <Field label=\"Name\" htmlFor=\"contact-name\" required>\n                  <Input id=\"contact-name\" name=\"name\" autoComplete=\"name\" />\n                </Field>\n                <Field label=\"Work email\" htmlFor=\"contact-email\" required>\n                  <Input id=\"contact-email\" name=\"email\" type=\"email\" autoComplete=\"email\" />\n                </Field>\n              </div>\n              <Field label=\"Company\" htmlFor=\"contact-company\">\n                <Input id=\"contact-company\" name=\"company\" autoComplete=\"organization\" placeholder=\"Acme\" />\n              </Field>\n              <Field label=\"Topic\" htmlFor=\"contact-topic\">\n                <NativeSelect id=\"contact-topic\" name=\"topic\" className=\"w-full\" defaultValue=\"sales\">\n                  <NativeSelectOption value=\"sales\">Sales and volume pricing</NativeSelectOption>\n                  <NativeSelectOption value=\"support\">Support</NativeSelectOption>\n                  <NativeSelectOption value=\"partnership\">A store or partnership</NativeSelectOption>\n                </NativeSelect>\n              </Field>\n              <Field label=\"Message\" htmlFor=\"contact-message\" required help=\"What should your agent buy, and from which stores?\">\n                <Textarea id=\"contact-message\" name=\"message\" rows={5} />\n              </Field>\n              <div className=\"mt-2 flex flex-wrap items-center gap-4\">\n                <Button type=\"submit\">Send message</Button>\n                <p aria-live=\"polite\" className=\"text-body-sm text-fg-muted\">\n                  {sent ? \"Thanks. We will reply within a day.\" : null}\n                </p>\n              </div>\n            </form>\n          </Window>\n          <aside aria-label=\"Other ways to reach us\">\n            <Eyebrow className=\"mb-3.5\">Other ways</Eyebrow>\n            <ItemGroup className=\"gap-3\">\n              {OPTIONS.map((option) => (\n                <Item key={option.title} asChild variant=\"outline\" size=\"sm\" role=\"listitem\">\n                  <a href={option.href}>\n                    <ItemMedia variant=\"icon\">{option.icon}</ItemMedia>\n                    <ItemContent>\n                      <ItemTitle>{option.title}</ItemTitle>\n                      <ItemDescription>{option.description}</ItemDescription>\n                    </ItemContent>\n                  </a>\n                </Item>\n              ))}\n            </ItemGroup>\n          </aside>\n        </div>\n      </main>\n      <SiteFooter description=\"The open router for commerce. Buy from any online store from a single endpoint.\" legal={<span>© 2026 Agentcard, Inc.</span>} groups={FOOTER} />\n    </div>\n  );\n}\n"
+    }
+  ]
+}

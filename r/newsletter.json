@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "name": "newsletter",
+  "useFor": "Use once on a page, near the footer. Pass onSubmit to add the address to your list.",
+  "constraints": [
+    "A second field",
+    "A blue band",
+    "A pop-up"
+  ],
+  "documentation": "`Newsletter` props: `title`, `description`, `action` (the key's label), `thanks`, `onSubmit` (receives `FormData`),\nplus div props.",
+  "source": "Extension in the opencommerce site's voice (the fields of monitoring.tsx, globals.css .win)",
+  "exports": [
+    "Newsletter"
+  ],
+  "client": true,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/newsletter",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/newsletter.md",
+  "examples": [
+    {
+      "path": "examples/newsletter.tsx",
+      "content": "import { Newsletter } from \"@/components/site/newsletter\";\n\nexport function Site() {\n  return <Newsletter title=\"Changes, once a month\" description=\"New stores, new endpoints and what shipped.\" />;\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "newsletter"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/newsletter/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Newsletter",
+  "description": "A newsletter sign-up in one window: the heading and a line, then the work email and the blue key, thanking the reader in place.",
+  "surface": "site",
+  "kinds": [
+    "window",
+    "input",
+    "button-primary"
+  ],
+  "requires": [
+    "theme",
+    "button",
+    "field",
+    "input",
+    "window",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/newsletter.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { Field } from \"@/components/ui/field\";\nimport { Input } from \"@/components/ui/input\";\nimport { Window } from \"@/components/ui/window\";\nimport { cn } from \"@/lib/utils\";\n\n// The newsletter sign-up: one window (newsletter.signup) on the medium column, the heading and a line on the left, the\n// work email and the blue key on the right, stacking on phones. The form holds its state and thanks the reader in place;\n// wire onSubmit to your list.\nfunction Newsletter({ title, description, action = \"Subscribe\", thanks = \"Thanks. Check your inbox.\", onSubmit, className, ...props }: Omit<React.ComponentProps<\"div\">, \"title\" | \"onSubmit\"> & { title: React.ReactNode; description?: React.ReactNode; action?: React.ReactNode; thanks?: React.ReactNode; onSubmit?: (data: FormData) => void | Promise<void> }) {\n  const [sent, setSent] = React.useState(false);\n  const id = React.useId();\n  async function submit(event: React.FormEvent<HTMLFormElement>) {\n    event.preventDefault();\n    await onSubmit?.(new FormData(event.currentTarget));\n    setSent(true);\n  }\n  return (\n    <div data-slot=\"newsletter\" className={cn(\"mx-auto w-full max-w-(--ds-layout-medium)\", className)} {...props}>\n      <Window name=\"newsletter.signup\">\n        <div className=\"grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-end md:p-8\">\n          <div>\n            <h2 className=\"font-display text-h3 leading-snug font-medium tracking-tighter\">{title}</h2>\n            {description && <p className=\"mt-2 text-body-sm leading-relaxed text-fg-muted\">{description}</p>}\n          </div>\n          <form onSubmit={submit} className=\"grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end\">\n            <Field label=\"Work email\" htmlFor={`${id}-email`} required>\n              <Input id={`${id}-email`} name=\"email\" type=\"email\" autoComplete=\"email\" />\n            </Field>\n            <Button type=\"submit\">{action}</Button>\n            <p aria-live=\"polite\" className=\"text-body-sm text-fg-muted sm:col-span-2\">\n              {sent ? thanks : null}\n            </p>\n          </form>\n        </div>\n      </Window>\n    </div>\n  );\n}\n\nexport { Newsletter };\n"
+    }
+  ]
+}

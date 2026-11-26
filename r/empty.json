@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "name": "empty",
+  "useFor": "Use when a list, search or panel has nothing to show. Put it inside a Window (or use EmptyState) when it stands for a whole list. Give it EmptyMedia with variant icon and a lucide glyph, EmptyTitle, EmptyDescription and one action in EmptyContent.",
+  "constraints": [
+    "Illustrations that shout",
+    "More than one main action",
+    "Copy that blames the reader",
+    "An empty state without a way forward"
+  ],
+  "documentation": "",
+  "source": "Extrapolated from opencommerce (empty-state.tsx body, the merchant tiles in features.tsx)",
+  "exports": [
+    "Empty",
+    "EmptyContent",
+    "EmptyDescription",
+    "EmptyHeader",
+    "EmptyMedia",
+    "EmptyTitle"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/empty",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/empty.md",
+  "examples": [
+    {
+      "path": "examples/empty.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\nimport { Package, Search, Store } from \"lucide-react\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from \"@/components/ui/empty\";\nimport { Input } from \"@/components/ui/input\";\nimport { Window } from \"@/components/ui/window\";\n\nexport function Site() {\n  const [connected, setConnected] = useState(false);\n  return (\n    <Window name=\"orders.list\" className=\"mx-auto w-full max-w-2xl\">\n      {connected ? (\n        <p role=\"status\" className=\"px-6 py-12 text-center text-body-sm text-fg-muted\">\n          Waiting for your agent&apos;s first order.\n        </p>\n      ) : (\n        <Empty>\n          <EmptyHeader>\n            <EmptyMedia variant=\"icon\">\n              <Package strokeWidth={1.5} />\n            </EmptyMedia>\n            <EmptyTitle>No orders yet</EmptyTitle>\n            <EmptyDescription>Connect an agent and its first purchase will show up here, with every step from cart to delivery.</EmptyDescription>\n          </EmptyHeader>\n          <EmptyContent>\n            <Button onClick={() => setConnected(true)}>Connect an agent</Button>\n          </EmptyContent>\n        </Empty>\n      )}\n    </Window>\n  );\n}\n\nexport function NoResults() {\n  const [query, setQuery] = useState(\"Kohl’s outlet\");\n  const stores = [\"Amazon\", \"Target\", \"Best Buy\", \"Staples\", \"Wayfair\"].filter((s) => s.toLowerCase().includes(query.toLowerCase().trim()));\n  return (\n    <div className=\"mx-auto grid w-full max-w-2xl gap-4\">\n      <Input variant=\"search\" aria-label=\"Search merchants\" value={query} onChange={(e) => setQuery(e.target.value)} />\n      {stores.length ? (\n        <ul aria-live=\"polite\" className=\"grid\">\n          {stores.map((s) => (\n            <li key={s} className=\"border-b border-line py-3 text-body-sm\">\n              {s}\n            </li>\n          ))}\n        </ul>\n      ) : (\n        <Empty className=\"rounded-panel border border-line-window\">\n          <EmptyHeader>\n            <EmptyMedia variant=\"icon\">\n              <Search strokeWidth={1.5} />\n            </EmptyMedia>\n            <EmptyTitle>No merchant matches</EmptyTitle>\n            <EmptyDescription>Try the store&apos;s name as it appears on its site.</EmptyDescription>\n          </EmptyHeader>\n          <EmptyContent>\n            <Button variant=\"secondary\" onClick={() => setQuery(\"\")}>\n              Clear search\n            </Button>\n          </EmptyContent>\n        </Empty>\n      )}\n    </div>\n  );\n}\n\nexport function Plain() {\n  return (\n    <Empty>\n      <EmptyHeader>\n        <EmptyMedia>\n          <Store strokeWidth={1.25} className=\"size-8 text-fg-faint\" />\n        </EmptyMedia>\n        <EmptyTitle>No stores paused</EmptyTitle>\n        <EmptyDescription>Every route is healthy right now.</EmptyDescription>\n      </EmptyHeader>\n    </Empty>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "NoResults",
+        "Plain"
+      ],
+      "requires": [
+        "empty",
+        "button",
+        "input",
+        "window"
+      ],
+      "packages": [
+        "lucide-react"
+      ],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/empty/Site"
+        },
+        {
+          "name": "NoResults",
+          "url": "https://opencommerce-ds.vercel.app/preview/empty/NoResults"
+        },
+        {
+          "name": "Plain",
+          "url": "https://opencommerce-ds.vercel.app/preview/empty/Plain"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Empty",
+  "description": "A quiet centered message for an empty list: an optional merchant-tile mark, a display-face title, one muted line and the next action.",
+  "surface": "site",
+  "kinds": [
+    "window"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/empty.tsx",
+      "content": "import * as React from \"react\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { cn } from \"@/lib/utils\";\n\n// Nothing here yet, in the brand's quiet voice (the body of empty-state.tsx, globals.css .win): centered on white with\n// 48px of air (64px from 768px), an optional mark, the title in the 20px display face at 500 tracked tight, one line of\n// 14px Inter at 64 percent ink, at most 384px wide, then the next action. `icon` media is the merchant tile's shape: a\n// 40px white square with 6px corners on the 9 percent ink edge and a hairline drop, its 18px glyph in the blue. Put it\n// in a Window (as EmptyState does) when it stands for a whole list. Nothing moves.\nfunction Empty({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"empty\" className={cn(\"flex min-w-0 flex-1 flex-col items-center justify-center gap-5 px-6 py-12 text-center text-balance md:py-16\", className)} {...props} />;\n}\n\nfunction EmptyHeader({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"empty-header\" className={cn(\"flex max-w-sm flex-col items-center gap-3\", className)} {...props} />;\n}\n\nconst emptyMediaVariants = cva(\"mb-1 flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0\", {\n  variants: {\n    variant: {\n      default: \"bg-transparent\",\n      icon: \"size-10 rounded-card border border-line bg-surface text-fg-brand shadow-tile [&_svg:not([class*='size-'])]:size-4.5\",\n    },\n  },\n  defaultVariants: { variant: \"default\" },\n});\n\nfunction EmptyMedia({ className, variant = \"default\", ...props }: React.ComponentProps<\"div\"> & VariantProps<typeof emptyMediaVariants>) {\n  return <div data-slot=\"empty-media\" data-variant={variant} aria-hidden className={cn(emptyMediaVariants({ variant }), className)} {...props} />;\n}\n\nfunction EmptyTitle({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"empty-title\" className={cn(\"font-display text-h4 leading-snug font-medium tracking-tight text-fg\", className)} {...props} />;\n}\n\nfunction EmptyDescription({ className, ...props }: React.ComponentProps<\"p\">) {\n  return <p data-slot=\"empty-description\" className={cn(\"max-w-sm text-body-sm leading-relaxed text-pretty text-fg-muted [&>a]:text-fg-brand [&>a]:underline [&>a]:underline-offset-3\", className)} {...props} />;\n}\n\nfunction EmptyContent({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"empty-content\" className={cn(\"flex w-full max-w-sm min-w-0 flex-col items-center gap-3 text-body-sm text-balance\", className)} {...props} />;\n}\n\nexport { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle };\n"
+    }
+  ]
+}

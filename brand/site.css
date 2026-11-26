@@ -1,0 +1,84 @@
+/* The site layer: what every opencommerce page has before any component is styled, measured from the opencommerce
+   site. Defaults use :where() so the site's own rules still win. opencommerce has no markup touches: the page is
+   white throughout and blue is only ever an action, a label or an accent. */
+
+/* The display steps shrink on phones so a headline holds to three lines; the gutter narrows to 20px. */
+@media (max-width: 47.9375rem) {
+	:root {
+		--ds-text-display: 3.5rem;
+		--ds-text-hero: 2.5rem;
+		--ds-text-h1: 2.25rem;
+		--ds-text-h2: 2rem;
+		--ds-text-h3: 1.25rem;
+		--ds-layout-gutter: 1.25rem;
+	}
+}
+
+/* Element defaults sit in the base layer, so a utility class on an element (a library component's text-white) wins
+   over them; their :where() selectors already let an app's own rules win. */
+@layer base {
+	/* No rubber band at the top or bottom of the page. */
+	html,
+	body {
+		color: var(--ds-color-text-default);
+		background-color: var(--ds-color-bg-default);
+		overscroll-behavior: none;
+	}
+
+	body {
+		font-family: var(--ds-font-sans);
+		font-size: var(--ds-text-body);
+		line-height: var(--ds-leading-body);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	:where(h1, h2, h3, h4, h5, h6) {
+		font-family: var(--ds-font-display);
+		font-weight: var(--ds-font-weight-medium);
+		color: inherit;
+		letter-spacing: var(--ds-tracking-tight);
+		line-height: var(--ds-leading-snug);
+		text-wrap: balance;
+	}
+
+	:where(h1) {
+		line-height: var(--ds-leading-heading);
+		letter-spacing: var(--ds-tracking-hero);
+	}
+
+	:where(h2) {
+		line-height: var(--ds-leading-display);
+		letter-spacing: var(--ds-tracking-tighter);
+	}
+
+	:where(p, li, blockquote, figcaption, dd, td) {
+		text-wrap: pretty;
+	}
+
+	:where(code, kbd, pre, samp) {
+		font-family: var(--ds-font-mono);
+	}
+
+	/* Anything clickable gets the hand. */
+	:where(button:not(:disabled), [role="button"], [role="tab"], [role="radio"], summary) {
+		cursor: pointer;
+	}
+
+	::selection {
+		background-color: var(--ds-color-ring-tint);
+	}
+
+	:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+		outline: 2px solid var(--ds-color-focus-ring);
+		outline-offset: 2px;
+	}
+}
+
+/* A label in a window bar, a table head or a tag: the platform mono, small and muted. Sentence case, never caps. */
+.ds-label {
+	font-family: var(--ds-font-mono);
+	font-size: var(--ds-text-bar);
+	letter-spacing: var(--ds-tracking-label);
+	color: var(--ds-color-text-muted);
+}

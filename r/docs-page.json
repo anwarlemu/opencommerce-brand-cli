@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "name": "docs-page",
+  "useFor": "Use for a guide or reference page. Pass the article as children; put code in CodeWindow with copy.",
+  "constraints": [
+    "Code as an image",
+    "Headings in caps",
+    "More than one idea per heading"
+  ],
+  "documentation": "`DocsPage` props: `children` (the article; a sample guide by default). Composed from `SiteHeader`, `SiteSection`,\n`Prose`, `CodeWindow` and `SiteFooter`.",
+  "source": "Extension in the opencommerce site's voice, after legal-page (opencommerce-agentcard-web globals.css prose and .win code)",
+  "exports": [
+    "DocsPage"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/docs-page",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/docs-page.md",
+  "examples": [
+    {
+      "path": "examples/docs-page.tsx",
+      "content": "import { DocsPage } from \"@/components/blocks/docs-page\";\n\nexport function Block() {\n  return <DocsPage />;\n}\n",
+      "exports": [
+        "Block"
+      ],
+      "requires": [
+        "docs-page"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Block",
+          "url": "https://opencommerce-ds.vercel.app/preview/docs-page/Block"
+        }
+      ]
+    }
+  ],
+  "type": "block",
+  "title": "Docs page",
+  "description": "A docs article template with the header, the article on the text column (eyebrow, title, date, paragraphs, headings and code windows with the copy key), and the footer.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "prose",
+    "section",
+    "site-footer",
+    "site-header",
+    "code-window"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/blocks/docs-page.tsx",
+      "content": "import type * as React from \"react\";\n\nimport { Prose } from \"@/components/site/prose\";\nimport { SiteSection } from \"@/components/site/section\";\nimport { SiteFooter } from \"@/components/site/site-footer\";\nimport { SiteHeader } from \"@/components/site/site-header\";\nimport { CodeWindow } from \"@/components/ui/code-window\";\n\n// A docs article, in the legal page's voice: the glass header, the article on the 640px text column (the mono eyebrow,\n// the 48px title, the mono date), its paragraphs and headings in Prose, and its code in the code window with the copy\n// key, then the footer. Sample article; pass your own children.\n\nconst SIGNUP = \"https://app.agentcard.sh\";\nconst DOCS = \"https://docs.agentcard.sh\";\n\nconst LINKS = [\n  { label: \"Home\", href: \"/\" },\n  { label: \"Features\", href: \"/features\" },\n  { label: \"Pricing\", href: \"/pricing\" },\n  { label: \"Docs\", href: DOCS },\n];\n\nconst FOOTER = [\n  { title: \"Product\", links: [{ label: \"Features\", href: \"/features\" }, { label: \"Pricing\", href: \"/pricing\" }, { label: \"Changelog\", href: \"/changelog\" }] },\n  { title: \"Developers\", links: [{ label: \"Docs\", href: DOCS }, { label: \"SDK\", href: \"https://www.npmjs.com/package/@agentcard/sdk\" }] },\n  { title: \"Company\", links: [{ label: \"About\", href: \"/about\" }, { label: \"Careers\", href: \"/careers\" }, { label: \"Contact\", href: \"/contact\" }] },\n];\n\nconst INSTALL = `npm install @agentcard/sdk`;\nconst CALL = `const order = await agentcard.purchase({\n  store: \"acme-supply\",\n  item: \"Cup\",\n});`;\n\nexport function DocsPage({ children }: { children?: React.ReactNode }) {\n  return (\n    <div className=\"bg-surface text-fg\">\n      <SiteHeader href=\"/\" links={LINKS} spy={false} action={{ label: \"Get started\", href: SIGNUP }} />\n      <main>\n        <SiteSection>\n          <Prose eyebrow=\"Guides\" title=\"Make your first purchase\" meta=\"Updated November 2026\">\n            {children ?? (\n              <>\n                <p>An agent buys with one call: name the store and the item, and the order comes back as data.</p>\n                <h2>Install the SDK</h2>\n                <CodeWindow title=\"terminal\" code={INSTALL} copy />\n                <h2>Buy something</h2>\n                <CodeWindow title=\"agent.ts\" code={CALL} copy highlight={[1]} />\n                <p>The call returns when the store confirms the order. Track it from the same endpoint.</p>\n              </>\n            )}\n          </Prose>\n        </SiteSection>\n      </main>\n      <SiteFooter description=\"The open router for commerce. Buy from any online store from a single endpoint.\" legal={<span>© 2026 Agentcard, Inc.</span>} groups={FOOTER} />\n    </div>\n  );\n}\n"
+    }
+  ]
+}

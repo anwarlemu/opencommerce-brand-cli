@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "name": "card",
+  "useFor": "Use default for a small group of related lines. Use raised for a card set on a picture (an order, a receipt). For code, plans and features use Window: the brand names its containers like files.",
+  "constraints": [
+    "Gray card backgrounds",
+    "Heavy or offset shadows",
+    "Cards inside cards",
+    "Rounded corners above 8px"
+  ],
+  "documentation": "",
+  "source": "opencommerce-agentcard-web src/app/globals.css (.feat-tile, .feat-order)",
+  "exports": [
+    "Card",
+    "CardHeader",
+    "CardFooter",
+    "CardTitle",
+    "CardAction",
+    "CardDescription",
+    "CardContent",
+    "cardVariants"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/card",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/card.md",
+  "examples": [
+    {
+      "path": "examples/card.tsx",
+      "content": "import { Badge } from \"@/components/ui/badge\";\nimport { Card, CardDescription, CardHeader, CardTitle } from \"@/components/ui/card\";\n\nexport function Site() {\n  return (\n    <div className=\"grid gap-5 sm:grid-cols-2\">\n      <Card>\n        <CardHeader>\n          <CardTitle>Every merchant</CardTitle>\n          <CardDescription>One endpoint reaches any online store: catalog search, checkout and order tracking.</CardDescription>\n        </CardHeader>\n      </Card>\n      <Card>\n        <CardHeader>\n          <CardTitle>Warmed routes</CardTitle>\n          <CardDescription>The stores your agents buy from most are kept warm, so a purchase finishes in seconds.</CardDescription>\n        </CardHeader>\n      </Card>\n    </div>\n  );\n}\n\n// The order card, set on a feature's picture.\nexport function Raised() {\n  return (\n    <div className=\"flex justify-center rounded-panel border border-line bg-surface px-6 py-10\">\n      <Card variant=\"raised\" className=\"w-full max-w-75\">\n        <div className=\"flex items-center justify-between border-b border-line pb-2.5 font-mono text-bar text-fg-muted\">\n          <span>Order · Amazon</span>\n          <Badge variant=\"brand\">Confirmed</Badge>\n        </div>\n        <ol className=\"mt-1 grid gap-2 text-body-sm\">\n          {[\n            [\"Cart\", \"2 items · $48.20\"],\n            [\"Payment\", \"Visa ···· 4832\"],\n            [\"Confirmed\", \"#A-10293\"],\n          ].map(([step, detail]) => (\n            <li key={step} className=\"flex items-baseline justify-between gap-3\">\n              <span>{step}</span>\n              <span className=\"font-mono text-bar text-fg-muted\">{detail}</span>\n            </li>\n          ))}\n        </ol>\n      </Card>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site",
+        "Raised"
+      ],
+      "requires": [
+        "card",
+        "badge"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/card/Site"
+        },
+        {
+          "name": "Raised",
+          "url": "https://opencommerce-ds.vercel.app/preview/card/Raised"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Card",
+  "description": "Container for related content, with default and raised variants.",
+  "surface": "site",
+  "kinds": [
+    "card",
+    "card-raised",
+    "card-title"
+  ],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "components/ui/card.tsx",
+      "content": "import * as React from \"react\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The brand's cards (globals.css .feat-tile, .feat-order; computed). `default` is the small white card: a 9 percent ink\n// edge, 6px corners and a hairline drop. `raised` is the card set on a picture (the order card): 8px corners and a\n// firmer, longer drop. For anything with a name of its own (code, a plan, a feature), use a Window instead.\nconst cardVariants = cva(\"flex flex-col border border-line bg-surface text-fg\", {\n  variants: {\n    variant: {\n      default: \"gap-2 rounded-card p-6 shadow-tile\",\n      raised: \"gap-2 rounded-control px-3.5 pt-3 pb-3.5 shadow-raised\",\n    },\n  },\n  defaultVariants: { variant: \"default\" },\n});\n\nfunction Card({ className, variant, ...props }: React.ComponentProps<\"div\"> & VariantProps<typeof cardVariants>) {\n  return <div data-slot=\"card\" className={cn(cardVariants({ variant }), className)} {...props} />;\n}\n\nfunction CardHeader({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-header\" className={cn(\"grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 has-data-[slot=card-action]:grid-cols-[1fr_auto]\", className)} {...props} />;\n}\n\n// 20px display at 500, tracked tight (.h-card).\nfunction CardTitle({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-title\" className={cn(\"font-display text-h4 leading-snug font-medium tracking-tight text-fg\", className)} {...props} />;\n}\n\n// 16px Inter at 64 percent ink.\nfunction CardDescription({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-description\" className={cn(\"text-body leading-relaxed text-fg-muted\", className)} {...props} />;\n}\n\nfunction CardAction({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-action\" className={cn(\"col-start-2 row-span-2 row-start-1 self-start justify-self-end\", className)} {...props} />;\n}\n\nfunction CardContent({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-content\" className={cn(\"text-body-sm text-fg\", className)} {...props} />;\n}\n\nfunction CardFooter({ className, ...props }: React.ComponentProps<\"div\">) {\n  return <div data-slot=\"card-footer\" className={cn(\"mt-auto flex items-center gap-3 pt-3\", className)} {...props} />;\n}\n\nexport { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent, cardVariants };\n"
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "logo",
+  "useFor": "Use Lockup in headers and footers (compact once the header scrolls), and LogoMark in tight spots: an app icon, an avatar, a favicon-sized slot. Set label={null} when the containing link already has an accessible name.",
+  "constraints": [
+    "The name set in another face or weight",
+    "The name capitalized",
+    "The byline larger than the name",
+    "The mark stretched or outlined",
+    "A drop shadow or glow behind the logo"
+  ],
+  "documentation": "`Lockup` takes every span prop plus `label` (string or null, default \"opencommerce by Agentcard\"), `tone` (\"ink\" |\n\"brand\" | \"white\" | \"current\", default \"ink\"), `byline` (default true) and `compact` (folds the byline away over 250ms).\nIt is type, so size it with a text size on the name (`[&>[data-logo-name]]:text-h3`); the default is the header's 17px.\n\n`LogoMark` takes every SVG prop plus `label` (default \"opencommerce\") and `tone` (the square's color: \"brand\" by default;\n\"white\" draws a white square with blue strokes). Size it by width (`w-8`).",
+  "source": "opencommerce-agentcard-web src/components/logo.tsx, src/app/icon2.svg; brand/logo (lockup.svg, mark.svg)",
+  "exports": [
+    "Lockup",
+    "LogoMark",
+    "LogoProps",
+    "LockupProps"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/logo",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/logo.md",
+  "examples": [
+    {
+      "path": "examples/logo.tsx",
+      "content": "import { Lockup, LogoMark } from \"@/components/ui/logo\";\n\nexport function Site() {\n  return (\n    <div className=\"grid gap-6 sm:grid-cols-2\">\n      <div className=\"flex min-h-40 flex-col items-start justify-center gap-6 rounded-panel border border-line bg-surface p-8\">\n        <Lockup />\n        <Lockup byline={false} />\n        <Lockup className=\"[&>[data-logo-name]]:text-h3\" />\n      </div>\n      <div className=\"flex min-h-40 items-center gap-4 rounded-panel border border-line bg-subtle p-8\">\n        <LogoMark />\n        <LogoMark className=\"w-6\" />\n        <LogoMark tone=\"ink\" />\n      </div>\n    </div>\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "logo"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/logo/Site"
+        }
+      ]
+    }
+  ],
+  "type": "ui",
+  "title": "Logo",
+  "description": "The typeset opencommerce lockup with its byline, and the [*] mark.",
+  "surface": "site",
+  "kinds": [],
+  "requires": [
+    "theme",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/ui/logo.tsx",
+      "content": "import * as React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// The brand's logo (logo.tsx, icon2.svg; brand/logo). The lockup is typeset, not drawn: the name in the display face at\n// 17px, 500 and tracked tight, with \"by Agentcard\" beside it at 12px in 64 percent ink. `compact` folds the byline away\n// (the header does once the page scrolls: width, opacity and margin over 250ms ease-out); `byline={false}` leaves it out.\n// The mark is the [*] in white on a blue square with rounded corners, for tight spots (an app icon, an avatar, a tab).\n// `tone` picks one of the brand's colors: ink (the default for the lockup), blue, white, or the text color around it.\nconst TONES = {\n  current: \"\",\n  brand: \"text-fg-brand\",\n  white: \"text-white\",\n  ink: \"text-fg\",\n} as const;\n\ntype Tone = keyof typeof TONES;\n\ntype LogoProps = {\n  /** The accessible name. Pass null when a link around the logo already names it (then the logo is hidden from readers). */\n  label?: string | null;\n  tone?: Tone;\n};\n\ntype LockupProps = Omit<React.ComponentProps<\"span\">, \"children\"> &\n  LogoProps & {\n    /** Show \"by Agentcard\" beside the name (default true). */\n    byline?: boolean;\n    /** Fold the byline away, as the header does once the page scrolls. */\n    compact?: boolean;\n  };\n\n/** The lockup: the name and its byline, typeset. Size it with a text size on the name (the default is 17px). */\nfunction Lockup({ label = \"opencommerce by Agentcard\", tone = \"ink\", byline = true, compact = false, className, ...props }: LockupProps) {\n  return (\n    <span\n      data-slot=\"lockup\"\n      role={label ? \"img\" : undefined}\n      aria-label={label ?? undefined}\n      aria-hidden={label ? undefined : true}\n      className={cn(\"inline-flex shrink-0 items-baseline font-display leading-none whitespace-nowrap\", TONES[tone], className)}\n      {...props}\n    >\n      <span data-logo-name className=\"text-h5 font-medium tracking-tight\">\n        opencommerce\n      </span>\n      {byline && (\n        <span\n          className={cn(\n            \"overflow-x-clip text-caption transition-[max-width,opacity,margin] duration-250 ease-out motion-reduce:transition-[opacity]\",\n            tone === \"white\" ? \"text-fg-on-brand-muted\" : \"text-fg-muted\",\n            compact ? \"ml-0 max-w-0 opacity-0\" : \"ml-1.5 max-w-25 opacity-100\",\n          )}\n        >\n          by Agentcard\n        </span>\n      )}\n    </span>\n  );\n}\n\n/** The mark alone: the [*] on a blue square. Size it by width (w-8); the height follows. */\nfunction LogoMark({ label = \"opencommerce\", tone = \"brand\", className, ...props }: Omit<React.ComponentProps<\"svg\">, \"children\"> & LogoProps) {\n  return (\n    <svg\n      data-slot=\"logo-mark\"\n      viewBox=\"0 0 32 32\"\n      role={label ? \"img\" : undefined}\n      aria-label={label ?? undefined}\n      aria-hidden={label ? undefined : true}\n      focusable=\"false\"\n      className={cn(\"block h-auto w-8 shrink-0\", TONES[tone], className)}\n      {...props}\n    >\n      <rect width=\"32\" height=\"32\" rx=\"7\" className=\"fill-current\" />\n      <g className={cn(\"fill-none [stroke-linecap:square] [stroke-width:2.4]\", tone === \"white\" ? \"stroke-brand\" : \"stroke-white\")}>\n        <path d=\"M9.5 8.5H7.25v15H9.5M22.5 8.5h2.25v15H22.5\" />\n        <path d=\"M16 11v10M11.67 13.5l8.66 5M11.67 18.5l8.66-5\" />\n      </g>\n    </svg>\n  );\n}\n\nexport { Lockup, LogoMark };\nexport type { LogoProps, LockupProps };\n"
+    }
+  ]
+}

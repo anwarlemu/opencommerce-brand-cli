@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "name": "stats",
+  "useFor": "Use for two to four figures that matter (orders a day, stores reached). Pass stats with value, label and an optional window name.",
+  "constraints": [
+    "Figures nobody can check",
+    "More than four in a row",
+    "Blue figures"
+  ],
+  "documentation": "`Stats` props: `title`, `description`, `stats` (`{ value, label, name? }[]`), plus div props.",
+  "source": "Extension in the opencommerce site's voice (the live numbers in monitoring.tsx and features.tsx, globals.css .win)",
+  "exports": [
+    "Stats",
+    "Stat"
+  ],
+  "client": false,
+  "docsUrl": "https://opencommerce-ds.vercel.app/components/stats",
+  "markdownUrl": "https://opencommerce-ds.vercel.app/r/stats.md",
+  "examples": [
+    {
+      "path": "examples/stats.tsx",
+      "content": "import { Stats } from \"@/components/site/stats\";\n\nexport function Site() {\n  return (\n    <Stats\n      title=\"Built for volume\"\n      stats={[\n        { value: \"1,200+\", label: \"Stores an agent can buy from\", name: \"stores.live\" },\n        { value: \"3 s\", label: \"From request to confirmed order\", name: \"checkout.live\" },\n        { value: \"99.9%\", label: \"Uptime over the last 90 days\", name: \"uptime.live\" },\n      ]}\n    />\n  );\n}\n",
+      "exports": [
+        "Site"
+      ],
+      "requires": [
+        "stats"
+      ],
+      "packages": [],
+      "previews": [
+        {
+          "name": "Site",
+          "url": "https://opencommerce-ds.vercel.app/preview/stats/Site"
+        }
+      ]
+    }
+  ],
+  "type": "site",
+  "title": "Stats",
+  "description": "Figures in windows: the number in the display face, its label under it, in a row that wraps, under an optional heading.",
+  "surface": "site",
+  "kinds": [
+    "window",
+    "stat"
+  ],
+  "requires": [
+    "theme",
+    "section",
+    "window",
+    "utils"
+  ],
+  "packages": [],
+  "files": [
+    {
+      "path": "components/site/stats.tsx",
+      "content": "import * as React from \"react\";\n\nimport { SectionHeading } from \"@/components/site/section\";\nimport { Window } from \"@/components/ui/window\";\nimport { cn } from \"@/lib/utils\";\n\n// Figures, as the site sets its live numbers: each in a window (its name file-like, the figure in the display face at\n// 500 tracked tight, its label in Inter at 64 percent ink), in a row that wraps on phones, under an optional heading.\ntype Stat = { value: React.ReactNode; label: React.ReactNode; name?: string };\n\nfunction Stats({ title, description, stats, className, ...props }: Omit<React.ComponentProps<\"div\">, \"title\"> & { title?: React.ReactNode; description?: React.ReactNode; stats: Stat[] }) {\n  return (\n    <div data-slot=\"stats\" className={cn(\"w-full\", className)} {...props}>\n      {title && <SectionHeading title={title} description={description} />}\n      <ul className={cn(\"grid gap-4 sm:grid-cols-2\", stats.length > 2 && \"lg:grid-cols-3\", stats.length > 3 && \"lg:grid-cols-4\")}>\n        {stats.map((stat, i) => (\n          <li key={stat.name ?? i}>\n            <Window name={stat.name ?? `figure-${i + 1}.live`} bodyClassName=\"px-6 py-7\">\n              <p className=\"font-display text-h1 leading-none font-medium tracking-hero\">{stat.value}</p>\n              <p className=\"mt-3 text-body-sm leading-relaxed text-fg-muted\">{stat.label}</p>\n            </Window>\n          </li>\n        ))}\n      </ul>\n    </div>\n  );\n}\n\nexport { Stats };\nexport type { Stat };\n"
+    }
+  ]
+}

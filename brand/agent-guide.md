@@ -1,0 +1,269 @@
+# {{brand}} design system: instructions for agents
+
+Use this system to build {{brand}} pages and interfaces from the user's brief. These instructions work with any agent that can read text and edit project files. The CLI is a local Node.js tool; no model account or agent-specific integration is needed for setup, discovery, installation or token checks.
+
+## Start here
+
+1. Read the project instructions and package.json. Identify the framework, package manager, stylesheet and import aliases. Use the user's requirements to decide whether to build new UI or restyle existing UI.
+2. Read this guide, then the relevant component references. The library is at {{registry}}/components. Plain text is at {{registry}}/llms.txt; a complete copy is at {{registry}}/llms-full.txt.
+3. Run `{{cli}} manifest --json` (or `describe --json`) before inventing anything. It lists every command, token, font, logo, template, size, component and rule. Unknown names are errors.
+4. Reuse the library's components and variants. Do not recreate them from screenshots or guess their props. `{{cli}} component inspect <name> --json` returns the props and states that exist. `{{cli}} component emit` returns example code or JSX for values you checked.
+
+## I need X
+
+| I need | Run |
+| --- | --- |
+| A link preview, social post, story, banner or ad (X, LinkedIn, Instagram, Facebook, Threads, Pinterest, YouTube, the IAB ads) | `{{cli}} image <template> --size <id>` (`image templates --json` lists both) |
+| Several posts in a set | `{{cli}} image carousel slides.json` |
+| To change an image until it is right | `{{cli}} design new <template> ...`, then `design revise <file> "..."` |
+| A layout no template has (a stat card, a chart, a comparison, a quote card) at any size | `{{cli}} design new compose --size <id>`, then `design compose add <file> <block> ...` |
+| A profile picture | `{{cli}} image avatar` |
+| Favicons, app icons and the default share image | `{{cli}} icons` |
+| Slides | `{{cli}} deck --input deck.json` (cover, section, statement, bullets, stat, quote, image, end, agenda, team, timeline, chart, comparison, qa) |
+| A one-pager, report cover, letterhead, business card, certificate, badge or name tag | `{{cli}} merch <item> --format pdf,png` |
+| Merch | `{{cli}} merch <item>` (`merch --list`) |
+| A clip, a loop, a GIF, a logo reveal or a counting figure | `{{cli}} video <template> --size <id> [--format gif]` |
+| A wallpaper, a meeting background or the brand art at any size | `{{cli}} illustrate <subject> --size meeting|desktop|phone-wallpaper|WxH` |
+| An email | `{{cli}} email announcement|newsletter|receipt|password-reset` |
+| A component or section for a site | `{{cli}} component list`, then `add <names...>` |
+| A whole page | `{{cli}} design page compose outline.json --flavor react,html` |
+
+Nothing here invents copy: every command draws only the words you pass (`--sample` fills sample words on purpose).
+
+## Install and prepare a project
+
+Requires Node.js 20 or later. Run commands from the consuming project root, not the design-system repository.
+
+```sh
+npm install --save-dev {{source}}
+{{cli}} init
+```
+
+`npm install` installs the CLI only. `init` installs styles, fonts and agent instructions without converting existing components or creating conversion review tasks. It preserves other instructions already in the project. Inspect its warnings about a missing stylesheet or alias.
+
+React components require React 19 or later, Tailwind CSS 4 and a working build. The installer follows components.json and TypeScript or JavaScript aliases; without aliases, it uses relative imports. Set up that framework first. Other frameworks can use the CSS tokens and styling guidance, but cannot render the React components.
+
+For an existing interface that the user wants restyled, preview the explicit apply command:
+
+```sh
+npx -y {{source}} apply --dry-run
+npx -y {{source}} apply
+```
+
+The apply command can adapt matching components, convert style values, and install agent rules and hooks. Color conversion is scoped to recognized components; unrelated palettes and artwork remain unchanged. The legacy bare command also converts styles; use explicit commands for setup and discovery. Subsequent runs resume review tasks. `--redo` repeats conversion. Review the diff and test existing behavior after conversion; a successful exit is not proof that the visual review is complete.
+
+## Find, inspect and add components
+
+```sh
+{{cli}} list --json
+{{cli}} show select
+{{cli}} show select --json
+{{cli}} add field select button --dry-run --json
+{{cli}} add field select button --json
+```
+
+The add command above is an example, not the list required for every page. Choose items from `list`. `show` is read-only and works offline using the registry bundled with the CLI. `show --json` returns source, examples, usage rules, exports, dependencies and links. Hooks and helper libraries are included in the JSON index.
+
+`add` copies source files and their transitive dependencies, installs missing npm packages, and wires the theme. Existing files are kept. Use `--overwrite` only when intentionally replacing local component changes. Read the returned file list and warnings. Generated imports and target files follow components.json and the project alias configuration. Existing utility files are preserved; brand helpers use their own names.
+
+For HTTP-only agents, fetch `{{registry}}/r/index.json`, then `{{registry}}/r/<name>.json` or `{{registry}}/r/<name>.md`. Follow `requires` recursively. Each `files[].path` is relative to the source root; `files[].content` is the exact source. Each example lists its own `requires` and `packages`; install these too when using that example. Do not copy the example file as the component implementation. The CLI handles dependency ordering and theme installation for you.
+
+The component reference states its source. `{{registry}}/r/audit.json` records the reference basis for all components. Some controls extend the site's patterns because the opencommerce site has no standalone equivalent (a select, a dialog, a toast); they use its fields, windows and keys. Do not describe extensions as exact copies of live controls.
+
+## Compose the interface
+
+- Follow the user's brief. For new pages, add the required content and behavior. When only restyling an existing page, preserve its content, links, order and behavior unless the user requests changes.
+- Use component props and variants shown in the source. Read the named example functions before composing compound components. Keep client state inside a client component when using Next.js; imports of client components can still be rendered by server pages.
+- Use design tokens for custom styles. `{{cli}} tokens <term> --json` finds values; `{{cli}} look <element-or-file> --json` explains styling by role. Use `var(--ds-*)` in CSS or the matching Tailwind utilities.
+- Body text, buttons and links use Inter; headings use the display font stack; code, window bars and tags use the platform monospace. Keep one white page; use the provided flat keys, windows with mist bars and the [*] mark, glass header trays and the *@ glyph field (behind windows only). Do not introduce unrelated colors, shadows or type scales.
+- The installed stylesheet imports `./_{{bin}}/brand.css` and `./_{{bin}}/theme.css` beside the main stylesheet. `brand.css` includes tokens and base styles. Keep both imports after `@import "tailwindcss"`. Let the installer configure fonts; do not add a second font loader.
+- Put one control in each Field. Field connects labels, help, errors and required state. Validation and submission belong to your form. For Select use `value` and `onValueChange`, SelectTrigger with SelectValue, and SelectContent with SelectItem; values must be non-empty strings. Give the root a `name` for FormData. Use `defaultValue` only for uncontrolled input.
+- Connect every action to its intended behavior. Handle empty, loading, disabled, invalid, success and error states. Preserve keyboard controls, focus return, accessible names and native form semantics. Never present a preview's local demo action as a completed backend operation.
+- Use the provided portal behavior. Surface is for an isolated preview or a scoped theme; ordinary pages do not need an extra Surface wrapper. Mount one Toaster per application when using toast notifications.
+
+## Render images
+
+The CLI renders share images, social posts, banners and profile pictures from copy you pass in. It does not open a browser. Colors, type and the logo come from the brand tokens and the bundled fonts and marks.
+
+```sh
+{{cli}} image templates --json
+{{cli}} image lead --size og --headline "..." --body "..." --out og.png --json
+{{cli}} image hero --size og,x-banner,linkedin --badge "Product by Agentcard" --headline "..." --body "..." --out ./images
+{{cli}} image window --size square --headline "..." --image ./screen.png --label screen.png
+{{cli}} image cards --size portrait --headline "..." --content cards.json
+{{cli}} image avatar
+{{cli}} image carousel slides.json --size portrait
+```
+
+Only the copy you pass is drawn, and it is drawn whole: text steps down and wraps again to a readable floor, and copy that still does not fit is an error that says what to shorten. Unset slots are left out. `--sample` fills sample copy on purpose. A slot a template does not draw is an error, and so is a character no bundled face has (the faces cover Latin, Greek and Cyrillic, with no emoji).
+
+Templates: `hero` (badge, headline and line centered, a window under them with `--code` or `--image`), `window` (words beside a window), `closing` (the mist card with the lockup and keys), `cards` (`--cards` with blank lines between cards, heading first), `headline`, `lead`, `frame` (a window with `--image`, `--code` or `--body`), `quote` (`--body` and `--by`), `announcement` (badge, headline and `--action`) and `avatar` (the mark). Slots: `--headline --body --badge --label --by --action --secondary --code --highlight --cards --footer --image`; `--title`, `--text` and `--chip` still work. Themes are `white` and `mist` (`--theme`, or `--ground`).
+
+Sizes: `og`, `square`, `portrait`, `story`, `landscape`, `x-banner`, `linkedin`, `linkedin-banner`, `linkedin-page`, `youtube`, `youtube-thumbnail`, `email`, `avatar`, `WIDTHxHEIGHT` or `--width` and `--height` (200 to 4000). `--size a,b,c` and `--size all` draw several. Words, logos and keys stay out of what each platform covers or crops (a profile picture, a story's bars); `image templates --json` lists the zones, which are official and which approximate. `--format` is `png`, `svg`, `jpg`, `webp`, `pdf` or several; a file over the platform's upload limit is a warning. `--out` is one file or a directory. Pictures may be PNG, JPEG, WebP, GIF or SVG and are shown whole; one too tall for a hero fades into the ground.
+
+`image carousel` takes `{ "size": "portrait", "slides": [ { "template": "headline", "headline": "..." } ] }` and writes one numbered image per slide, with one headline size per template.
+
+`--json` prints the files written. SVG text is outlined, so the file does not need the fonts installed. Headings and the wordmark use the bundled Helvetica-compatible display face, because Neue Haas Grotesk Display is not redistributable. The same inputs write the same bytes.
+
+## Any layout, never only the templates
+
+The templates are starting points, not limits. When a person asks for an arrangement no template has, make it:
+
+- **Ads and posts from a brief:** `{{cli}} design ad brief.md` lays the brief's parts (headline, supporting line, label,
+  stat, quote, search prompt, plan, offer, features, pictures, button) out on the brand's grid in its own blocks. A
+  `## Layout` section says how in plain words, one row per line from the top, parts side by side split by commas:
+  `headline top left`, `stat left, quote right`, `three photos in a row`, `button bottom right`. Without one it makes
+  stacked, centered and two-column arrangements of every part. Each result passes the brand check and is a design file.
+- **Any graphic at any size:** `{{cli}} design new compose --size <size>`, then
+  `{{cli}} design compose add|move|span|remove|order <file> ...` puts any of the brand's blocks (`{{cli}} design --help`
+  lists them) on any cells. `{{cli}} design revise <file> "stat on the right, bigger headline"` takes plain words.
+- **A template, rearranged:** start from a template and revise or move its parts; nothing stays in the template's
+  arrangement unless the person wants it.
+- **Pages and sections:** `{{cli}} design page compose outline.json` builds a page from the brand's sections in any
+  order, and the library's components combine freely in code.
+
+Only the brand's rules are fixed (its colors, type, logo, contrast and clear space); the arrangement is whatever the
+person asks for.
+
+## Revising a design
+
+When someone will want changes, make a design instead of a one-off image. It is a small JSON file that remembers the copy, the settings and every change.
+
+```sh
+{{cli}} design new hero --size x-banner --headline "..." --body "..." -o banner
+{{cli}} design revise banner "bigger headline, show the logo, logo top right, darker theme"
+{{cli}} design edit banner --set headline="..." --layer headline.dx=0.03 --hide badge --theme mist --size og
+{{cli}} design undo banner
+{{cli}} design variants banner --by theme
+{{cli}} design sizes banner --to og,square,story,x-banner
+{{cli}} design compare banner banner-mist
+{{cli}} design render banner --format svg,pdf
+{{cli}} design check banner --json
+```
+
+1. Make it, then look at the PNG beside the file.
+2. Turn what the person said into edits. `revise` reads plain words by rules (copy in quotes); a part it does not understand changes nothing and lists what you can say. `edit` is exact; use it when you reason about the change yourself. `show` lists the layers, where they were drawn and what each can do.
+3. Every write is checked: whole words, nothing invented, brand colors, contrast, the logo's size and clear space, overlaps, safe areas, cuts, readable text. Errors block the write and change nothing. `--allow <rule>` accepts a composition rule; brand rules are never allowed.
+4. Look again, and repeat until the person is happy. `undo` and `redo` step through; `history` lists the steps.
+
+Edits happen inside the layout: a bigger headline wraps again, the glyph field keeps clear, a window makes room. Never hand-edit the PNG or SVG. Slides (`slide-cover`...), print files (`merch-tee-back`...), illustrations (`illustration-field`...) and clips (`video-hero`...) work the same way: `design templates` lists them. Images and slides take layer edits; the others take copy, theme, options, size and seed. A print PNG is drawn at 100 px per inch; `design render <file> --scale 3` gives 300.
+
+## Read the brand system
+
+These commands only report what is in the package. They do not invent a token, a font file or a logo.
+
+```sh
+{{cli}} manifest --json
+{{cli}} brand system --json
+{{cli}} brand tokens --group color --json
+{{cli}} brand tokens --name=--ds-color-brand --json
+{{cli}} brand fonts --json
+{{cli}} brand logos --json
+{{cli}} brand voice --json
+{{cli}} principles --json
+{{cli}} principles --surface product --json
+```
+
+`brand tokens --group` accepts `color`, `type`, `space`, `radius`, `motion` and `shadow`. `--name` must be the exact token, passed as `--name=--ds-color-brand` so the leading dashes are not read as a flag. `tokens <term>` still searches by substring, and a term that matches nothing is an error.
+
+Fonts: Inter and JetBrains Mono are bundled, with their license files. The display face named in the tokens is not bundled. Renderers use the substitute face named by `brand fonts`. Do not download or invent a display font file.
+
+Logos: `brand logos` returns the mark and the lockup, their files, and the do and do-not rules. There is no other logo file.
+
+Voice: follow `brand voice`. The banned word list is closed. The product name stays lowercase.
+
+Principles: `site` is the page system. `product` explains that this brand has no separate product theme. Build product UI with the site tokens and the registry. Do not invent a dark product palette.
+
+## Use the component library
+
+```sh
+{{cli}} component list --json
+{{cli}} component list --type ui --json
+{{cli}} component inspect button --json
+{{cli}} component emit button --state Site --json
+{{cli}} component emit button --props '{"variant":"secondary","size":"sm"}' --text "Read the docs" --json
+```
+
+`component list` is the full catalog. `list` and `search` filter that catalog by words. `inspect` returns exports, parsed props, example state names, constraints and source. `emit --state` copies that example. `emit --props` checks every key and value against the parsed schema and errors on anything unknown. Pass `--text` for the child text. Do not pass `--state` and `--props` together. If a component has no parsed prop schema, emit a state instead of inventing JSX.
+
+`show` and `view` remain the full registry record. Prefer `inspect` and `emit` when you need props and a snippet.
+
+## Compose and pages
+
+`design new compose --size <id>` starts an empty design built from the brand's blocks on a 12 by 12 grid inside the platform's safe area: headline, body, badge, logo, button, picture, window (code), art (the field, the mark, the orbit), panel, card, cards, stat, quote, list, chart (bar, line or donut from "Label 12, Label 30"), table (cells separated by |), divider and icon. `design compose add <file> <block> ["words"] --place top-left` (or `--at col,row,cols,rows`), `compose move|remove|order|span|grid`, and plain words ("add a stat "42%" top right", "send the art to the back") all work, with the same check, undo, variants and sizes. Every image template can be rebuilt from blocks.
+
+`design page compose outline.json --flavor react,html` writes a whole page from the site's sections in order (header, hero, page-header, features, steps, pricing, testimonials, logos, stats, newsletter, faq, prose, cta, footer): React from the library (add the components it lists) and a plain HTML file with the brand stylesheet. The outline is checked first; only its words go on the page.
+
+## Make slides, print files and illustrations
+
+```sh
+{{cli}} deck --list
+{{cli}} deck --input deck.json --out deck          # a PNG per slide and deck.pdf
+{{cli}} deck cover --title "..." --body "..."
+{{cli}} merch --list
+{{cli}} merch tee-front --out merch                # SVG at physical size and a 300 dpi PNG
+{{cli}} merch tee-back --headline "..." --code "..."  # words and code only when you pass them
+{{cli}} merch sticker --guides                     # trim and safe lines for proofing
+{{cli}} illustrate --list
+{{cli}} illustrate field --size 1500x500 --seed 7
+{{cli}} illustrate halftone --image ./photo.png
+```
+
+Slides are `cover`, `section`, `statement`, `bullets`, `stat`, `quote`, `image` and `end`, each a layout of the image tool at 1920x1080. `deck.json` holds `{ "slides": [ { "type": "cover", "title": "..." } ] }`; unknown slots error. Slides draw only the copy they are given (`"sample": true` or `--sample` fills the rest). Merch items are print files only (no mockups) with bleed and safe area; sizes are common vendor print areas, so confirm with the vendor. The brand has one ground, so merch prints on white or light blanks, and logos are the files in `brand/logo/` as drawn. Illustrations follow `brand/illustration.md`: glyphs on a lattice, faint ink, blue only where the site puts it.
+
+## Work in Figma
+
+The CLI never calls Figma. Each action writes files and prints the Figma MCP calls to make, in order.
+
+```sh
+{{cli}} figma tokens                               # variables JSON and use_figma scripts
+{{cli}} figma push illustration field              # also asset, slide, component, page
+{{cli}} figma pull "https://figma.com/design/<key>/x?node-id=1-2"
+{{cli}} figma check figma/variables-1-2.json figma/design-1-2.txt
+```
+
+`figma check` lists every off-brand color, font, size, radius and space with the nearest token and exits 1 when there are any. Build from library components and tokens, never the raw Figma values.
+
+## Render a short video
+
+`video` renders a short mp4 or webm. It does not open a browser. Frames are SVG from the same tokens, bundled fonts and logo files as `image`, rasterized with system fonts off, then encoded with the pinned ffmpeg build and bitexact flags. The same inputs write the same bytes.
+
+```sh
+{{cli}} video templates --json
+{{cli}} video --template social --size square --headline "..." --body "..." --out clip.mp4 --json
+{{cli}} video --template announcement --size vertical --headline "..." --badge "Now available" --action "Get started" --json
+{{cli}} video --template product --size landscape --label order.ts --code "const order = { sku: \"cup\" }" --json
+```
+
+Templates are `social`, `announcement` and `product` (2 seconds at 12 fps), `hero`, `window`, `closing` and `cards` (the image tool's layouts, 4 seconds at 30 fps: they play in once on the ease-out token, staggered 60ms, and rest while the glyph field drifts as the site's does), `field` (6 seconds at 12 fps, the site's drift) and `mark` and `orbit` (6 seconds at 30 fps, the hero's swaying [*]). Sizes are `square` (1080x1080), `vertical` (1080x1920, 9:16) and `landscape` (1920x1080, 16:9). `--template` and `--size` are required; copy works as it does for images (only what you pass, whole; `--sample` fills sample copy). `--theme` is `white` or `mist`. `--out` is an `.mp4` or `.webm` file or a directory (default `.ds/videos`); `--format webm` also picks WebM. `--still <seconds>` writes one PNG frame instead. There is no other template, size, frame rate or duration.
+
+## Verify before finishing
+
+1. Run the consuming project's type checks, tests and production build.
+2. Run `{{cli}} check --json`. Exit 0 means no token violations; exit 1 means unresolved violations or a command error. Read the JSON result, fix the findings and rerun. A token check does not test accessibility or behavior.
+3. Test every interaction with mouse and keyboard. Submit invalid and valid forms, choose options, open and close overlays, and test loading/error paths. Check desktop and phone widths, focus visibility, overflow and reduced-motion behavior.
+4. Compare screenshots against the relevant library previews and reference. `{{cli}} review http://localhost:3000 --any` can capture and review a running page. It requires playwright-core and Chromium. Automated scoring uses an available supported reviewer; if none is available, read the saved screenshots and report a manual review. Never claim an independent score that was not produced.
+5. Report what changed, which checks passed, and any remaining limitations. If conversion left follow-up tasks, complete or report them explicitly.
+
+## Instructions and hooks
+
+`init` and conversion install AGENTS.md and a local `.ds/agent-guide.md`, plus supported agent instruction files and hook configuration. Agents that do not load those files automatically should read them explicitly. Hooks support Claude Code, Codex and Cursor when enabled by that tool; other agents run the CLI checks directly. Codex hook activation may require the user's `/hooks` trust step. No hook integration is required to use the components correctly.
+
+Read-only commands: `guide`, `manifest`, `describe`, `brand`, `principles`, `component list`, `component inspect`, `component emit`, `list`, `show`, `look`, `tokens`, `check` without `--fix`, `image templates`, `video templates`, `design show|history|check|templates`, the `--list` of `deck`, `merch` and `illustrate`, `figma pull` and `figma check`.
+Commands that write files: `init`, `add`, `apply`, the legacy bare conversion command, `check --fix`, `image` (image files), `design new|revise|edit|undo|redo|variants|sizes|compare|render` (the design file and its pictures), `video` (mp4, webm or png files), `deck`, `merch`, `illustrate` and `figma tokens|push` (files under `--out`), and review/snapshot state updates. Use `--dry-run` with `init`, `add` or conversion to inspect planned writes. JSON goes to stdout and progress goes to stderr. Unknown names and installation failures return a nonzero exit code. The error JSON is `{ "ok": false, "error": "..." }`.
+
+## Project configuration and agent handoff
+
+Start with `{{cli}} manifest --json`, then `info --json`, `search <term> --json` and `view <names...> --json`. These commands are read-only. `show` and `inspect` remain aliases of `view`. `component inspect` is the prop and state view.
+
+`add` respects components.json, inherited TypeScript or JavaScript aliases, the target stylesheet and the package manager. It emits JSX/JS when `tsx` is false, installs the theme and agent guidance, and preserves differing local files. Use `add <names...> --diff` to review changes before `--overwrite`. Use `--cwd <app>` from a repository root. For shared workspace packages, use the upstream installer described below.
+
+`create --template vite --name <directory>` scaffolds a new app and installs brand components. `init` configures an existing app; `init button card` also adds components. `apply --dry-run --json` previews a requested conversion of existing styles. Do not run conversion to discover or install the library.
+
+Portable skills are installed in `.agents/skills/{{bin}}/SKILL.md` and `.claude/skills/{{bin}}/SKILL.md`; the full guide is `.ds/agent-guide.md`. Read `add --view` or the installed source for imports resolved to this project's paths. The installed brand utility is separate from the application's existing `lib/utils` exports.
+
+The standard shadcn registry is configured under `@{{bin}}` in components.json. For workspace routing, install with `{{cli}} shadcn add @{{bin}}/theme @{{bin}}/button`. Include the theme explicitly with upstream shadcn so existing font and color aliases are updated. Native `add` applies it automatically.
+
+Advanced operations use pinned shadcn 4.22.1: `shadcn <args...>`, `mcp`, `registry`, `preset`, `migrate`, `eject`, and `build`. These need network access on first use and preserve upstream output formats. Native brand commands accept `--json`. Preset/base changes are upstream operations that may change the brand; use them only when requested. MCP configuration alone does not prove the agent host has loaded its server.
+
+The explicit `apply` command scopes color conversion to recognized components and preserves unrelated artwork and shared palette data. The legacy bare-command conversion remains for compatibility; use `apply` for new restyling tasks.
